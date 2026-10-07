@@ -1,0 +1,2806 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>옷, 총기 통합 편집기</title>
+<link rel="icon" href="icon.png" type="image/png">
+<link rel="apple-touch-icon" href="icon.png">
+
+<style>
+*{
+ box-sizing:border-box;
+ margin:0;
+ padding:0;
+ -webkit-tap-highlight-color:transparent;
+ touch-action:manipulation;
+ user-select:none;
+ -webkit-user-select:none;
+}
+body{
+ margin:0;
+ background:#08090d;
+ font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;
+ color:#f5f7fb;
+ min-height:100vh;
+ overscroll-behavior-y:none;
+}
+#auth-screen{
+ position:fixed;
+ inset:0;
+ background:rgba(8,9,13,.95);
+ backdrop-filter:blur(5px);
+ z-index:999999;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ padding:20px;
+}
+.auth-box{
+ width:100%;
+ max-width:380px;
+ background:#11131a;
+ border:1px solid #272b36;
+ border-radius:22px;
+ padding:32px 22px;
+ box-shadow:0 20px 50px rgba(0,0,0,.5);
+ text-align:center;
+}
+.auth-box h2{font-size:22px;margin-bottom:10px;font-weight:800}
+.auth-box p{color:#8d93a1;font-size:13px;margin-bottom:24px;line-height:1.5}
+.auth-input{
+ width:100%;
+ height:52px;
+ background:#1c2029;
+ border:1px solid #303541;
+ border-radius:14px;
+ color:#fff;
+ font-size:16px;
+ text-align:center;
+ margin-bottom:12px;
+ outline:none;
+ user-select:text;
+ -webkit-user-select:text;
+}
+.auth-input:focus{
+ border-color:#6c63ff;
+ box-shadow:0 0 10px rgba(108,99,255,.2);
+}
+.auth-btn{
+ width:100%;
+ height:52px;
+ background:#6c63ff;
+ color:#fff;
+ border:none;
+ border-radius:14px;
+ font-size:16px;
+ font-weight:800;
+ cursor:pointer;
+}
+.spinner{
+ width:40px;
+ height:40px;
+ border:4px solid #1c2029;
+ border-top:4px solid #6c63ff;
+ border-radius:50%;
+ animation:spin 1s linear infinite;
+ margin:0 auto 20px;
+}
+@keyframes spin{
+ 0%{transform:rotate(0)}
+ 100%{transform:rotate(360deg)}
+}
+#admin-dashboard{
+ display:none;
+ position:fixed;
+ inset:0;
+ background:#08090d;
+ z-index:9999999;
+ padding:20px;
+ overflow-y:auto;
+}
+.admin-header{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ max-width:600px;
+ margin:0 auto 20px;
+ border-bottom:1px solid #272b36;
+ padding-bottom:15px;
+}
+.admin-header h2{font-size:24px}
+.admin-close-btn{
+ background:#272b36;
+ color:#fff;
+ border:none;
+ padding:10px 16px;
+ border-radius:12px;
+ font-weight:800;
+}
+.admin-list-wrap{max-width:600px;margin:auto}
+.admin-section-title{
+ font-size:16px;
+ font-weight:800;
+ color:#8d93a1;
+ margin:20px 0 10px;
+}
+.admin-card{
+ background:#11131a;
+ border:1px solid #272b36;
+ padding:18px;
+ border-radius:16px;
+ margin-bottom:12px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+}
+.admin-card-info{text-align:left}
+.admin-card-name{
+ font-size:18px;
+ font-weight:800;
+ margin-bottom:5px;
+}
+.admin-card-status{font-size:12px;font-weight:700}
+.status-pending{color:#ffb86c}
+.status-approved{color:#4ade9b}
+.admin-card-actions{
+ display:flex;
+ gap:6px;
+ flex-wrap:wrap;
+ justify-content:flex-end;
+ max-width:200px;
+}
+.admin-btn{
+ padding:8px 12px;
+ border-radius:8px;
+ border:none;
+ font-weight:800;
+ font-size:12px;
+ color:#fff;
+}
+.btn-approve{background:#4ade9b;color:#000}
+.btn-revoke{background:#ffa502;color:#000}
+.btn-delete{background:#ff4757}
+.log-card{
+ background:#11131a;
+ border:1px solid #272b36;
+ padding:14px;
+ border-radius:12px;
+ margin-bottom:8px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ font-size:13px;
+}
+#admin-pw-modal{
+ display:none;
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.8);
+ z-index:99999999;
+ align-items:center;
+ justify-content:center;
+ padding:20px;
+}
+.global-tabs{
+ display:flex;
+ gap:10px;
+ padding:15px;
+ background:#11131a;
+ border-bottom:1px solid #272b36;
+ position:sticky;
+ top:0;
+ z-index:99999;
+}
+.global-tabs button{
+ flex:1;
+ padding:14px;
+ background:#1c2029;
+ color:#aeb5c3;
+ border:1px solid #303541;
+ border-radius:12px;
+ font-weight:800;
+ font-size:15px;
+}
+.global-tabs button.active{
+ background:#6c63ff;
+ color:#fff;
+ border-color:#8a70ff;
+ box-shadow:0 5px 15px rgba(108,99,255,.3);
+}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+.app{
+ width:min(100%,920px);
+ margin:auto;
+ padding:18px 14px 70px;
+}
+.header{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ padding:8px 2px 20px;
+}
+.logo-area{display:flex;align-items:center;gap:12px}
+.logo{
+ width:46px;
+ height:46px;
+ border-radius:15px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ background:linear-gradient(145deg,#5c96ff,#315fd5);
+ font-size:23px;
+}
+.title-wrap h1{font-size:22px;letter-spacing:-.7px}
+.title-wrap p{
+ margin-top:4px;
+ color:#8d93a1;
+ font-size:12px;
+}
+.upload{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:15px;
+ padding:18px;
+ border:1px solid #303746;
+ border-radius:22px;
+ background:linear-gradient(145deg,rgba(28,34,48,.96),rgba(15,18,25,.96));
+ cursor:pointer;
+}
+.upload-left{display:flex;align-items:center;gap:13px}
+.upload-icon{
+ width:44px;
+ height:44px;
+ border-radius:14px;
+ background:#202b42;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-size:20px;
+}
+.upload-text strong{display:block;font-size:16px}
+.upload-text span{
+ display:block;
+ color:#8d93a1;
+ font-size:12px;
+ margin-top:4px;
+}
+input[type=file]{display:none}
+.photo-panel{
+ margin-top:14px;
+ padding:15px;
+ border:1px solid #272b36;
+ border-radius:20px;
+ background:rgba(17,19,26,.88);
+}
+.panel-head{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ margin-bottom:12px;
+ font-size:14px;
+}
+.photo-list{
+ display:flex;
+ gap:8px;
+ overflow-x:auto;
+ scrollbar-width:none;
+}
+.photo-list::-webkit-scrollbar{display:none}
+.photo-button{
+ flex:0 0 auto;
+ min-width:82px;
+ height:42px;
+ padding:0 14px;
+ border-radius:12px;
+ border:1px solid #303542;
+ background:#151821;
+ color:#aeb5c3;
+ font-size:13px;
+ font-weight:700;
+}
+.photo-button.active{
+ background:#315fae;
+ color:#fff;
+ border-color:#5f98ff;
+}
+.status-row{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+ margin-top:12px;
+}
+.status{
+ padding:15px;
+ border-radius:17px;
+ background:#11131a;
+ border:1px solid #272b36;
+}
+.status-label{color:#747c8b;font-size:11px}
+.status-value{
+ margin-top:5px;
+ font-size:22px;
+ font-weight:800;
+}
+.status-value.blue{color:#6198ff}
+.action-row{
+ display:grid;
+ grid-template-columns:110px 1fr;
+ gap:10px;
+ margin-top:12px;
+}
+.action{
+ min-height:52px;
+ border:1px solid #2c313c;
+ border-radius:16px;
+ background:#171a22;
+ color:#e6e9ef;
+ font-size:14px;
+ font-weight:800;
+}
+.action.main{
+ border-color:#5b8ee7;
+ background:linear-gradient(135deg,#4d8dff,#356fd8);
+ color:white;
+}
+.results{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:11px;
+ margin-top:12px;
+}
+.card{
+ padding:8px;
+ border-radius:18px;
+ border:1px solid #292e39;
+ background:#11131a;
+}
+.card img{
+ display:block;
+ width:100%;
+ height:110px;
+ object-fit:contain;
+ border-radius:12px;
+ background:#08090d;
+}
+.card-info{
+ margin:8px 3px 0;
+ color:#747c8b;
+ font-size:10px;
+}
+.save{
+ width:100%;
+ margin-top:8px;
+ min-height:40px;
+ border:1px solid #315b9f;
+ border-radius:12px;
+ background:#16243b;
+ color:#7eafff;
+ font-size:12px;
+ font-weight:800;
+}
+.empty{
+ grid-column:1/-1;
+ min-height:130px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ flex-direction:column;
+ gap:7px;
+ border:1px dashed #292e38;
+ border-radius:18px;
+ color:#606876;
+ font-size:12px;
+ text-align:center;
+}
+.all-save{
+ width:100%;
+ min-height:54px;
+ border:1px solid #3c70c7;
+ border-radius:17px;
+ background:linear-gradient(135deg,#172a4b,#132038);
+ color:#82b3ff;
+ font-size:14px;
+ font-weight:850;
+ margin-top:12px;
+}
+.all-save:disabled{opacity:.35}
+#clothes-tab .viewer,#guns-tab .viewer{
+ position:relative;
+ width:100%;
+ min-height:300px;
+ padding:10px;
+ border:1px solid #282d38;
+ border-radius:22px;
+ background:linear-gradient(145deg,#0e1016,#090a0e);
+ overflow:hidden;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+}
+#clothes-tab .canvas-wrap,#guns-tab .canvas-wrap{
+ position:relative;
+ width:100%;
+ min-height:280px;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+}
+#clothes-tab #c_imageCanvas,#guns-tab #imageCanvas{
+ display:block;
+ max-width:100%;
+ max-height:65vh;
+ width:auto;
+ height:auto;
+ border-radius:13px;
+}
+#clothes-tab #c_selectionCanvas,#guns-tab #selectionCanvas{
+ position:absolute;
+ pointer-events:none;
+}
+#merge-tab .settings{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:8px;
+ margin-top:8px;
+ font-size:12px;
+}
+#merge-tab .setting{
+ padding:8px;
+ border:1px solid #282d37;
+ border-radius:10px;
+ background:#101319;
+}
+.setting-input{
+ width:45px;
+ height:28px;
+ background:#1c2029;
+ color:#fff;
+ border:1px solid #303541;
+ text-align:center;
+ border-radius:6px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="auth-screen">
+ <div class="auth-box" id="view-user-form">
+  <h2>🔒 접근 권한 필요</h2>
+  <p>사용하실 이름을 입력하고<br>관리자에게 승인을 요청해주세요.</p>
+  <input type="text" id="userNameInput" class="auth-input" placeholder="이름 또는 닉네임 입력">
+  <button class="auth-btn" onclick="window.requestAccess()">승인 요청하기</button>
+ </div>
+
+ <div class="auth-box" id="view-waiting" style="display:none">
+  <div class="spinner"></div>
+  <h2>⏳ 대기 중입니다</h2>
+  <p>관리자의 승인을 실시간으로 기다리고 있습니다.<br>승인되면 자동으로 앱이 시작됩니다.</p>
+ </div>
+</div>
+
+<div id="admin-dashboard">
+ <div class="admin-header">
+  <h2>🛠 관리자 대시보드</h2>
+  <button class="admin-close-btn" onclick="window.closeAdmin()">앱 열기 ✕</button>
+ </div>
+ <div class="admin-list-wrap">
+  <div class="admin-section-title">👥 사용자 승인 관리</div>
+  <div id="admin-user-list"></div>
+  <div class="admin-section-title" style="margin-top:30px">📊 최근 접속 로그</div>
+  <div id="admin-log-list"></div>
+ </div>
+</div>
+
+<div id="admin-pw-modal">
+ <div class="auth-box">
+  <h2>⚙ 관리자 확인</h2>
+  <p>비밀번호를 입력해주세요.</p>
+  <input type="password" id="customAdminPw" class="auth-input" placeholder="비밀번호 입력">
+  <button class="auth-btn" onclick="window.confirmAdminPw()">확인</button>
+  <button class="auth-btn" onclick="document.getElementById('admin-pw-modal').style.display='none'" style="margin-top:8px;background:#272b36">취소</button>
+ </div>
+</div>
+
+<script type="module">
+import {initializeApp}
+from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+
+import {
+ getFirestore,doc,setDoc,getDoc,onSnapshot,
+ collection,updateDoc,deleteDoc,addDoc,query,orderBy,limit
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyBBQRcC_essCma5tJEe7aplg2KnSfReXc",
+ authDomain:"item-cutter.firebaseapp.com",
+ projectId:"item-cutter",
+ storageBucket:"item-cutter.firebasestorage.app",
+ messagingSenderId:"574864062709",
+ appId:"1:574864062709:web:2a71e45af988ded86eedbc"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+const ADMIN_CODE="528510";
+
+let savedName=localStorage.getItem("itemCutterUserName");
+
+const authScreen=document.getElementById("auth-screen");
+const viewUserForm=document.getElementById("view-user-form");
+const viewWaiting=document.getElementById("view-waiting");
+
+if(savedName) checkUserAuth(savedName,false);
+
+window.openAdminPrompt=()=>{
+ document.getElementById("customAdminPw").value="";
+ document.getElementById("admin-pw-modal").style.display="flex";
+};
+
+window.confirmAdminPw=()=>{
+ const pw=document.getElementById("customAdminPw").value;
+ if(pw===ADMIN_CODE){
+  document.getElementById("admin-pw-modal").style.display="none";
+  document.getElementById("admin-dashboard").style.display="block";
+  loadAdminData();
+ }else alert("비밀번호가 틀렸습니다.");
+};
+
+let isAdminMode=false;
+
+async function checkUserAuth(name,isNewRequest){
+
+ const userRef=doc(db,"users",name);
+ const snap=await getDoc(userRef);
+
+ if(!snap.exists()){
+
+  if(isNewRequest){
+
+   await setDoc(userRef,{
+    name,
+    status:"pending",
+    createdAt:Date.now()
+   });
+
+   localStorage.setItem("itemCutterUserName",name);
+   viewUserForm.style.display="none";
+   viewWaiting.style.display="block";
+
+  }else{
+
+   localStorage.removeItem("itemCutterUserName");
+   authScreen.style.display="flex";
+   viewUserForm.style.display="block";
+   viewWaiting.style.display="none";
+
+  }
+
+ }else{
+
+  const data=snap.data();
+
+  localStorage.setItem("itemCutterUserName",name);
+
+  if(data.status==="approved"){
+
+   authScreen.style.display="none";
+
+   try{
+    await addDoc(collection(db,"logs"),{
+     name,
+     time:new Date().toLocaleString(),
+     timestamp:Date.now()
+    });
+   }catch(e){}
+
+   onSnapshot(userRef,s=>{
+    if(isAdminMode)return;
+
+    if(!s.exists()||s.data().status!=="approved"){
+     localStorage.removeItem("itemCutterUserName");
+     location.reload();
+    }
+   });
+
+  }else{
+
+   authScreen.style.display="flex";
+   viewUserForm.style.display="none";
+   viewWaiting.style.display="block";
+
+   onSnapshot(userRef,s=>{
+    if(s.exists()&&s.data().status==="approved")
+     location.reload();
+   });
+
+  }
+ }
+}
+
+window.requestAccess=async()=>{
+ const name=document.getElementById("userNameInput").value.trim();
+
+ if(!name){
+  alert("이름을 입력해주세요!");
+  return;
+ }
+
+ if(name===ADMIN_CODE){
+
+  const adminName="관리자(마스터)";
+
+  await setDoc(doc(db,"users",adminName),{
+   name:adminName,
+   status:"approved",
+   createdAt:Date.now()
+  });
+
+  localStorage.setItem("itemCutterUserName",adminName);
+  authScreen.style.display="none";
+  return;
+ }
+
+ checkUserAuth(name,true);
+};
+
+function loadAdminData(){
+
+ onSnapshot(collection(db,"users"),snapshot=>{
+
+  const list=document.getElementById("admin-user-list");
+  list.innerHTML="";
+
+  snapshot.forEach(docSnap=>{
+
+   const data=docSnap.data();
+   const id=docSnap.id;
+
+   if(data.name==="최고 관리자")return;
+
+   const pending=data.status==="pending";
+
+   list.innerHTML+=`
+    <div class="admin-card">
+     <div class="admin-card-info">
+      <div class="admin-card-name">${data.name}</div>
+      <div class="admin-card-status ${pending?"status-pending":"status-approved"}">
+       ${pending?"⏳ 승인 대기 중":"✅ 이용 중 (승인됨)"}
+      </div>
+     </div>
+     <div class="admin-card-actions">
+      ${
+       pending
+       ?`<button class="admin-btn btn-approve" onclick="window.approveUser('${id}')">승인</button>`
+       :`<button class="admin-btn btn-revoke" onclick="window.revokeUser('${id}')">차단</button>`
+      }
+      <button class="admin-btn btn-delete" onclick="window.deleteUser('${id}')">삭제</button>
+     </div>
+    </div>
+   `;
+  });
+
+  if(!list.innerHTML)
+   list.innerHTML="<div style='color:#8d93a1;text-align:center;margin-top:20px'>현재 등록된 사용자가 없습니다.</div>";
+ });
+
+ const q=query(
+  collection(db,"logs"),
+  orderBy("timestamp","desc"),
+  limit(20)
+ );
+
+ onSnapshot(q,snapshot=>{
+
+  const list=document.getElementById("admin-log-list");
+  list.innerHTML="";
+
+  snapshot.forEach(docSnap=>{
+
+   const log=docSnap.data();
+
+   list.innerHTML+=`
+    <div class="log-card">
+     <div>👤 <b>${log.name}</b> 님이 접속함</div>
+     <div style="color:#8d93a1;font-size:11px">${log.time}</div>
+    </div>
+   `;
+  });
+
+  if(!list.innerHTML)
+   list.innerHTML="<div style='color:#8d93a1;text-align:center;margin-top:20px'>기록된 접속 로그가 없습니다.</div>";
+ });
+}
+
+window.approveUser=async id=>{
+ await updateDoc(doc(db,"users",id),{status:"approved"});
+};
+
+window.revokeUser=async id=>{
+ await updateDoc(doc(db,"users",id),{status:"pending"});
+};
+
+window.deleteUser=async id=>{
+ await deleteDoc(doc(db,"users",id));
+};
+
+window.closeAdmin=()=>{
+ document.getElementById("admin-dashboard").style.display="none";
+};
+</script>
+
+<div class="global-tabs">
+
+ <button id="btn-clothes" class="active" onclick="switchTab('clothes')">
+  👕 옷 추출
+ </button>
+
+ <button id="btn-guns" onclick="switchTab('guns')">
+  ✂ 총 자르기
+ </button>
+
+ <button id="btn-merge" onclick="switchTab('merge')">
+  🖼️ 합치기
+ </button>
+
+ <button onclick="window.openAdminPrompt()" style="flex:0 0 48px;font-size:20px;padding:0">
+  ⚙️
+ </button>
+
+</div>
+
+<!-- =====================================================
+     옷
+===================================================== -->
+
+<div id="clothes-tab" class="tab-pane active">
+<div class="app">
+
+<header class="header">
+ <div class="logo-area">
+  <div class="logo">✦</div>
+  <div class="title-wrap">
+   <h1>옷장 자동 추출</h1>
+   <p>사진 위치가 달라도 옷을 자동으로 인식합니다</p>
+  </div>
+ </div>
+</header>
+
+<label class="upload" id="c_uploadLabel">
+ <div class="upload-left">
+  <div class="upload-icon">＋</div>
+  <div class="upload-text">
+   <strong>사진 추가하기</strong>
+   <span>PNG · JPG · WEBP / 여러 장 선택 가능</span>
+  </div>
+ </div>
+ <div style="color:#778399;font-size:22px">›</div>
+</label>
+
+<input id="c_fileInput" type="file" accept="image/png,image/jpeg,image/webp" multiple>
+
+<section class="photo-panel">
+ <div class="panel-head">
+  <strong>사진 목록</strong>
+  <span id="c_photoCountLabel">0장</span>
+ </div>
+ <div id="c_photoList" class="photo-list"></div>
+</section>
+
+<div style="display:flex;justify-content:space-between;margin:16px 2px 9px;font-size:13px">
+ <div>
+  <span style="width:7px;height:7px;display:inline-block;border-radius:50%;background:#4ade9b"></span>
+  <span id="c_currentPhoto">사진을 선택해주세요</span>
+ </div>
+ <span style="color:#646c7b;font-size:11px">옷 상자를 눌러 선택</span>
+</div>
+
+<section class="viewer">
+ <div class="canvas-wrap">
+  <canvas id="c_imageCanvas"></canvas>
+  <canvas id="c_selectionCanvas"></canvas>
+ </div>
+</section>
+
+<div style="margin-top:10px;padding:12px 14px;border-radius:14px;background:#10131a;border:1px solid #202530;color:#858d9c;font-size:12px;line-height:1.55;text-align:center">
+ 인식된 옷을 <b style="color:#dbe5ff">한 번 누르면 선택</b> / 다시 누르면 해제됩니다.<br>
+ 모든 인식 박스가 <b style="color:#629aff">동일한 크기</b>로 맞춰집니다.
+</div>
+
+<div class="status-row">
+
+ <div class="status">
+  <div class="status-label">현재 사진 선택</div>
+  <div class="status-value blue"><span id="c_count">0</span><small>개</small></div>
+ </div>
+
+ <div class="status">
+  <div class="status-label">추출 완료</div>
+  <div class="status-value"><span id="c_resultCount">0</span><small>개</small></div>
+ </div>
+
+</div>
+
+<div class="action-row">
+ <button class="action" onclick="window.c_clearCurrentSelection()">선택 해제</button>
+ <button class="action main" onclick="window.c_extractSelected()">✂ 선택한 옷 자르기</button>
+</div>
+
+<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:34px;margin-bottom:12px">
+ <div style="font-size:20px;font-weight:850">
+  추출 결과 <span id="c_resultCountTitle" style="color:#629aff">0</span>
+ </div>
+ <div style="color:#666e7c;font-size:11px">JPG 이미지</div>
+</div>
+
+<div id="c_results" class="results">
+ <div class="empty">
+  <div>◇</div>
+  옷을 선택한 뒤<br>자르기를 눌러주세요.
+ </div>
+</div>
+
+<button id="c_saveAllButton" class="all-save" onclick="window.c_saveAllCards()" disabled>
+ 📥 선택한 옷 모두 저장
+</button>
+
+</div>
+</div>
+
+<!-- =====================================================
+     총기
+===================================================== -->
+
+<div id="guns-tab" class="tab-pane">
+<div class="app">
+
+<header class="header">
+ <div class="logo-area">
+  <div class="logo">✂</div>
+  <div class="title-wrap">
+   <h1>Card Cutter</h1>
+   <p>총기를 자동으로 인식하고 같은 크기로 자릅니다</p>
+  </div>
+ </div>
+</header>
+
+<label class="upload" id="g_uploadLabel">
+ <div class="upload-left">
+  <div class="upload-icon">＋</div>
+  <div class="upload-text">
+   <strong>사진 추가하기</strong>
+   <span>PNG · JPG · WEBP / 여러 장 선택 가능</span>
+  </div>
+ </div>
+ <div style="color:#778399;font-size:22px">›</div>
+</label>
+
+<input id="g_fileInput" type="file" accept="image/png,image/jpeg,image/webp" multiple>
+
+<section class="photo-panel">
+ <div class="panel-head">
+  <strong>사진 목록</strong>
+  <span id="g_photoCountLabel">0장</span>
+ </div>
+ <div id="g_photoList" class="photo-list"></div>
+</section>
+
+<div style="display:flex;justify-content:space-between;margin:16px 2px 9px;font-size:13px">
+ <div>
+  <span style="width:7px;height:7px;display:inline-block;border-radius:50%;background:#4ade9b"></span>
+  <span id="g_currentPhoto">사진을 선택해주세요</span>
+ </div>
+ <span style="color:#646c7b;font-size:11px">총기 상자를 눌러 선택</span>
+</div>
+
+<section class="viewer">
+ <div class="canvas-wrap">
+  <canvas id="imageCanvas"></canvas>
+  <canvas id="selectionCanvas"></canvas>
+ </div>
+</section>
+
+<div style="margin-top:10px;padding:12px 14px;border-radius:14px;background:#10131a;border:1px solid #202530;color:#858d9c;font-size:12px;line-height:1.55;text-align:center">
+ 인식된 총기를 <b style="color:#dbe5ff">한 번 누르면 선택</b> / 다시 누르면 해제됩니다.<br>
+ 모든 인식 박스가 <b style="color:#629aff">동일한 크기</b>로 맞춰집니다.
+</div>
+
+<div class="status-row">
+
+ <div class="status">
+  <div class="status-label">현재 사진 선택</div>
+  <div class="status-value blue"><span id="g_count">0</span><small>개</small></div>
+ </div>
+
+ <div class="status">
+  <div class="status-label">추출 완료</div>
+  <div class="status-value"><span id="g_resultCount">0</span><small>개</small></div>
+ </div>
+
+</div>
+
+<div class="action-row">
+ <button class="action" onclick="window.g_clearCurrentSelection()">선택 해제</button>
+ <button class="action main" onclick="window.g_extractSelected()">✂ 선택한 카드 자르기</button>
+</div>
+
+<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:34px;margin-bottom:12px">
+ <div style="font-size:20px;font-weight:850">
+  추출 결과 <span id="g_resultCountTitle" style="color:#629aff">0</span>
+ </div>
+ <div style="color:#666e7c;font-size:11px">JPG 이미지</div>
+</div>
+
+<div id="g_results" class="results">
+ <div class="empty">
+  <div>◇</div>
+  카드를 선택한 뒤<br>자르기를 눌러주세요.
+ </div>
+</div>
+
+<button id="g_saveAllButton" class="all-save" onclick="window.g_saveAllCards()" disabled>
+ 📥 선택한 카드 모두 저장
+</button>
+
+</div>
+</div>
+
+<!-- =====================================================
+     합치기
+===================================================== -->
+
+<div id="merge-tab" class="tab-pane">
+<div class="app">
+
+<header class="header">
+ <div class="logo-area">
+  <div class="logo">🖼</div>
+  <div class="title-wrap">
+   <h1>이미지 합치기</h1>
+   <p>추출된 아이템들을 하나의 이미지로 병합</p>
+  </div>
+ </div>
+</header>
+
+<label class="upload" id="m_uploadLabel">
+ <div class="upload-left">
+  <div class="upload-icon">＋</div>
+  <div class="upload-text">
+   <strong>이미지 추가하기</strong>
+   <span id="m_fileName">PNG · JPG / 여러 장 선택 가능</span>
+  </div>
+ </div>
+ <div style="color:#778399;font-size:22px">›</div>
+</label>
+
+<input id="m_imageInput" type="file" accept="image/*" multiple>
+
+<div class="photo-panel">
+
+ <div class="panel-head">
+  <strong>작업 설정</strong>
+  <span id="m_photoCount">0장</span>
+ </div>
+
+ <button id="m_positionBtn" class="action" style="width:100%;min-height:44px;background:#242832">
+  📍 위치 변경 모드 켜기
+ </button>
+
+ <div class="settings">
+
+  <div class="setting">
+   <div style="color:#7f8694;font-size:11px;margin-bottom:4px">가로 배치 (열)</div>
+   <input id="m_cols" type="number" min="1" max="20" value="6" class="setting-input" style="width:100%;height:32px;font-weight:bold">
+  </div>
+
+  <div class="setting">
+   <div style="color:#7f8694;font-size:11px;margin-bottom:4px">세로 배치 (행)</div>
+   <input id="m_rows" type="number" min="1" max="20" value="7" class="setting-input" style="width:100%;height:32px;font-weight:bold">
+  </div>
+
+ </div>
+</div>
+
+<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:34px;margin-bottom:12px">
+ <div style="font-size:20px;font-weight:850">미리보기</div>
+ <div id="m_resultCount" style="color:#666e7c;font-size:11px">준비 중</div>
+</div>
+
+<div id="m_empty" class="empty" style="min-height:220px">
+ <div>🖼️</div>
+ 이미지를 추가해주세요<br>
+ 위의 「이미지 추가하기」 버튼을 눌러 시작하세요.
+</div>
+
+<div id="m_mergeWrap" style="display:none;position:relative;width:100%;border-radius:14px;background:#fff;overflow:hidden;margin-top:10px">
+ <canvas id="m_resultCanvas" style="display:block;width:100%;height:auto"></canvas>
+</div>
+
+<div class="action-row" style="grid-template-columns:1fr 60px">
+ <button id="m_saveBtn" class="action main" style="min-height:48px">💾 JPG 이미지 저장</button>
+ <button id="m_clearBtn" class="action" style="min-height:48px;background:#242832">🗑️</button>
+</div>
+
+</div>
+</div>
+
+<script>
+
+/* =====================================================
+   공통
+===================================================== */
+
+function switchTab(tabId){
+
+ ["clothes","guns","merge"].forEach(id=>{
+  document.getElementById("btn-"+id).classList.remove("active");
+  document.getElementById(id+"-tab").classList.remove("active");
+ });
+
+ document.getElementById("btn-"+tabId).classList.add("active");
+ document.getElementById(tabId+"-tab").classList.add("active");
+}
+
+
+/* =====================================================
+   ★ 공유창(Share API) 기반 다운로드 방식
+   (아이폰, 갤럭시 등 모바일에서 네이티브 공유창/저장창 띄우기)
+===================================================== */
+
+async function downloadFile(dataURL, filename) {
+  const arr = dataURL.split(',');
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while(n--){
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  
+  const blob = new Blob([u8arr], {type: 'image/jpeg'});
+  const finalFilename = filename.endsWith('.jpg') ? filename : filename + '.jpg';
+  const file = new File([blob], finalFilename, { type: 'image/jpeg' });
+
+  // 모바일 네이티브 공유창(Web Share API) 지원 여부 확인
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({
+        files: [file]
+      });
+    } catch (err) {
+      console.log("공유 창 닫힘 또는 에러:", err);
+    }
+  } else {
+    // API를 지원하지 않는 PC나 특정 브라우저용 일반 다운로드
+    const blobUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = finalFilename;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => {
+      link.remove();
+      URL.revokeObjectURL(blobUrl);
+    }, 150);
+  }
+}
+
+async function downloadMultipleFiles(dataURLs, prefix) {
+  const files = [];
+  for(let i=0; i<dataURLs.length; i++) {
+    const arr = dataURLs[i].split(',');
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while(n--){
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    const blob = new Blob([u8arr], {type: 'image/jpeg'});
+    files.push(new File([blob], `${prefix}_${i+1}.jpg`, { type: 'image/jpeg' }));
+  }
+
+  // 여러 파일을 한 번에 공유창으로 넘기기
+  if (navigator.canShare && navigator.canShare({ files: files })) {
+    try {
+      await navigator.share({ files: files });
+    } catch (err) {
+      console.log("공유 창 닫힘 또는 에러:", err);
+    }
+  } else {
+    // 지원하지 않는 경우 반복문으로 다운로드 강제 실행
+    for (const file of files) {
+      const blobUrl = URL.createObjectURL(file);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = file.name;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        link.remove();
+        URL.revokeObjectURL(blobUrl);
+      }, 150);
+      await new Promise(r => setTimeout(r, 200));
+    }
+  }
+}
+
+
+async function shareFile(dataURL, filename) {
+  await downloadFile(dataURL, filename);
+}
+
+
+async function shareMultipleFiles(dataURLs, prefix) {
+  await downloadMultipleFiles(dataURLs, prefix);
+}
+
+
+/* =====================================================
+   👕 옷 추출
+===================================================== */
+
+(function(){
+
+const fileInput=document.getElementById("c_fileInput");
+const imageCanvas=document.getElementById("c_imageCanvas");
+const selectionCanvas=document.getElementById("c_selectionCanvas");
+
+const imageCtx=imageCanvas.getContext("2d",{willReadFrequently:true});
+const selectionCtx=selectionCanvas.getContext("2d");
+
+const countText=document.getElementById("c_count");
+const resultCountText=document.getElementById("c_resultCount");
+const resultCountTitle=document.getElementById("c_resultCountTitle");
+const results=document.getElementById("c_results");
+const saveAllButton=document.getElementById("c_saveAllButton");
+const photoList=document.getElementById("c_photoList");
+const currentPhoto=document.getElementById("c_currentPhoto");
+const photoCountLabel=document.getElementById("c_photoCountLabel");
+
+let photos=[];
+let currentIndex=0;
+let image=new Image();
+let originalImageData=null;
+let cards=[];
+let selectedCards=[];
+let croppedCards=[];
+
+document.getElementById("c_uploadLabel")
+.addEventListener("click",()=>fileInput.click());
+
+fileInput.addEventListener("change",event=>{
+
+ const files=[...event.target.files];
+
+ if(!files.length)return;
+
+ photos=[];
+ currentIndex=0;
+ selectedCards=[];
+ croppedCards=[];
+
+ results.innerHTML=
+ `<div class="empty"><div>◇</div>옷을 선택한 뒤<br>자르기를 눌러주세요.</div>`;
+
+ resultCountText.textContent="0";
+ resultCountTitle.textContent="0";
+ saveAllButton.disabled=true;
+
+ let loaded=0;
+
+ files.forEach((file,index)=>{
+
+  const url=URL.createObjectURL(file);
+  const img=new Image();
+
+  img.onload=()=>{
+
+   photos[index]={
+    image:img,
+    url,
+    name:file.name,
+    selected:[]
+   };
+
+   loaded++;
+
+   if(loaded===files.length){
+    makePhotoButtons();
+    showPhoto(0);
+   }
+  };
+
+  img.src=url;
+ });
+
+ fileInput.value="";
+});
+
+function makePhotoButtons(){
+
+ photoList.innerHTML="";
+
+ photos.forEach((photo,index)=>{
+
+  if(!photo)return;
+
+  const button=document.createElement("button");
+
+  button.type="button";
+  button.className="photo-button";
+  button.onclick=()=>showPhoto(index);
+
+  photo.button=button;
+  photoList.appendChild(button);
+ });
+
+ updatePhotoButtons();
+
+ photoCountLabel.textContent=
+  `${photos.filter(Boolean).length}장`;
+}
+
+function updatePhotoButtons(){
+
+ photos.forEach((photo,index)=>{
+
+  if(!photo||!photo.button)return;
+
+  photo.button.textContent=
+   `사진 ${index+1} · ${(photo.selected||[]).length}`;
+
+  photo.button.classList.toggle(
+   "active",
+   index===currentIndex
+  );
+ });
+}
+
+function showPhoto(index){
+
+ if(!photos[index])return;
+
+ currentIndex=index;
+
+ const photo=photos[index];
+
+ image=photo.image;
+ selectedCards=photo.selected||[];
+
+ imageCanvas.width=image.naturalWidth;
+ imageCanvas.height=image.naturalHeight;
+
+ selectionCanvas.width=image.naturalWidth;
+ selectionCanvas.height=image.naturalHeight;
+
+ imageCtx.clearRect(
+  0,0,imageCanvas.width,imageCanvas.height
+ );
+
+ imageCtx.drawImage(image,0,0);
+
+ originalImageData=imageCtx.getImageData(
+  0,0,imageCanvas.width,imageCanvas.height
+ );
+
+ detectCards();
+
+ resizeSelectionCanvas();
+ updateCount();
+ drawSelections();
+ updatePhotoButtons();
+
+ currentPhoto.textContent=
+  `사진 ${index+1} · ${photo.name}`;
+}
+
+function isTierPixel(r,g,b){
+
+ const max=Math.max(r,g,b);
+ const min=Math.min(r,g,b);
+ const sat=max-min;
+
+ if(max<55||sat<35)return false;
+
+ if(
+  r>110 &&
+  g>85 &&
+  b<110 &&
+  r>g*.95
+ )return true;
+
+ if(
+  r>105 &&
+  r>g*1.35 &&
+  r>b*1.15
+ )return true;
+
+ if(
+  r>75 &&
+  b>85 &&
+  r>g*1.15 &&
+  b>g*1.15
+ )return true;
+
+ return false;
+}
+
+function detectCards(){
+
+ cards=[];
+
+ const width=imageCanvas.width;
+ const height=imageCanvas.height;
+ const data=originalImageData.data;
+ const total=width*height;
+
+ const visited=new Uint8Array(total);
+
+ const queueX=new Int32Array(total);
+ const queueY=new Int32Array(total);
+
+ const rawRects=[];
+
+ for(let y=0;y<height;y+=3){
+
+  for(let x=0;x<width;x+=3){
+
+   const index=y*width+x;
+
+   if(visited[index])continue;
+
+   visited[index]=1;
+
+   const p=index*4;
+
+   if(!isTierPixel(
+    data[p],
+    data[p+1],
+    data[p+2]
+   ))continue;
+
+   let head=0;
+   let tail=0;
+
+   queueX[tail]=x;
+   queueY[tail]=y;
+   tail++;
+
+   let minX=x;
+   let maxX=x;
+   let minY=y;
+   let maxY=y;
+
+   let area=0;
+
+   while(head<tail){
+
+    const cx=queueX[head];
+    const cy=queueY[head];
+
+    head++;
+    area++;
+
+    if(cx<minX)minX=cx;
+    if(cx>maxX)maxX=cx;
+    if(cy<minY)minY=cy;
+    if(cy>maxY)maxY=cy;
+
+    const neighbors=[
+     [cx-3,cy],
+     [cx+3,cy],
+     [cx,cy-3],
+     [cx,cy+3]
+    ];
+
+    for(const [px,py] of neighbors){
+
+     if(
+      px<0||
+      px>=width||
+      py<0||
+      py>=height
+     )continue;
+
+     const ni=py*width+px;
+
+     if(visited[ni])continue;
+
+     visited[ni]=1;
+
+     const np=ni*4;
+
+     if(isTierPixel(
+      data[np],
+      data[np+1],
+      data[np+2]
+     )){
+
+      queueX[tail]=px;
+      queueY[tail]=py;
+      tail++;
+
+     }
+    }
+   }
+
+   const w=maxX-minX+1;
+   const h=maxY-minY+1;
+
+   const ratio=w/h;
+
+   if(
+    area>=150 &&
+    w>=30 &&
+    h>=30 &&
+    ratio>.6 &&
+    ratio<1.5
+   ){
+
+    rawRects.push({
+     x:minX,
+     y:minY,
+     width:w,
+     height:h,
+     centerX:minX+w/2,
+     centerY:minY+h/2
+    });
+   }
+  }
+ }
+
+ if(!rawRects.length)return;
+
+ const widths=rawRects
+  .map(r=>r.width)
+  .sort((a,b)=>a-b);
+
+ const heights=rawRects
+  .map(r=>r.height)
+  .sort((a,b)=>a-b);
+
+ const standardWidth=
+  widths[Math.floor(widths.length/2)];
+
+ const standardHeight=
+  heights[Math.floor(heights.length/2)];
+
+ const validRects=rawRects.filter(r=>{
+
+  const wr=r.width/standardWidth;
+  const hr=r.height/standardHeight;
+
+  return(
+   wr>=.60 &&
+   wr<=1.40 &&
+   hr>=.60 &&
+   hr<=1.40
+  );
+ });
+
+ if(!validRects.length)return;
+
+ const TRIM_TOP=.02;
+ const TRIM_BOTTOM=.03;
+ const TRIM_LEFT=.03;
+ const TRIM_RIGHT=.03;
+
+ const boxWidth=Math.round(standardWidth);
+ const boxHeight=Math.round(standardHeight);
+
+ const trimLeft=Math.round(boxWidth*TRIM_LEFT);
+ const trimRight=Math.round(boxWidth*TRIM_RIGHT);
+ const trimTop=Math.round(boxHeight*TRIM_TOP);
+ const trimBottom=Math.round(boxHeight*TRIM_BOTTOM);
+
+ const finalWidth=Math.max(
+  10,
+  boxWidth-trimLeft-trimRight
+ );
+
+ const finalHeight=Math.max(
+  10,
+  boxHeight-trimTop-trimBottom
+ );
+
+ validRects.sort((a,b)=>{
+
+  if(
+   Math.abs(a.centerY-b.centerY)<
+   standardHeight*.45
+  ){
+
+   return a.centerX-b.centerX;
+
+  }
+
+  return a.centerY-b.centerY;
+ });
+
+ validRects.forEach(r=>{
+
+  let x=Math.round(
+   r.centerX-boxWidth/2
+  );
+
+  let y=Math.round(
+   r.centerY-boxHeight/2
+  );
+
+  x=Math.max(
+   0,
+   Math.min(
+    x,
+    width-boxWidth
+   )
+  );
+
+  y=Math.max(
+   0,
+   Math.min(
+    y,
+    height-boxHeight
+   )
+  );
+
+  cards.push({
+
+   x:x+trimLeft,
+
+   y:y+trimTop,
+
+   width:finalWidth,
+
+   height:finalHeight
+
+  });
+ });
+}
+
+imageCanvas.addEventListener("click",event=>{
+
+ if(!originalImageData)return;
+
+ const rect=imageCanvas.getBoundingClientRect();
+
+ const pt={
+
+  x:
+   (event.clientX-rect.left)*
+   imageCanvas.width/
+   rect.width,
+
+  y:
+   (event.clientY-rect.top)*
+   imageCanvas.height/
+   rect.height
+
+ };
+
+ const found=cards.find(c=>
+  pt.x>=c.x&&
+  pt.x<=c.x+c.width&&
+  pt.y>=c.y&&
+  pt.y<=c.y+c.height
+ );
+
+ if(!found)return;
+
+ const existing=selectedCards.findIndex(card=>
+  Math.abs(card.x-found.x)<=3&&
+  Math.abs(card.y-found.y)<=3
+ );
+
+ if(existing>=0)
+  selectedCards.splice(existing,1);
+ else
+  selectedCards.push(found);
+
+ photos[currentIndex].selected=selectedCards;
+
+ updateCount();
+ updatePhotoButtons();
+ drawSelections();
+
+});
+
+function drawSelections(){
+
+ selectionCtx.clearRect(
+  0,
+  0,
+  selectionCanvas.width,
+  selectionCanvas.height
+ );
+
+ selectedCards.forEach(card=>{
+
+  selectionCtx.fillStyle="rgba(77,141,255,.24)";
+
+  selectionCtx.fillRect(
+   card.x,
+   card.y,
+   card.width,
+   card.height
+  );
+
+  selectionCtx.strokeStyle="#5c98ff";
+
+  selectionCtx.lineWidth=Math.max(
+   4,
+   Math.round(
+    Math.min(card.width,card.height)*.015
+   )
+  );
+
+  selectionCtx.strokeRect(
+   card.x,
+   card.y,
+   card.width,
+   card.height
+  );
+ });
+}
+
+function updateCount(){
+ countText.textContent=selectedCards.length;
+}
+
+window.c_clearCurrentSelection=()=>{
+
+ if(!photos[currentIndex])return;
+
+ selectedCards=[];
+ photos[currentIndex].selected=[];
+
+ updateCount();
+ updatePhotoButtons();
+ drawSelections();
+};
+
+window.c_extractSelected=()=>{
+
+ const all=[];
+
+ photos.forEach((photo,photoIndex)=>{
+
+  if(!photo)return;
+
+  (photo.selected||[]).forEach(card=>{
+   all.push({
+    photo,
+    card,
+    photoIndex
+   });
+  });
+ });
+
+ if(!photos.length){
+  alert("먼저 사진을 넣어주세요.");
+  return;
+ }
+
+ if(!all.length){
+  alert("옷을 하나 이상 눌러주세요.");
+  return;
+ }
+
+ results.innerHTML="";
+ croppedCards=[];
+
+ all.forEach((item,index)=>{
+
+  const card=item.card;
+  const img=item.photo.image;
+
+  const cropCanvas=document.createElement("canvas");
+
+  const cropW=Math.round(card.width);
+  const cropH=Math.round(card.height);
+
+  cropCanvas.width=Math.max(1,cropW);
+  cropCanvas.height=Math.max(1,cropH);
+
+  cropCanvas.getContext("2d").drawImage(
+   img,
+   Math.round(card.x),
+   Math.round(card.y),
+   cropW,
+   cropH,
+   0,
+   0,
+   cropW,
+   cropH
+  );
+
+  const dataURL=cropCanvas.toDataURL(
+   "image/jpeg",
+   .95
+  );
+
+  croppedCards.push(dataURL);
+
+  const resultCard=document.createElement("div");
+
+  resultCard.className="card";
+
+  resultCard.innerHTML=`
+   <img src="${dataURL}">
+   <div class="card-info">
+    사진 ${item.photoIndex+1} · 옷 ${index+1}
+   </div>
+   <button class="save"
+    onclick="shareFile('${dataURL}','clothes_${index+1}.jpg')">
+    📥 JPG 저장
+   </button>
+  `;
+
+  results.appendChild(resultCard);
+
+ });
+
+ resultCountText.textContent=croppedCards.length;
+ resultCountTitle.textContent=croppedCards.length;
+ saveAllButton.disabled=false;
+};
+
+window.c_saveAllCards=async()=>{
+
+ if(croppedCards.length){
+
+  await shareMultipleFiles(
+   croppedCards,
+   "clothes_item"
+  );
+
+ }
+};
+
+function resizeSelectionCanvas(){
+
+ const rect=imageCanvas.getBoundingClientRect();
+
+ selectionCanvas.style.width=rect.width+"px";
+ selectionCanvas.style.height=rect.height+"px";
+
+ selectionCanvas.style.left=
+  imageCanvas.offsetLeft+"px";
+
+ selectionCanvas.style.top=
+  imageCanvas.offsetTop+"px";
+}
+
+window.addEventListener("resize",()=>{
+ resizeSelectionCanvas();
+ drawSelections();
+});
+
+})();
+
+
+/* =====================================================
+   🔫 총기 추출
+===================================================== */
+
+(function(){
+
+const fileInput=document.getElementById("g_fileInput");
+const imageCanvas=document.getElementById("imageCanvas");
+const selectionCanvas=document.getElementById("selectionCanvas");
+
+const imageCtx=imageCanvas.getContext("2d",{willReadFrequently:true});
+const selectionCtx=selectionCanvas.getContext("2d");
+
+const countText=document.getElementById("g_count");
+const resultCountText=document.getElementById("g_resultCount");
+const resultCountTitle=document.getElementById("g_resultCountTitle");
+const results=document.getElementById("g_results");
+const saveAllButton=document.getElementById("g_saveAllButton");
+const photoList=document.getElementById("g_photoList");
+const currentPhoto=document.getElementById("g_currentPhoto");
+const photoCountLabel=document.getElementById("g_photoCountLabel");
+
+let photos=[];
+let currentIndex=0;
+let image=new Image();
+let originalImageData=null;
+let cards=[];
+let selectedCards=[];
+let croppedCards=[];
+
+
+/* =====================================================
+   ★ 총기 커트 비율 (아래 3.0%로 수정됨)
+   위 2.0%
+   아래 3.0%
+   왼쪽 1.0%
+   오른쪽 1.0%
+===================================================== */
+
+const TOP_TRIM_RATIO=.020;
+const BOTTOM_TRIM_RATIO=.030;
+const LEFT_TRIM_RATIO=.010;
+const RIGHT_TRIM_RATIO=.010;
+
+
+document.getElementById("g_uploadLabel")
+.addEventListener("click",()=>fileInput.click());
+
+
+fileInput.addEventListener("change",event=>{
+
+ const files=[...event.target.files];
+
+ if(!files.length)return;
+
+ photos=[];
+ currentIndex=0;
+ selectedCards=[];
+ croppedCards=[];
+
+ results.innerHTML=
+ `<div class="empty"><div>◇</div>카드를 선택한 뒤<br>자르기를 눌러주세요.</div>`;
+
+ resultCountText.textContent="0";
+ resultCountTitle.textContent="0";
+ saveAllButton.disabled=true;
+
+ let loaded=0;
+
+ files.forEach((file,index)=>{
+
+  const url=URL.createObjectURL(file);
+  const img=new Image();
+
+  img.onload=()=>{
+
+   photos[index]={
+    image:img,
+    url,
+    name:file.name,
+    selected:[]
+   };
+
+   loaded++;
+
+   if(loaded===files.length){
+    makePhotoButtons();
+    showPhoto(0);
+   }
+  };
+
+  img.src=url;
+ });
+
+ fileInput.value="";
+});
+
+
+function makePhotoButtons(){
+
+ photoList.innerHTML="";
+
+ photos.forEach((photo,index)=>{
+
+  if(!photo)return;
+
+  const button=document.createElement("button");
+
+  button.type="button";
+  button.className="photo-button";
+  button.onclick=()=>showPhoto(index);
+
+  photo.button=button;
+  photoList.appendChild(button);
+ });
+
+ updatePhotoButtons();
+
+ photoCountLabel.textContent=
+  `${photos.filter(Boolean).length}장`;
+}
+
+
+function updatePhotoButtons(){
+
+ photos.forEach((photo,index)=>{
+
+  if(!photo||!photo.button)return;
+
+  photo.button.textContent=
+   `사진 ${index+1} · ${(photo.selected||[]).length}`;
+
+  photo.button.classList.toggle(
+   "active",
+   index===currentIndex
+  );
+ });
+
+
+}
+
+
+function showPhoto(index){
+
+ if(!photos[index])return;
+
+ currentIndex=index;
+
+ const photo=photos[index];
+
+ image=photo.image;
+ selectedCards=photo.selected||[];
+
+ imageCanvas.width=image.naturalWidth;
+ imageCanvas.height=image.naturalHeight;
+
+ selectionCanvas.width=image.naturalWidth;
+ selectionCanvas.height=image.naturalHeight;
+
+ imageCtx.clearRect(
+  0,0,imageCanvas.width,imageCanvas.height
+ );
+
+ imageCtx.drawImage(image,0,0);
+
+ originalImageData=imageCtx.getImageData(
+  0,0,imageCanvas.width,imageCanvas.height
+ );
+
+ detectCards();
+
+ resizeSelectionCanvas();
+ updateCount();
+ drawSelections();
+ updatePhotoButtons();
+
+ currentPhoto.textContent=
+  `사진 ${index+1} · ${photo.name}`;
+}
+
+
+function isCardPixel(r,g,b){
+
+ const max=Math.max(r,g,b);
+ const min=Math.min(r,g,b);
+ const saturation=max-min;
+
+ if(saturation<35||max<55)return false;
+
+ return(
+  (
+   r>105&&
+   r>g*1.25&&
+   r>b*1.15&&
+   g<150
+  )
+  ||
+  (
+   r>55&&
+   b>60&&
+   g<150&&
+   r>g*1.10&&
+   b>g*1.05
+  )
+ );
+}
+
+
+/* =====================================================
+   ★ 총기 자동 인식
+   모든 총기 박스의 크기를 완전히 동일하게 맞춤
+===================================================== */
+
+function detectCards(){
+
+ cards=[];
+
+ const width=imageCanvas.width;
+ const height=imageCanvas.height;
+ const data=originalImageData.data;
+ const total=width*height;
+
+ const visited=new Uint8Array(total);
+
+ const queueX=new Int32Array(total);
+ const queueY=new Int32Array(total);
+
+ const rawRects=[];
+
+ const minArea=Math.max(
+  300,
+  total*.0001
+ );
+
+
+ for(let y=0;y<height;y+=2){
+
+  for(let x=0;x<width;x+=2){
+
+   const index=y*width+x;
+
+   if(visited[index])continue;
+
+   visited[index]=1;
+
+   const p=index*4;
+
+   if(!isCardPixel(
+    data[p],
+    data[p+1],
+    data[p+2]
+   ))continue;
+
+
+   let head=0;
+   let tail=0;
+
+   queueX[tail]=x;
+   queueY[tail]=y;
+   tail++;
+
+   let minX=x;
+   let maxX=x;
+   let minY=y;
+   let maxY=y;
+
+   let area=0;
+
+
+   while(head<tail){
+
+    const cx=queueX[head];
+    const cy=queueY[head];
+
+    head++;
+    area++;
+
+    if(cx<minX)minX=cx;
+    if(cx>maxX)maxX=cx;
+    if(cy<minY)minY=cy;
+    if(cy>maxY)maxY=cy;
+
+
+    const neighbors=[
+     [cx-2,cy],
+     [cx+2,cy],
+     [cx,cy-2],
+     [cx,cy+2]
+    ];
+
+
+    for(const [px,py] of neighbors){
+
+     if(
+      px<0||
+      px>=width||
+      py<0||
+      py>=height
+     )continue;
+
+     const ni=py*width+px;
+
+     if(visited[ni])continue;
+
+     visited[ni]=1;
+
+     const np=ni*4;
+
+     if(isCardPixel(
+      data[np],
+      data[np+1],
+      data[np+2]
+     )){
+
+      queueX[tail]=px;
+      queueY[tail]=py;
+      tail++;
+
+     }
+    }
+   }
+
+
+   const w=maxX-minX+1;
+   const h=maxY-minY+1;
+   const ratio=w/h;
+
+
+   if(
+    area>=minArea&&
+    w>=40&&
+    h>=20&&
+    ratio>1.2&&
+    ratio<3.0
+   ){
+
+    rawRects.push({
+     x:minX,
+     y:minY,
+     width:w,
+     height:h,
+     centerX:minX+w/2,
+     centerY:minY+h/2
+    });
+
+   }
+  }
+ }
+
+
+ if(!rawRects.length)return;
+
+
+ /* =========================================
+    ★ 모든 총기의 기준 크기를 하나로 결정
+ ========================================= */
+
+ const widths=rawRects
+  .map(r=>r.width)
+  .sort((a,b)=>a-b);
+
+ const heights=rawRects
+  .map(r=>r.height)
+  .sort((a,b)=>a-b);
+
+
+ const standardWidth=
+  widths[Math.floor(widths.length/2)];
+
+ const standardHeight=
+  heights[Math.floor(heights.length/2)];
+
+
+ /* =========================================
+    비정상적으로 다른 영역 제거
+ ========================================= */
+
+ const validRects=rawRects.filter(r=>{
+
+  const wr=r.width/standardWidth;
+  const hr=r.height/standardHeight;
+
+  return(
+   wr>=.60&&
+   wr<=1.40&&
+   hr>=.60&&
+   hr<=1.40
+  );
+
+ });
+
+
+ if(!validRects.length)return;
+
+
+ /* =========================================
+    ★ 모든 총기 박스의 원본 크기 완전 동일
+ ========================================= */
+
+ const boxWidth=Math.round(standardWidth);
+ const boxHeight=Math.round(standardHeight);
+
+
+ /* =========================================
+    ★ 요청한 총기 커트 비율 (아래 3.0%)
+ ========================================= */
+
+ const trimLeft=Math.round(
+  boxWidth*LEFT_TRIM_RATIO
+ );
+
+ const trimRight=Math.round(
+  boxWidth*RIGHT_TRIM_RATIO
+ );
+
+ const trimTop=Math.round(
+  boxHeight*TOP_TRIM_RATIO
+ );
+
+ const trimBottom=Math.round(
+  boxHeight*BOTTOM_TRIM_RATIO
+ );
+
+
+ /* =========================================
+    ★ 모든 결과물의 최종 크기도 완전히 동일
+ ========================================= */
+
+ const finalWidth=Math.max(
+  10,
+  boxWidth-trimLeft-trimRight
+ );
+
+ const finalHeight=Math.max(
+  10,
+  boxHeight-trimTop-trimBottom
+ );
+
+
+ validRects.sort((a,b)=>{
+
+  if(
+   Math.abs(a.centerY-b.centerY)<
+   standardHeight*.45
+  ){
+   return a.centerX-b.centerX;
+  }
+
+  return a.centerY-b.centerY;
+ });
+
+
+ validRects.forEach(r=>{
+
+  let x=Math.round(
+   r.centerX-boxWidth/2
+  );
+
+  let y=Math.round(
+   r.centerY-boxHeight/2
+  );
+
+
+  x=Math.max(
+   0,
+   Math.min(
+    x,
+    width-boxWidth
+   )
+  );
+
+  y=Math.max(
+   0,
+   Math.min(
+    y,
+    height-boxHeight
+   )
+  );
+
+
+  /* 모든 cards가 똑같은 x/y 기준 크기를 사용 */
+
+  cards.push({
+
+   x:x+trimLeft,
+
+   y:y+trimTop,
+
+   width:finalWidth,
+
+   height:finalHeight
+
+  });
+ });
+}
+
+
+imageCanvas.addEventListener("click",event=>{
+
+ if(!originalImageData)return;
+
+ const rect=imageCanvas.getBoundingClientRect();
+
+ const pt={
+
+  x:
+   (event.clientX-rect.left)*
+   imageCanvas.width/
+   rect.width,
+
+  y:
+   (event.clientY-rect.top)*
+   imageCanvas.height/
+   rect.height
+
+ };
+
+
+ const found=cards.find(c=>
+  pt.x>=c.x&&
+  pt.x<=c.x+c.width&&
+  pt.y>=c.y&&
+  pt.y<=c.y+c.height
+ );
+
+
+ if(!found)return;
+
+
+ const existing=selectedCards.findIndex(card=>
+  Math.abs(card.x-found.x)<=3&&
+  Math.abs(card.y-found.y)<=3
+ );
+
+
+ if(existing>=0)
+  selectedCards.splice(existing,1);
+ else
+  selectedCards.push(found);
+
+
+ photos[currentIndex].selected=selectedCards;
+
+ updateCount();
+ updatePhotoButtons();
+ drawSelections();
+
+});
+
+
+function drawSelections(){
+
+ selectionCtx.clearRect(
+  0,
+  0,
+  selectionCanvas.width,
+  selectionCanvas.height
+ );
+
+ selectedCards.forEach(card=>{
+
+  selectionCtx.fillStyle="rgba(77,141,255,.24)";
+
+  selectionCtx.fillRect(
+   card.x,
+   card.y,
+   card.width,
+   card.height
+  );
+
+  selectionCtx.strokeStyle="#5c98ff";
+
+  selectionCtx.lineWidth=Math.max(
+   4,
+   Math.round(
+    Math.min(card.width,card.height)*.015
+   )
+  );
+
+  selectionCtx.strokeRect(
+   card.x,
+   card.y,
+   card.width,
+   card.height
+  );
+ });
+}
+
+
+function updateCount(){
+ countText.textContent=selectedCards.length;
+}
+
+
+window.g_clearCurrentSelection=()=>{
+
+ if(!photos[currentIndex])return;
+
+ selectedCards=[];
+ photos[currentIndex].selected=[];
+
+ updateCount();
+ updatePhotoButtons();
+ drawSelections();
+};
+
+
+window.g_extractSelected=()=>{
+
+ const all=[];
+
+ photos.forEach((photo,photoIndex)=>{
+
+  if(!photo)return;
+
+  (photo.selected||[]).forEach(card=>{
+
+   all.push({
+    photo,
+    card,
+    photoIndex
+   });
+
+  });
+
+ });
+
+
+ if(!photos.length){
+  alert("먼저 사진을 넣어주세요.");
+  return;
+ }
+
+ if(!all.length){
+  alert("카드를 하나 이상 눌러주세요.");
+  return;
+ }
+
+
+ results.innerHTML="";
+ croppedCards=[];
+
+
+ all.forEach((item,index)=>{
+
+  const card=item.card;
+  const img=item.photo.image;
+
+  const cropCanvas=document.createElement("canvas");
+
+  /* 모든 총기 결과는 card의 동일한 크기를 사용 */
+
+  const cropW=finalGunWidth(card);
+  const cropH=finalGunHeight(card);
+
+  cropCanvas.width=cropW;
+  cropCanvas.height=cropH;
+
+
+  cropCanvas.getContext("2d").drawImage(
+   img,
+   Math.round(card.x),
+   Math.round(card.y),
+   cropW,
+   cropH,
+   0,
+   0,
+   cropW,
+   cropH
+  );
+
+
+  const dataURL=cropCanvas.toDataURL(
+   "image/jpeg",
+   .95
+  );
+
+
+  croppedCards.push(dataURL);
+
+
+  const resultCard=document.createElement("div");
+
+  resultCard.className="card";
+
+  resultCard.innerHTML=`
+   <img src="${dataURL}">
+   <div class="card-info">
+    사진 ${item.photoIndex+1} · 총기 ${index+1}
+   </div>
+   <button class="save"
+    onclick="shareFile('${dataURL}','gun_${index+1}.jpg')">
+    📥 JPG 저장
+   </button>
+  `;
+
+  results.appendChild(resultCard);
+
+ });
+
+
+ resultCountText.textContent=croppedCards.length;
+ resultCountTitle.textContent=croppedCards.length;
+ saveAllButton.disabled=false;
+};
+
+
+/* 선택된 총기의 width/height를 그대로 사용 */
+
+function finalGunWidth(card){
+ return Math.max(1,Math.round(card.width));
+}
+
+function finalGunHeight(card){
+ return Math.max(1,Math.round(card.height));
+}
+
+
+window.g_saveAllCards=async()=>{
+
+ if(croppedCards.length){
+
+  await shareMultipleFiles(
+   croppedCards,
+   "gun_card"
+  );
+
+ }
+};
+
+
+function resizeSelectionCanvas(){
+
+ const rect=imageCanvas.getBoundingClientRect();
+
+ selectionCanvas.style.width=rect.width+"px";
+ selectionCanvas.style.height=rect.height+"px";
+
+ selectionCanvas.style.left=
+  imageCanvas.offsetLeft+"px";
+
+ selectionCanvas.style.top=
+  imageCanvas.offsetTop+"px";
+}
+
+
+window.addEventListener("resize",()=>{
+ resizeSelectionCanvas();
+ drawSelections();
+});
+
+})();
+
+
+/* =====================================================
+   🖼️ 합치기
+===================================================== */
+
+(function(){
+
+const uploadLabel=document.getElementById("m_uploadLabel");
+const imageInput=document.getElementById("m_imageInput");
+const fileName=document.getElementById("m_fileName");
+const colsInput=document.getElementById("m_cols");
+const rowsInput=document.getElementById("m_rows");
+const resultCanvas=document.getElementById("m_resultCanvas");
+const resultCtx=resultCanvas.getContext("2d");
+const mergeWrap=document.getElementById("m_mergeWrap");
+const empty=document.getElementById("m_empty");
+const positionBtn=document.getElementById("m_positionBtn");
+const saveBtn=document.getElementById("m_saveBtn");
+const clearBtn=document.getElementById("m_clearBtn");
+const status=document.getElementById("m_photoCount");
+const resultCount=document.getElementById("m_resultCount");
+
+let files=[];
+let order=[];
+let images=[];
+let positionMode=false;
+let firstPos=null;
+
+
+uploadLabel.addEventListener(
+ "click",
+ ()=>imageInput.click()
+);
+
+
+imageInput.addEventListener(
+ "change",
+ async e=>{
+
+  const selectedFiles=[...e.target.files];
+
+  if(!selectedFiles.length)return;
+
+  fileName.textContent=
+   `${selectedFiles.length}장의 이미지가 선택됨`;
+
+  files=selectedFiles;
+
+  order=files.map((_,i)=>i);
+
+  status.textContent=
+   files.length+"장";
+
+  resultCount.textContent=
+   `${files.length}장 배치 완료`;
+
+
+  images=await Promise.all(
+   files.map(f=>
+    new Promise(res=>{
+
+     const url=URL.createObjectURL(f);
+     const img=new Image();
+
+     img.onload=()=>{
+      URL.revokeObjectURL(url);
+      res(img);
+     };
+
+     img.src=url;
+
+    })
+   )
+  );
+
+
+  makeComposite();
+
+  imageInput.value="";
+ }
+);
+
+
+function makeComposite(){
+
+ if(!files.length)return;
+
+ const cols=parseInt(colsInput.value)||6;
+ const rows=parseInt(rowsInput.value)||7;
+
+ const CELL=500;
+
+ resultCanvas.width=cols*CELL;
+ resultCanvas.height=rows*CELL;
+
+ resultCtx.fillStyle="#fff";
+
+ resultCtx.fillRect(
+  0,
+  0,
+  resultCanvas.width,
+  resultCanvas.height
+ );
+
+
+ order.forEach((idx,pos)=>{
+
+  const img=images[idx];
+
+  if(!img)return;
+
+  resultCtx.drawImage(
+   img,
+   (pos%cols)*CELL,
+   Math.floor(pos/cols)*CELL,
+   CELL,
+   CELL
+  );
+
+ });
+
+
+ empty.style.display="none";
+ mergeWrap.style.display="block";
+
+ updateOverlay(cols,rows);
+}
+
+
+function updateOverlay(cols,rows){
+
+ const old=document.getElementById("selectionOverlay");
+
+ if(old)old.remove();
+
+ const overlay=document.createElement("div");
+
+ overlay.id="selectionOverlay";
+
+ overlay.style.cssText=`
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  display:grid;
+  grid-template-columns:repeat(${cols},1fr);
+  grid-template-rows:repeat(${rows},1fr);
+  pointer-events:${positionMode?"auto":"none"};
+ `;
+
+
+ order.forEach((_,pos)=>{
+
+  const cell=document.createElement("div");
+
+  cell.onclick=e=>{
+
+   if(!positionMode)return;
+
+   e.stopPropagation();
+
+   if(firstPos===null){
+
+    firstPos=pos;
+    cell.style.background=
+     "rgba(59,130,246,.4)";
+
+   }else{
+
+    const temp=order[firstPos];
+
+    order[firstPos]=order[pos];
+    order[pos]=temp;
+
+    firstPos=null;
+
+    makeComposite();
+
+   }
+  };
+
+  overlay.appendChild(cell);
+
+ });
+
+
+ mergeWrap.appendChild(overlay);
+}
+
+
+positionBtn.addEventListener("click",()=>{
+
+ positionMode=!positionMode;
+ firstPos=null;
+
+ positionBtn.classList.toggle(
+  "active",
+  positionMode
+ );
+
+ positionBtn.innerHTML=
+  positionMode
+  ?"❌ 위치 변경 모드 끄기"
+  :"📍 위치 변경 모드 켜기";
+
+ updateOverlay(
+  parseInt(colsInput.value)||6,
+  parseInt(rowsInput.value)||7
+ );
+});
+
+
+colsInput.addEventListener(
+ "change",
+ makeComposite
+);
+
+rowsInput.addEventListener(
+ "change",
+ makeComposite
+);
+
+
+clearBtn.addEventListener("click",()=>{
+
+ files=[];
+ order=[];
+ images=[];
+
+ resultCtx.clearRect(
+  0,
+  0,
+  resultCanvas.width,
+  resultCanvas.height
+ );
+
+ mergeWrap.style.display="none";
+ empty.style.display="flex";
+
+ status.textContent="0장";
+ resultCount.textContent="준비 중";
+
+ fileName.textContent=
+  "PNG · JPG / 여러 장 선택 가능";
+});
+
+
+saveBtn.addEventListener("click",async()=>{
+
+ if(!files.length){
+
+  alert("합쳐진 이미지가 없습니다.");
+  return;
+
+ }
+
+ await shareFile(
+  resultCanvas.toDataURL("image/jpeg",.95),
+  "merged_result.jpg"
+ );
+
+});
+
+})();
+</script>
+
+</body>
+</html>
