@@ -1750,14 +1750,17 @@ window.c_extractSelected=()=>{
 
 window.c_saveAllCards=async()=>{
 
- if(croppedCards.length){
+ if(!croppedCards.length) return;
 
-  await shareMultipleFiles(
-   croppedCards,
-   "clothes_item"
-  );
-
+ if(croppedCards.length > 10){
+  alert("기기 보안 정책상 한 번에 최대 10개까지만 저장/공유할 수 있습니다.\n10개 이하로 선택하여 나누어 저장해주세요.");
+  return;
  }
+
+ await shareMultipleFiles(
+  croppedCards,
+  "clothes_item"
+ );
 };
 
 function resizeSelectionCanvas(){
@@ -2502,14 +2505,17 @@ function finalGunHeight(card){
 
 window.g_saveAllCards=async()=>{
 
- if(croppedCards.length){
+ if(!croppedCards.length) return;
 
-  await shareMultipleFiles(
-   croppedCards,
-   "gun_card"
-  );
-
+ if(croppedCards.length > 10){
+  alert("기기 보안 정책상 한 번에 최대 10개까지만 저장/공유할 수 있습니다.\n10개 이하로 선택하여 나누어 저장해주세요.");
+  return;
  }
+
+ await shareMultipleFiles(
+  croppedCards,
+  "gun_card"
+ );
 };
 
 
