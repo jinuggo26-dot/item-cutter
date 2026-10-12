@@ -172,7 +172,7 @@ body{
  align-items:center;
  font-size:13px;
 }
-#admin-pw-modal{
+#admin-pw-modal, #custom-alert-modal{
  display:none;
  position:fixed;
  inset:0;
@@ -181,6 +181,7 @@ body{
  align-items:center;
  justify-content:center;
  padding:20px;
+ backdrop-filter:blur(5px);
 }
 .global-tabs{
  display:flex;
@@ -505,6 +506,15 @@ input[type=file]{display:none}
  </div>
 </div>
 
+<!-- 커스텀 알림창 모달 추가 -->
+<div id="custom-alert-modal">
+ <div class="auth-box">
+  <h2>⚠️ 안내</h2>
+  <p id="custom-alert-message" style="margin-top:15px; margin-bottom:25px; line-height:1.6; word-break:keep-all; color:#aeb5c3;"></p>
+  <button class="auth-btn" onclick="document.getElementById('custom-alert-modal').style.display='none'">확인</button>
+ </div>
+</div>
+
 <script type="module">
 import {initializeApp}
 from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
@@ -546,7 +556,9 @@ window.confirmAdminPw=()=>{
   document.getElementById("admin-pw-modal").style.display="none";
   document.getElementById("admin-dashboard").style.display="block";
   loadAdminData();
- }else alert("비밀번호가 틀렸습니다.");
+ }else{
+  window.showCustomAlert("비밀번호가 틀렸습니다.");
+ }
 };
 
 let isAdminMode=false;
@@ -625,7 +637,7 @@ window.requestAccess=async()=>{
  const name=document.getElementById("userNameInput").value.trim();
 
  if(!name){
-  alert("이름을 입력해주세요!");
+  window.showCustomAlert("이름을 입력해주세요!");
   return;
  }
 
@@ -1028,6 +1040,15 @@ window.closeAdmin=()=>{
 </div>
 
 <script>
+
+/* =====================================================
+   커스텀 모달 알림 함수 추가
+===================================================== */
+window.showCustomAlert = (msg) => {
+ document.getElementById("custom-alert-message").innerHTML = msg;
+ document.getElementById("custom-alert-modal").style.display = "flex";
+};
+
 
 /* =====================================================
    공통
@@ -1680,12 +1701,12 @@ window.c_extractSelected=()=>{
  });
 
  if(!photos.length){
-  alert("먼저 사진을 넣어주세요.");
+  window.showCustomAlert("먼저 사진을 넣어주세요.");
   return;
  }
 
  if(!all.length){
-  alert("옷을 하나 이상 눌러주세요.");
+  window.showCustomAlert("옷을 하나 이상 눌러주세요.");
   return;
  }
 
@@ -1753,7 +1774,7 @@ window.c_saveAllCards=async()=>{
  if(!croppedCards.length) return;
 
  if(croppedCards.length > 10){
-  alert("기기 보안 정책상 한 번에 최대 10개까지만 저장/공유할 수 있습니다.\n10개 이하로 선택하여 나누어 저장해주세요.");
+  window.showCustomAlert("기기 보안 정책상 한 번에 최대 10개까지만 저장/공유할 수 있습니다.<br>10개 이하로 선택하여 나누어 저장해주세요.");
   return;
  }
 
@@ -2414,12 +2435,12 @@ window.g_extractSelected=()=>{
 
 
  if(!photos.length){
-  alert("먼저 사진을 넣어주세요.");
+  window.showCustomAlert("먼저 사진을 넣어주세요.");
   return;
  }
 
  if(!all.length){
-  alert("카드를 하나 이상 눌러주세요.");
+  window.showCustomAlert("카드를 하나 이상 눌러주세요.");
   return;
  }
 
@@ -2508,7 +2529,7 @@ window.g_saveAllCards=async()=>{
  if(!croppedCards.length) return;
 
  if(croppedCards.length > 10){
-  alert("기기 보안 정책상 한 번에 최대 10개까지만 저장/공유할 수 있습니다.\n10개 이하로 선택하여 나누어 저장해주세요.");
+  window.showCustomAlert("기기 보안 정책상 한 번에 최대 10개까지만 저장/공유할 수 있습니다.<br>10개 이하로 선택하여 나누어 저장해주세요.");
   return;
  }
 
@@ -2793,7 +2814,7 @@ saveBtn.addEventListener("click",async()=>{
 
  if(!files.length){
 
-  alert("합쳐진 이미지가 없습니다.");
+  window.showCustomAlert("합쳐진 이미지가 없습니다.");
   return;
 
  }
