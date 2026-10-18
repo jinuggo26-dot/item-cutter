@@ -607,7 +607,7 @@ body{background:radial-gradient(ellipse 85% 50% at 52% -5%,#253d64 0%,transparen
 .admin-empty{color:#98abc6;text-align:center;padding:18px;background:#152238;border-radius:13px}
 @media(max-width:650px){
  .global-tabs{gap:4px;padding:9px 6px}
- .global-tabs button{padding:11px 4px;font-size:11px}
+ .global-tabs button{padding:11px 3px;font-size:10px}
  .admin-card{align-items:stretch;flex-direction:column}
  .admin-card-actions{min-width:0;justify-content:flex-start}
  .admin-filter-row{grid-template-columns:1fr 125px}
@@ -648,6 +648,95 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 .ui-dialog-actions button.primary{border-color:#afc5ff;background:linear-gradient(120deg,#91b6ff,#b4acff);color:#12203b}
 @media(max-width:480px){#b_loadPanel .load-top{align-items:stretch}#b_retryPhotos{width:100%}.ui-dialog-card{padding:22px 18px}}
 
+
+/* 회원 등급 · 공지사항 · 전시관 (독립 스타일) */
+.member-btn{border:1px solid #3a4a63;background:#1c2940;color:#e8efff;border-radius:11px;padding:11px 12px;cursor:pointer;font-weight:750}
+.member-btn.primary{background:#85aaff;color:#14213a;border-color:#a0c0ff}
+.member-btn.danger{background:#4a2632;border-color:#985368;color:#ffe0e7}
+.member-btn:disabled{opacity:.45;cursor:not-allowed}
+.member-panel{background:#152136;border:1px solid #34455f;border-radius:18px;padding:16px;margin:15px auto;color:#f1f5ff}
+.member-panel p,.member-tip{font-size:12px;color:#a9b8d1;line-height:1.6}
+.member-panel h3{font-size:16px;margin:0 0 12px}
+.member-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:9px}
+.member-controls input,.member-controls select,.member-controls textarea{font:inherit;background:#0e192b;color:#f2f7ff;border:1px solid #41516b;border-radius:10px;padding:11px;min-width:0;max-width:100%;box-sizing:border-box}
+.member-controls input[type="checkbox"]{width:18px;height:18px;min-width:18px;accent-color:#90b4ff}
+.member-controls textarea{width:100%;min-height:110px;resize:vertical}
+.member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.member-work{border:1px solid #33445f;border-radius:14px;background:#101b2d;overflow:hidden}
+.member-work img{display:block;width:100%;height:210px;object-fit:contain;cursor:zoom-in;background:#081020}
+.member-work-info{padding:11px;font-size:12px;line-height:1.6}
+.member-work-info strong{font-size:13px}
+#gallery-tab{padding:12px;min-height:60vh}
+#gallery-tab .member-panel{max-width:1100px}
+.member-shade{position:fixed;inset:0;background:#030916e9;z-index:10000001;display:none;align-items:center;justify-content:center;padding:12px}
+.member-modal{background:#142037;color:#f0f4ff;border:1px solid #405374;border-radius:20px;padding:20px;width:min(96vw,610px);max-height:88vh;overflow:auto;box-shadow:0 15px 65px #0008}
+.member-modal h2{font-size:20px;margin:0 0 12px}
+.member-modal img{max-width:100%;max-height:75vh;object-fit:contain;display:block;margin:auto}
+#member-notice-body{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75;color:#d7e4fb;font-size:14px}
+#admin-grade-panel{max-width:850px;margin:16px auto}
+#admin-grade-panel .member-controls{margin:12px 0}
+#admin-dashboard .admin-card-actions{flex-wrap:wrap;gap:6px;max-width:100%}
+@media(max-width:690px){#admin-dashboard .admin-card{flex-direction:column;align-items:stretch;gap:10px}.global-tabs{overflow-x:auto;scrollbar-width:thin}.global-tabs button{flex:0 0 auto;white-space:nowrap}.member-modal{padding:14px}.member-work img{height:170px}}
+#auth-screen .auth-box .auth-input{display:block;width:100%;margin:10px 0;user-select:text;-webkit-user-select:text}
+#auth-screen .auth-box p{line-height:1.6}
+.member-legacy-connect{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.member-legacy-connect input{min-width:180px;flex:1;color:#fff;background:#121d31;border:1px solid #526789;border-radius:8px;padding:10px;user-select:text;-webkit-user-select:text}
+
+/* 2026-10-18: 모바일 상단 메뉴 - 누르기 편한 크기 + 가로 스크롤.
+   기존 탭 이벤트, 등급 설정, 관리자 표시/인증 로직은 변경하지 않음. */
+.global-tabs{
+  display:flex;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  overflow-y:hidden;
+  gap:10px;
+  scroll-behavior:smooth;
+  scroll-snap-type:x proximity;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  scrollbar-color:#6881b0 transparent;
+  padding:12px max(12px,env(safe-area-inset-left)) 12px max(12px,env(safe-area-inset-right));
+}
+.global-tabs > button{
+  flex:0 0 auto;
+  min-width:124px;
+  min-height:58px;
+  padding:12px 15px;
+  font-size:15px;
+  line-height:1.35;
+  white-space:nowrap;
+  text-align:center;
+  scroll-snap-align:start;
+}
+@media(max-width:690px){
+  .global-tabs{gap:9px;padding:10px 12px;}
+  .global-tabs > button{
+    flex:0 0 auto;
+    min-width:146px;
+    min-height:62px;
+    padding:13px 16px;
+    font-size:15px;
+    font-weight:800;
+    white-space:nowrap;
+  }
+  .global-tabs > #btn-logout{
+    min-width:110px!important;
+    font-size:14px!important;
+    padding:13px 15px!important;
+  }
+  .global-tabs > #btn-member-info{
+    flex:0 0 65px!important;
+    min-width:65px!important;
+    font-size:22px!important;
+    padding:0!important;
+  }
+  .global-tabs > #btn-admin{
+    min-width:115px!important;
+    font-size:14px!important;
+    padding:13px 14px!important;
+  }
+}
+
 </style>
 </head>
 
@@ -655,20 +744,21 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 
 <div id="auth-screen">
  <div class="auth-box" id="view-user-form">
-  <h2>🔒 접근 권한 필요</h2>
-  <p>이름을 입력하고 이용 승인을 요청하세요.</p>
-  <input type="text" id="userNameInput" class="auth-input" placeholder="이름 또는 닉네임 입력">
-  <button class="auth-btn" onclick="window.requestAccess()">승인 요청하기</button>
+  <h2>🔐 대필 편집기 로그인</h2>
+  <p>이메일과 비밀번호로 로그인해 주세요. 새 회원은 가입 후 관리자 승인이 필요합니다.</p>
+  <input type="email" id="auth-email" class="auth-input" placeholder="이메일 주소" autocomplete="email" maxlength="254">
+  <input type="password" id="auth-password" class="auth-input" placeholder="비밀번호 (6자 이상)" autocomplete="current-password" minlength="6">
+  <input type="text" id="userNameInput" class="auth-input" placeholder="회원가입 시 닉네임 (기존 회원도 입력)" maxlength="30">
+  <button class="auth-btn" id="auth-login" type="button" onclick="window.requestAccess()">로그인</button>
+  <button class="auth-btn" id="auth-signup" type="button" onclick="window.registerMember()" style="margin-top:8px;background:#233954">새 계정 회원가입</button>
+  <p class="member-tip" id="auth-error" role="status">기존 회원은 가입 후 관리자에게 기존 이용권 연결을 요청하세요. 닉네임만으로 이전 권한이 연결되지 않습니다.</p>
  </div>
-
  <div class="auth-box" id="view-waiting" style="display:none">
-  <div class="spinner"></div>
-  <h2>⏳ 대기 중입니다</h2>
-  <p id="waiting-message">승인을 기다리는 중입니다.</p>
-  <button class="auth-btn" id="request-again" type="button" style="display:none" onclick="window.requestAgain()">다시 승인 요청하기</button>
+  <div class="spinner"></div><h2>⏳ 승인 대기 중</h2>
+  <p id="waiting-message">관리자 승인을 기다리는 중입니다.</p>
+  <button class="auth-btn" id="request-again" type="button" onclick="window.requestAgain()">로그아웃 / 다른 계정</button>
  </div>
 </div>
-
 <div id="admin-dashboard">
  <div class="admin-header">
   <h2>🛠 관리자 대시보드</h2>
@@ -676,7 +766,23 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
  </div>
  <div class="admin-list-wrap">
   <div class="admin-section-title">사용자 이용 기간</div><p class="admin-subtitle">7일 · 30일 · 영구 중 선택해서 승인할 수 있습니다.</p>
-  <div id="admin-user-list"></div>
+  <div class="member-panel" id="admin-grade-panel">
+ <h3>👑 회원 등급 · 이용 권한</h3>
+ <p>회원 등급은 관리자가 직접 지정합니다. 등급 만료 시 일반 등급으로 변경되고, 프로그램 이용 기간은 그대로 유지됩니다.</p>
+ <div class="member-controls"><label for="admin-grade-choice">권한을 편집할 등급</label><select id="admin-grade-choice"><option value="normal">일반</option><option value="silver">실버</option><option value="gold">골드</option><option value="vip">VIP</option></select></div>
+ <div id="admin-grade-permissions" class="member-controls"></div>
+ <div class="member-controls"><button type="button" class="member-btn primary" id="admin-save-grades">등급 권한 저장</button><span id="admin-grade-message" class="member-tip"></span></div>
+</div>
+<div class="member-panel"><h3>📢 공지사항 작성</h3>
+ <p>공지를 작성하면 승인된 회원에게 표시됩니다. 회원은 공지별로 24시간 보지 않기를 선택할 수 있습니다.</p>
+ <div class="member-controls"><input id="admin-notice-title" maxlength="80" placeholder="공지 제목" style="flex:1;min-width:170px"></div>
+ <div class="member-controls"><textarea id="admin-notice-body" maxlength="3000" placeholder="공지 내용을 입력하세요"></textarea></div>
+ <div class="member-controls"><button class="member-btn primary" id="admin-notice-publish" type="button">공지 등록</button><span id="admin-notice-message" class="member-tip"></span></div>
+ <div id="admin-notice-list"></div>
+</div>
+<div class="member-panel"><h3>🖼 대필 전시관 관리</h3><p>공개된 작품을 검토하고 필요한 경우 삭제할 수 있습니다.</p><div id="admin-gallery-list"></div></div>
+<div class="member-controls" style="margin-bottom:10px"><input id="admin-user-search" type="search" placeholder="회원 이름 검색" aria-label="회원 검색" style="flex:1"><select id="admin-user-grade-filter" aria-label="등급 검색"><option value="">모든 등급</option><option value="normal">일반</option><option value="silver">실버</option><option value="gold">골드</option><option value="vip">VIP</option></select></div>
+<div id="admin-user-list"></div>
   <div class="admin-section-title" style="margin-top:30px">최근 접속</div>
   <div id="admin-log-list"></div>
   <div class="admin-section-title" style="margin-top:30px">작업 내역</div><div class="admin-filter-row"><input id="admin-log-search" type="search" placeholder="이름 또는 작업 검색" aria-label="작업 로그 검색"><select id="admin-log-category" aria-label="작업 종류"><option value="">모든 작업</option><option value="옷">옷</option><option value="총">총기</option><option value="대필판">대필판</option><option value="합치기">합치기</option><option value="관리자">관리자</option><option value="접속">접속</option></select></div>
@@ -684,15 +790,7 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
  </div>
 </div>
 
-<div id="admin-pw-modal">
- <div class="auth-box">
-  <h2>⚙ 관리자 확인</h2>
-  <p>비밀번호를 입력해주세요.</p>
-  <input type="password" id="customAdminPw" class="auth-input" placeholder="비밀번호 입력">
-  <button class="auth-btn" onclick="window.confirmAdminPw()">확인</button>
-  <button class="auth-btn" onclick="document.getElementById('admin-pw-modal').style.display='none'" style="margin-top:8px;background:#272b36">취소</button>
- </div>
-</div>
+
 
 <div id="ui-dialog-backdrop" role="presentation"><div class="ui-dialog-card" role="dialog" aria-modal="true" aria-labelledby="ui-dialog-title"><div class="ui-dialog-symbol" id="ui-dialog-icon">✦</div><h3 id="ui-dialog-title">알림</h3><p id="ui-dialog-message"></p><div class="ui-dialog-actions" id="ui-dialog-actions"></div></div></div>
 <script>
@@ -720,17 +818,23 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 })();
 </script>
 
+<div id="member-notice-overlay" class="member-shade" role="dialog" aria-modal="true" aria-labelledby="member-notice-title"><div class="member-modal">
+ <h2 id="member-notice-title">📢 공지사항</h2><p id="member-notice-date" class="member-tip"></p><div id="member-notice-body"></div>
+ <div class="member-controls" style="justify-content:flex-end;margin-top:22px"><button class="member-btn" id="member-notice-hide" type="button">24시간 동안 보지 않기</button><button class="member-btn primary" id="member-notice-ok" type="button">확인</button></div>
+</div></div>
+<div id="member-info-overlay" class="member-shade" role="dialog" aria-modal="true" aria-label="내 이용 정보"><div class="member-modal"><h2>👤 내 이용 정보</h2><div id="member-info-content"></div><div class="member-controls"><button class="member-btn" id="member-open-notice" type="button">공지사항 보기</button><button class="member-btn primary" id="member-info-close" type="button">닫기</button></div></div></div>
+<div id="gallery-image-overlay" class="member-shade" role="dialog" aria-modal="true" aria-label="대필 작품 확대"><div class="member-modal" style="width:min(96vw,900px)"><button class="member-btn" type="button" id="gallery-image-close">닫기 ✕</button><h2 id="gallery-image-title"></h2><img id="gallery-image-large" alt="전시 작품"></div></div>
 <script type="module">
 import {initializeApp}
 from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 
 import {
  getFirestore,doc,setDoc,getDoc,onSnapshot,
- collection,updateDoc,deleteDoc,addDoc,query,orderBy,limit
+ collection,updateDoc,deleteDoc,addDoc,query,orderBy,limit,runTransaction
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig={
- apiKey:"AIzaSyBBQRcC_essCma5tJEe7aplg2KnSfReXc",
+ apiKey:"AIzaSyBBQR_cC_essCma5tJEe7aplg2KnSfReXc",
  authDomain:"item-cutter.firebaseapp.com",
  projectId:"item-cutter",
  storageBucket:"item-cutter.firebasestorage.app",
@@ -740,20 +844,182 @@ const firebaseConfig={
 
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
-const ADMIN_CODE="528510";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+ createUserWithEmailAndPassword, signOut, getIdTokenResult } from
+ "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+const auth=getAuth(app);
+let authUser=null;let savedName=null;
+let authReady=false;
+
 
 // Detailed per-user activity logging. Each record stores local time to seconds,
 // the signed-in display name, action, and action-specific details.
 window.logActivity=async(action,detail={})=>{
  try{
-  const name=localStorage.getItem("itemCutterUserName")||"이름 미확인";
+  if(!authUser)return;
+  const name=savedName||"이름 미확인";
   const now=new Date();
   const time=now.toLocaleString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
-  await addDoc(collection(db,"activityLogs"),{name,action:String(action||"작업"),detail:detail||{},time,timestamp:now.getTime(),page:location.pathname||"/",createdAt:now.toISOString()});
+  await addDoc(collection(db,"activityLogs"),{uid:authUser.uid,name,action:String(action||"작업"),detail:detail||{},time,timestamp:now.getTime(),page:location.pathname||"/",createdAt:now.toISOString()});
  }catch(e){console.warn("작업 로그 저장 실패",e);}
 };
 
-let savedName=localStorage.getItem("itemCutterUserName");
+
+// ===== 수동 회원 등급제 =====
+const GRADE_NAMES={normal:'일반',silver:'실버',gold:'골드',vip:'VIP'};
+const FEATURE_NAMES={clothes:'옷 추출',guns:'총 자르기',merge:'옷·총 합치기',kill:'킬로그 커팅',board:'대필판 제작'};
+const BASE_RIGHTS={normal:['clothes','guns'],silver:['clothes','guns','merge'],gold:['clothes','guns','merge','kill'],vip:['clothes','guns','merge','kill','board']};
+let gradeRights=structuredClone(BASE_RIGHTS);
+let currentMember=null;
+const effectiveGrade=data=>{
+ if(!data)return 'normal';
+ const grade=GRADE_NAMES[data.grade]?data.grade:'normal';
+ if(grade==='normal')return grade;
+ const until=data.gradeExpiresAt;
+ return Number.isFinite(Number(until))&&Number(until)>0&&Date.now()>=Number(until)?'normal':grade;
+};
+window.canUseFeature=feature=>{
+ if(feature==='gallery')return !!authUser && (isAdminMode||(currentMember?.status==='approved'&&!expired(currentMember)));
+ if(!FEATURE_NAMES[feature])return true;
+ if(isAdminMode)return true;
+ if(!currentMember||currentMember.status!=='approved'||expired(currentMember))return false;
+ return (gradeRights[effectiveGrade(currentMember)]||[]).includes(feature);
+};
+function refreshGradeUI(){
+ const effective=effectiveGrade(currentMember);
+ for(const feature of Object.keys(FEATURE_NAMES)){
+  const b=document.getElementById('btn-'+feature);
+  if(!b)continue;
+  const allowed=window.canUseFeature(feature);
+  b.title=allowed?FEATURE_NAMES[feature]:`${GRADE_NAMES[effective]} 등급에서는 이용 불가`;
+  b.style.opacity=allowed?'1':'.52';
+  b.setAttribute('aria-disabled',allowed?'false':'true');
+ }
+ document.getElementById('btn-member-info').title=`내 정보 · ${GRADE_NAMES[effective]} 등급`;
+ // 인증 상태가 아직 확인되지 않았을 때는 화면 이동·권한 안내를 실행하지 않는다.
+ // 특히 페이지를 새로 열 때 일반 등급으로 임시 판단되어 팝업이 반복되는 문제 방지.
+ if(!authUser||(!isAdminMode&&(!currentMember||currentMember.status!=='approved'||expired(currentMember))))return;
+ const active=document.querySelector('.global-tabs button.active');
+ if(active&&!window.canUseFeature(active.id.replace('btn-',''))){
+  const next=[...Object.keys(FEATURE_NAMES),'gallery'].find(x=>window.canUseFeature(x));
+  if(next)window.switchTab?.(next,true); // 시스템이 자동 이동할 때는 경고 팝업 없음
+ }
+}
+const formatGradeTime=v=>v==null||v===''?'영구':dateLabel(v);
+window.openMemberInfo=()=>{
+ const el=document.getElementById('member-info-content');el.replaceChildren();
+ const row=(title,value)=>{const p=make('p','member-tip',`${title}: ${value}`);el.append(p);};
+ row('현재 등급',GRADE_NAMES[effectiveGrade(currentMember)]||'일반');
+ row('프로그램 이용 기간',currentMember?dateLabel(validUntil(currentMember)):'확인 필요');
+ row('등급 유지 기간',currentMember?formatGradeTime(currentMember.gradeExpiresAt):'확인 필요');
+ row('사용 가능 기능',Object.keys(FEATURE_NAMES).filter(x=>window.canUseFeature(x)).map(x=>FEATURE_NAMES[x]).join(' · ')||'없음');
+ document.getElementById('member-info-overlay').style.display='flex';
+};
+document.getElementById('member-info-close').onclick=()=>document.getElementById('member-info-overlay').style.display='none';
+// 탭을 우회해 버튼을 직접 누른 경우에도 클라이언트에서 차단한다. (진짜 보안은 서버 권한 규칙이 필수)
+for(const feature of Object.keys(FEATURE_NAMES)){
+ const pane=document.getElementById(feature+'-tab');
+ if(!pane)continue;
+ pane.addEventListener('click',e=>{
+  if(window.canUseFeature(feature))return;
+  e.preventDefault();e.stopImmediatePropagation();
+  window.uiAlert?.('현재 등급에서는 이 기능을 이용할 수 없어요. 관리자에게 등급 변경을 요청해 주세요.');
+ },true);
+}
+let lastEffectiveGrade='normal';
+setInterval(()=>{
+ const nowGrade=effectiveGrade(currentMember);
+ if(nowGrade!==lastEffectiveGrade){lastEffectiveGrade=nowGrade;refreshGradeUI();if(savedName)downgradeExpiredGrade(savedName,currentMember);}
+},15000);
+// 등급 설정은 Firestore에 저장한다. 관리자 인증은 반드시 서버 측 규칙으로 별도 강화해야 한다.
+function startGradeSubscription(){return onSnapshot(doc(db,'appSettings','gradeRights'),snap=>{
+ const raw=snap.exists()?snap.data().rights:null;
+ if(raw){gradeRights=Object.fromEntries(Object.keys(GRADE_NAMES).map(g=>[
+  g,Array.isArray(raw[g])?raw[g].filter(x=>FEATURE_NAMES[x]):BASE_RIGHTS[g]
+ ]));}else gradeRights=structuredClone(BASE_RIGHTS);
+ refreshGradeUI();
+ renderGradeRights();
+},e=>console.warn('등급 권한 설정 읽기 실패',e));}
+function renderGradeRights(){
+ const grade=document.getElementById('admin-grade-choice')?.value||'normal';
+ const wrap=document.getElementById('admin-grade-permissions');if(!wrap)return;
+ wrap.replaceChildren();
+ Object.keys(FEATURE_NAMES).forEach(feature=>{
+  const label=make('label','member-controls');
+  const cb=document.createElement('input');cb.type='checkbox';cb.checked=gradeRights[grade]?.includes(feature)||false;
+  cb.onchange=()=>{
+   let set=new Set(gradeRights[grade]||[]);cb.checked?set.add(feature):set.delete(feature);
+   gradeRights[grade]=[...set];
+  };
+  label.append(cb,make('span',null,FEATURE_NAMES[feature]));wrap.append(label);
+ });
+}
+document.getElementById('admin-grade-choice').addEventListener('change',renderGradeRights);
+document.getElementById('admin-save-grades').onclick=async()=>{
+ if(!isAdminMode){window.uiAlert?.('관리자 화면에서만 설정할 수 있어요.');return;}
+ const el=document.getElementById('admin-grade-message');el.textContent='저장 중…';
+ try{await setDoc(doc(db,'appSettings','gradeRights'),{rights:gradeRights,updatedAt:Date.now()},{merge:true});el.textContent='등급별 기능 권한을 저장했어요.';window.logActivity?.('관리자: 등급 권한 변경',{});}
+ catch(e){el.textContent='저장 실패: Firestore 보안 규칙을 확인해 주세요.';console.error(e);}
+};
+// ========= 공지사항 (공지별 · 사용자별 24시간 보지 않기) =========
+let noticeItems=[],currentNotice=null;
+const noticeSessionHidden=new Set();
+function noticeHideKey(n){return `itemCutter_notice24_${savedName||'visitor'}_${n.id}_${n.updatedAt||n.createdAt}`;}
+function nextNotice(force=false){
+ if(!currentMember||currentMember.status!=='approved'||expired(currentMember))return;
+ if(document.getElementById('member-notice-overlay').style.display==='flex')return;
+ const found=noticeItems.find(n=>force||(!noticeSessionHidden.has(n.id)&&Date.now()>=Number(localStorage.getItem(noticeHideKey(n))||0)));
+ if(!found)return;
+ currentNotice=found;
+ document.getElementById('member-notice-title').textContent='📢 '+(found.title||'공지사항');
+ document.getElementById('member-notice-date').textContent=dateLabel(found.updatedAt||found.createdAt);
+ document.getElementById('member-notice-body').textContent=found.body||'';
+ document.getElementById('member-notice-overlay').style.display='flex';
+}
+function dismissNotice(fullDay){
+ if(!currentNotice)return;
+ if(fullDay){try{localStorage.setItem(noticeHideKey(currentNotice),String(Date.now()+24*60*60*1000));}catch(e){console.warn(e);}}
+ noticeSessionHidden.add(currentNotice.id);
+ document.getElementById('member-notice-overlay').style.display='none';currentNotice=null;
+ setTimeout(()=>nextNotice(),50);
+}
+document.getElementById('member-notice-ok').onclick=()=>dismissNotice(false);
+document.getElementById('member-notice-hide').onclick=()=>dismissNotice(true);
+document.getElementById('member-open-notice').onclick=()=>{
+ document.getElementById('member-info-overlay').style.display='none';
+ nextNotice(true);
+};
+function renderAdminNotices(){
+ const list=document.getElementById('admin-notice-list');list.replaceChildren();
+ noticeItems.forEach(n=>{
+  const row=make('div','member-controls');
+  const desc=make('span',null,`${n.title||'제목 없음'} (${dateLabel(n.createdAt)})`);
+  const del=make('button','member-btn danger','삭제');del.type='button';del.onclick=async()=>{
+   if(!isAdminMode||!await window.uiConfirm('이 공지를 삭제할까요?'))return;
+   try{await deleteDoc(doc(db,'notices',n.id));}catch(e){window.uiAlert?.('공지 삭제 실패: 권한을 확인해 주세요.');}
+  };
+  row.append(desc,del);list.append(row);
+ });
+}
+function startNoticesSubscription(){return onSnapshot(query(collection(db,'notices'),orderBy('createdAt','desc'),limit(30)),snap=>{
+ noticeItems=snap.docs.map(d=>({id:d.id,...d.data()}));renderAdminNotices();nextNotice();
+},e=>{console.warn('공지사항 불러오기 실패',e);document.getElementById('admin-notice-message').textContent='공지 불러오기 실패: Firestore 규칙을 확인해 주세요.';});}
+document.getElementById('admin-notice-publish').onclick=async()=>{
+ if(!isAdminMode)return;
+ const title=document.getElementById('admin-notice-title').value.trim();
+ const body=document.getElementById('admin-notice-body').value.trim();
+ const msg=document.getElementById('admin-notice-message');
+ if(!title||!body){msg.textContent='제목과 내용을 입력해 주세요.';return;}
+ msg.textContent='등록 중…';
+ try{
+  await addDoc(collection(db,'notices'),{title,body,createdAt:Date.now(),updatedAt:Date.now()});
+  msg.textContent='공지가 등록됐어요.';
+  document.getElementById('admin-notice-title').value='';document.getElementById('admin-notice-body').value='';
+  window.logActivity?.('관리자: 공지 등록',{title});
+ }catch(e){console.error(e);msg.textContent='등록 실패: Firestore 권한을 확인해 주세요.';}
+};
+
+
 const authScreen=document.getElementById("auth-screen");
 const viewUserForm=document.getElementById("view-user-form");
 const viewWaiting=document.getElementById("view-waiting");
@@ -792,22 +1058,24 @@ function showWaiting(message="승인을 기다리는 중입니다."){
  const ended=message.includes("종료")||message.includes("권한이 없습니다");
  const title=viewWaiting.querySelector("h2");if(title)title.textContent=ended?"이용 기간 종료":"승인 대기 중";
  const spinner=viewWaiting.querySelector(".spinner");if(spinner)spinner.style.display=ended?"none":"block";
- const retry=viewWaiting.querySelector("#request-again");if(retry)retry.style.display=ended?"block":"none";
+ const retry=viewWaiting.querySelector("#request-again");if(retry)retry.style.display="block";
 }
-async function handleExpired(name){
+async function handleExpired(){
  if(expiredHandled||isAdminMode)return;
- expiredHandled=true;
- accessExpiry=0;
- authScreen.style.display="flex";
- showWaiting("이용 기간이 종료됐습니다. 관리자에게 재승인을 요청하세요.");
+ expiredHandled=true;accessExpiry=0;
+ showWaiting("이용 기간이 종료됐습니다. 관리자에게 연장을 요청하세요.");
+}
+const downgradeAttempted=new Set();
+async function downgradeExpiredGrade(name,data){
+ if(!data||!GRADE_NAMES[data.grade]||data.grade==='normal')return;
+ const until=Number(data.gradeExpiresAt);
+ if(!Number.isFinite(until)||until<=0||Date.now()<until)return;
+ const key=name+':'+until;if(downgradeAttempted.has(key))return;
+ downgradeAttempted.add(key);
  try{
-  const ref=doc(db,"users",name);
-  const snapshot=await getDoc(ref);
-  if(snapshot.exists()&&expired(snapshot.data())){
-   await updateDoc(ref,{status:"expired"});
-   window.logActivity("이용 기간 종료",{user:name});
-  }
- }catch(e){console.warn("기간 만료 처리 실패",e);}
+  await updateDoc(doc(db,'users',name),{grade:'normal',gradeExpiresAt:null});
+  window.logActivity?.('등급 만료 · 일반 자동 전환',{user:name});
+ }catch(e){console.warn('등급 표시상 일반 적용됨. 서버 기록 변경은 권한 확인 필요',e);}
 }
 function subscribeUser(name){
  if(userUnsubscribe)userUnsubscribe();
@@ -820,12 +1088,21 @@ function subscribeUser(name){
    return;
   }
   const user=snapshot.data();
+  savedName=user.name||'회원';
+  currentMember=user;
+  if(authUser&&!isAdminMode&&!liveUnsubscribes.length){
+   liveUnsubscribes.push(startGradeSubscription(),startNoticesSubscription(),startGallerySubscription());
+  }
+  downgradeExpiredGrade(name,user);
+  lastEffectiveGrade=effectiveGrade(user);
+  refreshGradeUI();
   if(expired(user)){
    handleExpired(name);
   }else if(user.status==="approved"){
    expiredHandled=false;
    accessExpiry=validUntil(user);
    authScreen.style.display="none";
+   nextNotice();
   }else{
    accessExpiry=0;
    showWaiting(user.status==="expired"?"이용 기간이 종료됐습니다. 관리자에게 재승인을 요청하세요.":"승인을 기다리는 중입니다.");
@@ -838,87 +1115,112 @@ setInterval(()=>{
  if(Number.isFinite(accessExpiry)&&accessExpiry>0&&Date.now()>=accessExpiry)handleExpired(savedName);
 },1000);
 
-window.requestAgain=()=>{
- if(waitingUnsubscribe)waitingUnsubscribe();
- if(userUnsubscribe)userUnsubscribe();
- localStorage.removeItem("itemCutterUserName");savedName=null;accessExpiry=null;expiredHandled=false;
- authScreen.style.display="flex";viewWaiting.style.display="none";viewUserForm.style.display="block";
+// ===== Firebase Authentication + UID 기반 가입/승인 =====
+const authMsg=message=>{document.getElementById('auth-error').textContent=message;};
+const displayLogin=(message='')=>{
+ authScreen.style.display='flex';viewUserForm.style.display='block';viewWaiting.style.display='none';
+ if(message)authMsg(message);
 };
-window.openAdminPrompt=()=>{
- document.getElementById("customAdminPw").value="";
- document.getElementById("admin-pw-modal").style.display="flex";
-};
-window.confirmAdminPw=()=>{
- const pw=document.getElementById("customAdminPw").value;
- if(pw===ADMIN_CODE){
-  isAdminMode=true;
-  document.getElementById("admin-pw-modal").style.display="none";
-  document.getElementById("admin-dashboard").style.display="block";
-  loadAdminData();
- }else alert("비밀번호가 틀렸습니다.");
-};
-async function checkUserAuth(name,isNewRequest){
- try{
-  const userRef=doc(db,"users",name);
-  const snap=await getDoc(userRef);
-  if(!snap.exists()){
-   if(isNewRequest){
-    await setDoc(userRef,{name,status:"pending",createdAt:Date.now(),plan:null,expiresAt:null});
-    localStorage.setItem("itemCutterUserName",name);
-    savedName=name;
-    showWaiting();
-    subscribeUser(name);
-   }else{
-    localStorage.removeItem("itemCutterUserName");
-    authScreen.style.display="flex";
-    viewUserForm.style.display="block";
-    viewWaiting.style.display="none";
-   }
-   return;
-  }
-  const data=snap.data();
-  localStorage.setItem("itemCutterUserName",name);
-  savedName=name;
-  if(isNewRequest&&(data.status==="expired"||data.status==="revoked")){
-   await updateDoc(userRef,{status:"pending"});
-   showWaiting("재승인 요청을 보냈습니다. 관리자 승인을 기다려 주세요.");
-   subscribeUser(name);
-   return;
-  }
-  if(expired(data))await handleExpired(name);
-  else if(data.status==="approved"){
-   accessExpiry=validUntil(data);
-   authScreen.style.display="none";
-   try{
-    await addDoc(collection(db,"logs"),{name,time:new Date().toLocaleString("ko-KR",{hour12:false}),timestamp:Date.now()});
-    window.logActivity("로그인 / 접속",{status:"승인된 사용자 접속"});
-   }catch(e){}
-  }else showWaiting(data.status==="expired"?"이용 기간이 종료됐습니다. 관리자에게 재승인을 요청하세요.":"승인을 기다리는 중입니다.");
-  subscribeUser(name);
- }catch(e){
-  console.warn("접근 권한 확인 실패",e);
-  authScreen.style.display="flex";
-  viewUserForm.style.display="block";
-  viewWaiting.style.display="none";
- }
+async function resetCurrentSession(){
+ if(userUnsubscribe){userUnsubscribe();userUnsubscribe=null;}
+ for(const unsub of liveUnsubscribes)try{unsub();}catch(e){};
+ liveUnsubscribes=[];
+ authUser=null;savedName=null;currentMember=null;isAdminMode=false;
+ accessExpiry=null;expiredHandled=false;adminDataStarted=false;adminGradeDrafts.clear();
+ document.getElementById('admin-dashboard').style.display='none';
+ document.getElementById('btn-admin').style.display='none';
+ document.getElementById('member-notice-overlay').style.display='none';
+ document.getElementById('member-info-overlay').style.display='none';
+ noticeItems=[];currentNotice=null;noticeSessionHidden.clear();
+ refreshGradeUI();
 }
-if(savedName&&savedName!==ADMIN_NAME)checkUserAuth(savedName,false);
-else if(savedName===ADMIN_NAME)checkUserAuth(savedName,false);
+let liveUnsubscribes=[];
+window.signOutMember=async()=>{try{await signOut(auth);}catch(e){authMsg('로그아웃 오류: '+e.message);}};
+window.confirmSignOutMember=async()=>{
+ if(await window.uiConfirm('정말 로그아웃하시겠어요?'))await window.signOutMember();
+};
+window.requestAgain=()=>window.signOutMember();
+window.openAdminPrompt=async()=>{
+ if(!auth.currentUser)return window.uiAlert?.('로그인이 필요합니다.');
+ try{
+  const token=await getIdTokenResult(auth.currentUser,true);
+  if(token.claims.admin!==true)return window.uiAlert?.('최고 관리자 권한이 없습니다.');
+  isAdminMode=true;
+  document.getElementById('btn-admin').style.display='';
+  document.getElementById('admin-dashboard').style.display='block';
+  loadAdminData();refreshGradeUI();
+ }catch(e){console.error(e);window.uiAlert?.('관리자 권한 확인에 실패했어요. 다시 로그인해 주세요.');}
+};
 window.requestAccess=async()=>{
- const name=document.getElementById("userNameInput").value.trim();
- if(!name){alert("이름을 입력해 주세요.");return;}
- if(name===ADMIN_CODE){
-  // Legacy admin entry path; real security requires Firebase Authentication and rules.
-  const ref=doc(db,"users",ADMIN_NAME);
-  await setDoc(ref,{name:ADMIN_NAME,status:"approved",plan:"permanent",expiresAt:null,createdAt:Date.now()},{merge:true});
-  localStorage.setItem("itemCutterUserName",ADMIN_NAME);
+ const email=document.getElementById('auth-email').value.trim();
+ const password=document.getElementById('auth-password').value;
+ if(!email||!password)return authMsg('이메일과 비밀번호를 입력해 주세요.');
+ authMsg('로그인 중…');
+ try{await signInWithEmailAndPassword(auth,email,password);document.getElementById('auth-password').value='';}
+ catch(e){console.warn(e);authMsg('로그인에 실패했습니다. 이메일·비밀번호를 확인해 주세요.');}
+};
+window.registerMember=async()=>{
+ const email=document.getElementById('auth-email').value.trim();
+ const password=document.getElementById('auth-password').value;
+ const nickname=document.getElementById('userNameInput').value.trim();
+ if(!email||!nickname||password.length<6)return authMsg('이메일, 닉네임, 6자 이상 비밀번호를 입력해 주세요.');
+ if(nickname.length>30)return authMsg('닉네임은 30자 이내로 입력해 주세요.');
+ authMsg('계정을 만드는 중…');
+ try{
+  const credential=await createUserWithEmailAndPassword(auth,email,password);
+  await setDoc(doc(db,'users',credential.user.uid),{
+   authUid:credential.user.uid,name:nickname,status:'pending',plan:null,expiresAt:null,
+   grade:'normal',gradeExpiresAt:null,createdAt:Date.now()
+  });
+  document.getElementById('auth-password').value='';
+  showWaiting('가입 완료! 관리자 승인을 기다려 주세요. 기존 회원은 관리자에게 이전 이용권 연결을 요청하세요.');
+ }catch(e){console.error(e);authMsg(e.code==='auth/email-already-in-use'?'이미 가입된 이메일입니다. 로그인해 주세요.':'가입 실패: '+(e.code||e.message));}
+};
+async function afterAuthLogin(user){
+ authUser=user;
+ const token=await getIdTokenResult(user,true);
+ if(token.claims.admin===true){
+  isAdminMode=true;
+  document.getElementById('btn-admin').style.display='';
   savedName=ADMIN_NAME;
-  authScreen.style.display="none";
+  currentMember={name:ADMIN_NAME,grade:'vip',status:'approved',plan:'permanent',expiresAt:null};
+  accessExpiry=Infinity;authScreen.style.display='none';refreshGradeUI();
+  liveUnsubscribes.push(startGradeSubscription(),startNoticesSubscription(),startGallerySubscription());
+  loadAdminData();
   return;
  }
- await checkUserAuth(name,true);
-};
-
+ isAdminMode=false;
+ document.getElementById('btn-admin').style.display='none';
+ // Legacy users/{nickname} is never auto-claimed based on nicknames.
+ const memberRef=doc(db,'users',user.uid);
+ const member=await getDoc(memberRef);
+ if(!member.exists()){
+  savedName='새 회원';
+  showWaiting('새 계정 정보를 만드는 중입니다. 잠시 기다려 주세요.');
+  // 가입 완료 직후 사용자 문서가 생성되면 실시간 구독에서 상태를 갱신한다.
+  subscribeUser(user.uid);
+  return;
+ }
+ savedName=member.data().name||'회원';
+ currentMember=member.data();
+ lastEffectiveGrade=effectiveGrade(currentMember);
+ refreshGradeUI();
+ subscribeUser(user.uid);
+ liveUnsubscribes.push(startGradeSubscription(),startNoticesSubscription(),startGallerySubscription());
+ try{
+  await addDoc(collection(db,'logs'),{uid:user.uid,name:savedName,time:new Date().toLocaleString('ko-KR',{hour12:false}),timestamp:Date.now()});
+  window.logActivity('로그인 / 접속');
+ }catch(e){console.warn('로그 기록 실패',e);}
+}
+onAuthStateChanged(auth,async user=>{
+ await resetCurrentSession();
+ if(!user){displayLogin('이메일과 비밀번호로 로그인해 주세요.');return;}
+ authScreen.style.display='flex';
+ viewUserForm.style.display='none';viewWaiting.style.display='block';
+ showWaiting('로그인 상태와 이용권을 확인하는 중…');
+ try{await afterAuthLogin(user);}
+ catch(e){console.error('계정 연결 오류',e);showWaiting('계정 정보 확인 실패. 잠시 후 다시 로그인하거나 관리자에게 문의해 주세요.');}
+});
 let activityCache=[];
 function makeLogRow(log){
  const row=make("div","log-card admin-log-row");
@@ -953,15 +1255,35 @@ function renderActivityLogs(){
  filtered.forEach(log=>list.append(makeLogRow(log)));
  if(!filtered.length)list.append(make("div","admin-empty","표시할 작업 내역이 없습니다."));
 }
+// 관리자 등급 편집: Firestore 실제 저장 기간을 복원하고, 실시간 목록 갱신 중 선택값이 바뀌지 않게 보관.
+const adminGradeDrafts=new Map();
+function savedGradeDuration(data){
+ const saved=data?.gradeDuration;
+ if(saved==='7'||saved==='30'||saved==='permanent')return saved;
+ const until=data?.gradeExpiresAt;
+ if(until===null||until===undefined||until==='')return 'permanent';
+ const end=Number(until);
+ if(!Number.isFinite(end)||end<=0)return 'permanent';
+ const updated=Number(data?.gradeUpdatedAt);
+ if(Number.isFinite(updated)&&updated>0){
+  const days=(end-updated)/DAY_MS;
+  return days>18?'30':'7';
+ }
+ // 구버전 기록에는 선택 기간이 없을 수 있으므로 남은 시간으로 추정.
+ return (end-Date.now())/DAY_MS>7.5?'30':'7';
+}
+let adminUserSnapshot=null;
 function loadAdminData(){
  if(adminDataStarted)return;
  adminDataStarted=true;
  document.getElementById("admin-log-search")?.addEventListener("input",renderActivityLogs);
  document.getElementById("admin-log-category")?.addEventListener("change",renderActivityLogs);
- onSnapshot(collection(db,"users"),snapshot=>{
+ const renderUserSnapshot=snapshot=>{
   const list=document.getElementById("admin-user-list");
   list.replaceChildren();
-  const users=snapshot.docs.filter(d=>d.id!==ADMIN_NAME&&d.data().name!=="최고 관리자");
+  const search=(document.getElementById('admin-user-search')?.value||'').trim().toLowerCase();
+  const gradeFilter=document.getElementById('admin-user-grade-filter')?.value||'';
+  const users=snapshot.docs.filter(d=>d.id!==ADMIN_NAME&&!d.data().migratedTo&&d.data().name!=="최고 관리자"&&(!search||(d.data().name||d.id).toLowerCase().includes(search))&&(!gradeFilter||effectiveGrade(d.data())===gradeFilter));
   users.sort((a,b)=>{
    const order={pending:0,approved:1,expired:2,revoked:3};
    return (order[getUserState(a.data()).text==="승인 대기"?"pending":a.data().status]??5)-(order[getUserState(b.data()).text==="승인 대기"?"pending":b.data().status]??5);
@@ -976,7 +1298,57 @@ function loadAdminData(){
    if(data.status==="approved"){
     info.append(make("div","admin-expiry",validUntil(data)===Infinity?"영구 이용":`종료: ${dateLabel(data.expiresAt)}`));
    }else if(data.status==="expired")info.append(make("div","admin-expiry",`종료됨 · ${dateLabel(data.expiresAt)}`));
+   info.append(make('div','admin-expiry',`등급: ${GRADE_NAMES[effectiveGrade(data)]||'일반'} · 등급 만료: ${formatGradeTime(data.gradeExpiresAt)}`));
+   if(data.authUid!==id && !data.migratedTo){
+    const tip=make('div','admin-expiry','기존 닉네임 회원 · 새 Firebase 계정 UID 연결 필요');info.append(tip);
+    info.append(make('div','admin-expiry','UID 찾기: 회원이 이메일로 회원가입 → Firebase 콘솔 > Authentication > 사용자(Users) > 해당 이메일의 사용자 UID 복사. 본인 확인 후 연결하세요.'));
+    const connect=make('div','member-legacy-connect');
+    const uidInput=make('input');uidInput.placeholder='본인 확인한 회원의 Authentication UID';uidInput.setAttribute('aria-label','연결할 새 로그인 계정 UID');
+    const linkButton=make('button','admin-btn btn-approve','이전 이용권 연결');
+    linkButton.type='button';linkButton.onclick=async()=>{
+     if(!isAdminMode)return;
+     const newUid=uidInput.value.trim();
+     if(!/^[A-Za-z0-9_-]{16,128}$/.test(newUid))return window.uiAlert?.('Firebase Authentication의 UID를 정확히 입력해 주세요.');
+     if(!await window.uiConfirm(`${data.name||id} 회원의 과거 이용권을 새 UID 계정에 연결할까요? 반드시 본인 확인 후 진행하세요.`))return;
+     try{
+      await runTransaction(db,async tx=>{
+       const oldRef=doc(db,'users',id),newRef=doc(db,'users',newUid);
+       const oldDoc=await tx.get(oldRef),newDoc=await tx.get(newRef);
+       if(!oldDoc.exists()||!newDoc.exists())throw new Error('기존 회원 또는 새 가입 계정이 없습니다.');
+       const oldData=oldDoc.data(),newData=newDoc.data();
+       if(oldData.migratedTo)throw new Error('이미 연결된 회원입니다.');
+       if(newData.authUid!==newUid||newData.legacyId)throw new Error('가입 계정이 없거나 이미 이전 연결되었습니다.');
+       if(newData.status!=='pending')throw new Error('새 계정의 상태가 대기가 아닙니다. 확인해 주세요.');
+       tx.update(newRef,{legacyId:id,status:oldData.status,plan:oldData.plan??null,expiresAt:oldData.expiresAt??null,grade:oldData.grade||'normal',gradeExpiresAt:oldData.gradeExpiresAt??null,gradeDuration:savedGradeDuration(oldData),approvedAt:oldData.approvedAt??Date.now(),migratedAt:Date.now()});
+       tx.update(oldRef,{migratedTo:newUid,migratedAt:Date.now()});
+      });
+      window.uiAlert?.('기존 이용 기간과 등급을 새 로그인 계정에 연결했습니다.');
+      window.logActivity?.('관리자: 기존 이용권 연결',{legacyId:id});
+     }catch(e){console.error(e);window.uiAlert?.('연결 실패: '+e.message);}
+    };
+    connect.append(uidInput,linkButton);info.append(connect);
+   }else if(data.migratedTo){info.append(make('div','admin-expiry','새 로그인 계정 연결 완료 · 기존 기록 보존'));}
    const actions=make("div","admin-card-actions");
+   const gradeSelect=make('select','admin-plan-select');gradeSelect.setAttribute('aria-label','회원 등급');
+   Object.entries(GRADE_NAMES).forEach(([g,label])=>{const op=make('option',null,label);op.value=g;gradeSelect.append(op);});
+   const gradeDraft=adminGradeDrafts.get(id);
+   gradeSelect.value=gradeDraft?.grade||effectiveGrade(data);
+   const gradeDuration=make('select','admin-plan-select');gradeDuration.setAttribute('aria-label','등급 이용 기간');
+   [['7','등급 7일'],['30','등급 30일'],['permanent','등급 영구']].forEach(([v,t])=>{const op=make('option',null,t);op.value=v;gradeDuration.append(op);});
+   // 고정 30일이 아니라 Firebase에 실제 저장된 기간을 표시한다.
+   gradeDuration.value=gradeDraft?.duration||savedGradeDuration(data);
+   const rememberGradeDraft=()=>adminGradeDrafts.set(id,{grade:gradeSelect.value,duration:gradeDuration.value});
+   gradeSelect.addEventListener('change',rememberGradeDraft);
+   gradeDuration.addEventListener('change',rememberGradeDraft);
+   const setGrade=make('button','admin-btn btn-approve','등급 저장');setGrade.type='button';
+   setGrade.onclick=async()=>{
+    const chosenGrade=gradeSelect.value,chosenDuration=gradeDuration.value;
+    setGrade.disabled=true;setGrade.textContent='저장 중…';
+    const success=await window.setUserGrade(id,chosenGrade,chosenDuration);
+    setGrade.disabled=false;setGrade.textContent='등급 저장';
+    if(success){adminGradeDrafts.delete(id);if(adminUserSnapshot)renderUserSnapshot(adminUserSnapshot);}
+   };
+   actions.append(gradeSelect,gradeDuration,setGrade);
    const planSelect=make("select","admin-plan-select");
    planSelect.setAttribute("aria-label",`${data.name||id} 이용 기간`);
    [["7","7일"],["30","30일"],["permanent","영구"]].forEach(([value,label])=>{
@@ -1000,9 +1372,12 @@ function loadAdminData(){
    row.append(info,actions);list.append(row);
   });
   if(!users.length)list.append(make("div","admin-empty","등록된 사용자가 없습니다."));
- },err=>console.warn("사용자 목록 오류",err));
+ };
+ document.getElementById('admin-user-search').oninput=()=>{if(adminUserSnapshot)renderUserSnapshot(adminUserSnapshot);};
+ document.getElementById('admin-user-grade-filter').onchange=()=>{if(adminUserSnapshot)renderUserSnapshot(adminUserSnapshot);};
+ liveUnsubscribes.push(onSnapshot(collection(db,"users"),snapshot=>{adminUserSnapshot=snapshot;renderUserSnapshot(snapshot);},err=>console.warn("사용자 목록 오류",err)));
  const latest=query(collection(db,"logs"),orderBy("timestamp","desc"),limit(20));
- onSnapshot(latest,snapshot=>{
+ liveUnsubscribes.push(onSnapshot(latest,snapshot=>{
   const list=document.getElementById("admin-log-list");list.replaceChildren();
   snapshot.forEach(s=>{
    const d=s.data();const row=make("div","log-card");
@@ -1010,11 +1385,27 @@ function loadAdminData(){
    list.append(row);
   });
   if(!list.childNodes.length)list.append(make("div","admin-empty","접속 기록이 없습니다."));
- },err=>console.warn("접속 로그 오류",err));
+ },err=>console.warn("접속 로그 오류",err)));
  const q=query(collection(db,"activityLogs"),orderBy("timestamp","desc"),limit(150));
- onSnapshot(q,snapshot=>{activityCache=snapshot.docs.map(s=>s.data());renderActivityLogs();},err=>console.warn("작업 로그 오류",err));
+ liveUnsubscribes.push(onSnapshot(q,snapshot=>{activityCache=snapshot.docs.map(s=>s.data());renderActivityLogs();},err=>console.warn("작업 로그 오류",err)));
 }
+window.setUserGrade=async(id,grade='normal',duration='30')=>{
+ if(!isAdminMode||!GRADE_NAMES[grade])return false;
+ if(!['7','30','permanent'].includes(duration))return false;
+ const span=duration==='7'?7:duration==='30'?30:null;
+ const now=Date.now();
+ const gradeExpiresAt=grade==='normal'||!span?null:now+span*DAY_MS;
+ try{
+  // 기간 자체도 저장해서 실시간 갱신·재로그인 후 7/30/영구 선택이 정확히 유지된다.
+  await updateDoc(doc(db,'users',id),{
+   grade,gradeExpiresAt,gradeDuration:duration,fallbackGrade:'normal',gradeUpdatedAt:now
+  });
+  window.logActivity?.('관리자: 등급 변경',{user:id,grade,days:span||'영구'});
+  return true;
+ }catch(e){console.error(e);window.uiAlert?.('등급 변경 실패: Firestore 권한을 확인해 주세요.');return false;}
+};
 window.approveUser=async(id,plan="permanent")=>{
+ if(!isAdminMode||!auth.currentUser)return window.uiAlert?.('최고 관리자만 이용할 수 있습니다.');
  const dayCount=plan==="7"?7:plan==="30"?30:null;
  const timestamp=Date.now();
  const expiresAt=dayCount?timestamp+dayCount*DAY_MS:null;
@@ -1024,17 +1415,161 @@ window.approveUser=async(id,plan="permanent")=>{
  }catch(err){console.error(err);alert("승인 저장 실패: Firebase 권한을 확인하세요.");}
 };
 window.revokeUser=async id=>{
+ if(!isAdminMode||!auth.currentUser)return window.uiAlert?.('최고 관리자만 이용할 수 있습니다.');
  try{await updateDoc(doc(db,"users",id),{status:"revoked"});window.logActivity("관리자: 사용자 차단",{user:id});}
  catch(e){alert("이용 중지에 실패했습니다.");}
 };
 window.deleteUser=async id=>{
+ if(!isAdminMode||!auth.currentUser)return window.uiAlert?.('최고 관리자만 이용할 수 있습니다.');
  try{await deleteDoc(doc(db,"users",id));window.logActivity("관리자: 사용자 삭제",{user:id});}
  catch(e){alert("사용자 삭제에 실패했습니다.");}
 };
+
+// ========= 대필 전시관 =========
+// 개인 작품 원본은 이 브라우저의 IndexedDB에 자동 저장한다.
+// 대필판 PNG 저장 시 용량을 줄인 미리보기 이미지가 자동으로 Firestore 전시관에 게시된다.
+function openGalleryDB(){
+ return new Promise((resolve,reject)=>{
+  if(!window.indexedDB){reject(new Error('IndexedDB 미지원'));return;}
+  const r=indexedDB.open('daepil_gallery_private_v1',1);
+  r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('works'))r.result.createObjectStore('works',{keyPath:'id'});};
+  r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);
+ });
+}
+async function galleryLocalPut(item){
+ const dbx=await openGalleryDB();return new Promise((resolve,reject)=>{
+  const tx=dbx.transaction('works','readwrite');tx.objectStore('works').put(item);
+  tx.oncomplete=()=>{dbx.close();resolve();};tx.onerror=()=>{dbx.close();reject(tx.error);};
+ });
+}
+async function galleryLocalList(){
+ const dbx=await openGalleryDB();return new Promise((resolve,reject)=>{
+  const tx=dbx.transaction('works','readonly');const req=tx.objectStore('works').getAll();
+  req.onsuccess=()=>{dbx.close();resolve(req.result||[]);};req.onerror=()=>{dbx.close();reject(req.error);};
+ });
+}
+async function galleryLocalDelete(id){
+ const dbx=await openGalleryDB();return new Promise((resolve,reject)=>{
+  const tx=dbx.transaction('works','readwrite');tx.objectStore('works').delete(id);
+  tx.oncomplete=()=>{dbx.close();resolve();};tx.onerror=()=>{dbx.close();reject(tx.error);};
+ });
+}
+async function galleryThumbnail(blob){
+ const image=await createImageBitmap(blob);
+ const maxSide=740,scale=Math.min(1,maxSide/Math.max(image.width,image.height));
+ const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));
+ const ctx=canvas.getContext('2d');ctx.fillStyle='#101827';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(image,0,0,canvas.width,canvas.height);image.close?.();
+ // firestore document < 1MB. Tighter target improves loading on mobile.
+ let quality=.73,uri='';
+ for(let i=0;i<6;i++){
+  uri=canvas.toDataURL('image/jpeg',quality);
+  if(uri.length<260000)break;
+  quality=Math.max(.26,quality-.11);
+ }
+ if(uri.length>480000)throw new Error('전시관 미리보기 이미지가 너무 큽니다.');
+ return uri;
+}
+let publicGalleryItems=[],galleryMode='public';
+let localGalleryUrls=[];
+let galleryLoadToken=0;
+const galStatus=document.getElementById('gallery-status');
+function revokeGalleryUrls(){for(const u of localGalleryUrls)URL.revokeObjectURL(u);localGalleryUrls=[];}
+function galleryZoom(src,title){
+ document.getElementById('gallery-image-large').src=src;
+ document.getElementById('gallery-image-title').textContent=title||'대필 작품';
+ document.getElementById('gallery-image-overlay').style.display='flex';
+}
+document.getElementById('gallery-image-close').onclick=()=>{document.getElementById('gallery-image-overlay').style.display='none';document.getElementById('gallery-image-large').src='';};
+function showGalleryCard(item,local){
+ const card=make('div','member-work');
+ const img=document.createElement('img');img.loading='lazy';img.alt=item.title||'대필 작품';
+ const src=local?URL.createObjectURL(item.blob):item.thumb;
+ if(local)localGalleryUrls.push(src);
+ img.src=src;img.onclick=()=>galleryZoom(src,item.title);
+ const info=make('div','member-work-info');
+ info.append(make('strong',null,item.title||'대필 작품'));
+ info.append(make('div',null,`${item.author||'작성자'} · ${dateLabel(item.createdAt)}`));
+ if(local){
+  const badge=make('div','member-tip',item.isPublic?'내 작품 · 공개 설정':'내 작품 · 비공개');info.append(badge);
+  const del=make('button','member-btn danger','내 작품 삭제');del.type='button';del.onclick=async()=>{
+   if(!await window.uiConfirm(item.publicId?'이 작품을 내 기기와 전체 공개 전시관에서 모두 삭제할까요?':'이 기기의 전시관에서 작품을 삭제할까요?'))return;
+   if(item.publicId){
+    try{await deleteDoc(doc(db,'gallery',item.publicId));}
+    catch(e){window.uiAlert?.('전체 공개를 취소하지 못했어요. Firebase 권한을 확인해 주세요. 내 작품은 그대로 유지합니다.');return;}
+   }
+   await galleryLocalDelete(item.id);await loadGallery();
+  };info.append(del);
+ }else if(isAdminMode||item.ownerUid===authUser?.uid){
+  const del=make('button','member-btn danger','공개 작품 삭제');del.type='button';
+  del.onclick=async()=>{
+   if(!await window.uiConfirm('이 공개 작품을 삭제할까요?'))return;
+   try{await deleteDoc(doc(db,'gallery',item.id));}catch(e){window.uiAlert?.('삭제 실패: 권한을 확인해 주세요.');}
+  };info.append(del);
+ }
+ card.append(img,info);return card;
+}
+async function loadGallery(){
+ const token=++galleryLoadToken;
+ const list=document.getElementById('gallery-items');list.replaceChildren();revokeGalleryUrls();
+ if(galleryMode==='public'){
+  galStatus.textContent='전체 공개 작품';
+  for(const item of publicGalleryItems)list.append(showGalleryCard(item,false));
+  if(!publicGalleryItems.length)galStatus.textContent='아직 공개된 작품이 없어요. 대필판에서 PNG를 저장하면 자동으로 등록됩니다.';
+ }else{
+  galStatus.textContent='이 기기에 저장된 내 작품을 불러오는 중…';
+  try{
+   const works=(await galleryLocalList()).filter(x=>x.ownerUid===authUser?.uid).sort((a,b)=>b.createdAt-a.createdAt);
+   if(token!==galleryLoadToken)return;
+   for(const item of works)list.append(showGalleryCard(item,true));
+   galStatus.textContent=works.length?`내 작품 ${works.length}개 · 이 기기에 저장됨`:'아직 저장한 작품이 없어요. 대필판 PNG를 저장하면 자동으로 추가돼요.';
+  }catch(e){galStatus.textContent='내 작품을 읽지 못했어요. 브라우저의 저장소 설정을 확인해 주세요.';}
+ }
+}
+document.getElementById('gallery-refresh').onclick=loadGallery;
+document.getElementById('gallery-my').onclick=()=>{galleryMode='my';loadGallery();};
+document.getElementById('gallery-public').onclick=()=>{galleryMode='public';loadGallery();};
+function startGallerySubscription(){return onSnapshot(query(collection(db,'gallery'),orderBy('createdAt','desc'),limit(60)),snap=>{
+ publicGalleryItems=snap.docs.filter(d=>d.data().isPublic===true).map(d=>({id:d.id,...d.data()}));
+ const adminList=document.getElementById('admin-gallery-list');adminList.replaceChildren();
+ publicGalleryItems.forEach(item=>{
+  const row=make('div','member-controls');row.append(make('span',null,`${item.title} · ${item.author||'작성자'}`));
+  const del=make('button','member-btn danger','삭제');del.onclick=async()=>{
+   if(!isAdminMode||!await window.uiConfirm('공개 작품을 삭제할까요?'))return;
+   try{await deleteDoc(doc(db,'gallery',item.id));}catch(e){window.uiAlert?.('삭제 권한을 확인해 주세요.');}
+  };row.append(del);adminList.append(row);
+ });
+ if(galleryMode==='public')loadGallery();
+},e=>{console.warn('공개 전시관 읽기 실패',e);galStatus.textContent='공개 전시관을 불러오지 못했어요. Firestore 설정을 확인해 주세요.';});}
+window.addBoardToGallery=async(blob,options={})=>{
+ const status=document.getElementById('board-gallery-status');
+ if(status)status.textContent='내 작품을 전시관에 등록하는 중…';
+ const title=String(options.title||'대필 작품').slice(0,60);
+ const name=savedName||'미지정';
+ if(!authUser||!window.canUseFeature('board')){if(status)status.textContent='로그인 또는 대필판 이용 권한이 필요합니다.';return;}
+ const item={id:(crypto.randomUUID?.()||Date.now()+'_'+Math.random().toString(36).slice(2)),ownerUid:authUser.uid,owner:name,author:name,title,isPublic:false,blob,createdAt:Date.now()};
+ try{
+  await galleryLocalPut(item);
+  if(status)status.textContent='내 전시관에 작품이 자동 등록됐어요.';
+ }catch(e){if(status)status.textContent='이 기기에 작품을 저장하지 못했어요. 저장 공간을 확인해 주세요.';console.warn(e);}
+ // 공개 버튼 없이 모든 신규 저장 작품을 자동 공개한다.
+ {
+  try{
+   const thumb=await galleryThumbnail(blob);
+   const remote=await addDoc(collection(db,'gallery'),{title,author:name,ownerUid:authUser.uid,thumb,isPublic:true,createdAt:Date.now()});
+   item.isPublic=true;item.publicId=remote.id;
+   try{await galleryLocalPut(item);}catch(e){}
+   if(status)status.textContent='작품이 전시관 전체 공개 목록에 등록됐어요.';
+   window.logActivity?.('대필 전시관 공개',{title});
+  }catch(e){console.warn('전시관 공개 실패',e);if(status)status.textContent='내 작품 저장은 완료됐지만 전체 공개는 실패했어요. Firebase 권한을 확인해 주세요.';}
+ }
+ if(galleryMode==='my')loadGallery();
+};
+
 window.closeAdmin=()=>{
- isAdminMode=false;
+ // 관리자 화면을 닫는 것은 로그아웃이나 관리자 권한 해제가 아니다.
  document.getElementById("admin-dashboard").style.display="none";
- if(savedName&&savedName!==ADMIN_NAME)checkUserAuth(savedName,false);
+ if(authUser&&currentMember?.status==='approved')authScreen.style.display='none';
+ refreshGradeUI();
 };
 </script>
 
@@ -1048,6 +1583,10 @@ window.closeAdmin=()=>{
   ✂ 총 자르기
  </button>
 
+ <button id="btn-kill" onclick="switchTab('kill')">
+  🎯 킬로그 커팅
+ </button>
+
  <button id="btn-merge" onclick="switchTab('merge')">
   🖼️ 합치기
  </button>
@@ -1056,9 +1595,10 @@ window.closeAdmin=()=>{
   📝 대필판
  </button>
 
- <button onclick="window.openAdminPrompt()" style="flex:0 0 48px;font-size:20px;padding:0">
-  ⚙️
- </button>
+ <button id="btn-gallery" onclick="switchTab('gallery')">🏛️ 전시관</button>
+ <button id="btn-logout" onclick="window.confirmSignOutMember()" title="로그아웃" style="flex:0 0 auto;min-width:80px;font-size:12px;padding:10px 12px">로그아웃</button>
+  <button id="btn-member-info" onclick="window.openMemberInfo()" title="내 등급 · 공지사항" style="flex:0 0 48px;font-size:19px;padding:0">👤</button>
+ <button id="btn-admin" onclick="window.openAdminPrompt()" title="최고 관리자 전용" style="display:none;flex:0 0 auto;min-width:76px;font-size:12px;padding:10px 12px">⚙ 관리자</button>
 
 </div>
 
@@ -1262,6 +1802,35 @@ window.closeAdmin=()=>{
      합치기
 ===================================================== -->
 
+
+<!-- 킬로그 자동 커팅: 독립 모듈 -->
+<div id="kill-tab" class="tab-pane">
+ <div class="app" style="max-width:1050px">
+  <header class="header"><div class="title-wrap"><h1>🎯 킬로그 커팅</h1><p>게임 스크린샷을 추가하고, 자를 킬로그를 눌러 선택하세요.</p></div></header>
+  <label class="upload" for="kl-files"><div class="upload-left"><div class="upload-icon">＋</div><div class="upload-text"><strong>사진 추가하기</strong><span>PNG · JPG · WEBP / 여러 장 선택 가능</span></div></div></label>
+  <input id="kl-files" type="file" accept="image/png,image/jpeg,image/webp" multiple>
+  <div class="photo-panel"><div class="panel-head"><strong>사진 목록</strong><button class="photo-button" id="kl-clear" type="button" title="추가한 사진과 추출 결과를 모두 삭제합니다">사진·결과 모두 삭제</button></div><div id="kl-photos" class="photo-list"></div></div>
+  <div class="photo-panel"><div class="panel-head"><strong>원본 사진 · 자를 킬로그 선택</strong><span id="kl-status" style="font-size:12px;color:#9fb2cc">사진을 추가해 주세요.</span></div>
+   <div id="kl-zoom-controls" style="display:flex;align-items:center;justify-content:flex-start;gap:8px;flex-wrap:wrap;margin:5px 0 11px">
+    <button type="button" id="kl-zoom-out" class="photo-button" style="min-width:48px;width:48px" aria-label="사진 축소">−</button>
+    <span id="kl-zoom-percent" style="font-size:13px;font-weight:800;min-width:50px;text-align:center;color:#cfe1ff">100%</span>
+    <button type="button" id="kl-zoom-in" class="photo-button" style="min-width:48px;width:48px" aria-label="사진 확대">＋</button>
+    <button type="button" id="kl-zoom-reset" class="photo-button" style="min-width:85px">확대 초기화</button>
+    <span style="font-size:11px;color:#9fb2cc">사진만 확대됩니다 · 손가락 두 개로도 확대 가능</span>
+   </div>
+   <div id="kl-viewport" style="position:relative;width:100%;max-height:70vh;overflow:auto;overscroll-behavior:contain;border-radius:12px;background:#091220;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch">
+    <div id="kl-stage" style="position:relative;width:100%;overflow:hidden">
+     <canvas id="kl-source" style="display:block;width:100%;height:auto;cursor:crosshair;touch-action:pan-x pan-y"></canvas>
+     <canvas id="kl-selection-overlay" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
+    </div>
+   </div>
+   <p style="color:#b4c5dc;font-size:12px;margin-top:9px;line-height:1.6">게임 화면 위쪽의 ‘킬 알림’ 막대를 누르면 그 부분을 자동으로 잘라요. 사진을 확대해도 저장되는 이미지 크기는 달라지지 않습니다. 추출된 이미지는 아래에서 확인하고 저장하세요.</p>
+  </div>
+  <div class="photo-panel"><div class="panel-head"><strong>추출 결과 · 배경 없는 PNG</strong><span id="kl-count">0개</span></div><div id="kl-results" class="results"><div class="empty">아직 선택된 킬로그가 없습니다.</div></div>
+   <button class="all-save" id="kl-save-all" disabled>추출한 킬로그 모두 저장</button></div>
+ </div>
+</div>
+
 <div id="merge-tab" class="tab-pane">
 <div class="app">
 
@@ -1341,6 +1910,12 @@ window.closeAdmin=()=>{
 <!-- =====================================================
      대필판 - 옷/총기 이미지와 문구를 조합한 거래판 제작
 ===================================================== -->
+<div id="gallery-tab" class="tab-pane">
+ <div class="member-panel"><h2>🏛️ 대필 전시관</h2><p>대필판을 PNG로 저장하면 전시관에 자동으로 공개됩니다. 다른 회원도 작품 이미지와 작성자 닉네임을 볼 수 있어요. 등록한 작품은 내 작품에서 삭제할 수 있습니다.</p>
+ <div class="member-controls"><button class="member-btn primary" id="gallery-refresh" type="button">전시관 새로고침</button><button class="member-btn" id="gallery-my" type="button">내 작품</button><button class="member-btn" id="gallery-public" type="button">전체 공개 작품</button></div>
+ <p id="gallery-status" role="status">작품을 불러오는 중…</p><div class="member-grid" id="gallery-items"></div>
+ </div>
+</div>
 <div id="board-tab" class="tab-pane">
  <div class="board-app">
   <header class="header">
@@ -1518,6 +2093,12 @@ window.closeAdmin=()=>{
    
    <div id="b_previewMeta" class="board-counter">옷 0장 · 총기 0장 · 대기 중</div>
    <div class="board-preview-wrap" style="margin-top:10px"><canvas id="b_preview" width="900" height="1300"></canvas></div>
+   <div class="member-panel" style="margin:10px 0"><h3>🏛️ 대필 전시관 자동 등록</h3>
+    <p>PNG 대필판을 저장하면 전시관에 자동으로 등록되고 모든 회원에게 공개됩니다.</p>
+    <div class="member-controls"><input type="text" id="board-work-title" placeholder="작품 제목 (선택)" maxlength="60" style="flex:1"></div>
+    <p>※ 별도의 공개 버튼은 없습니다. 저장 시 작품 이미지와 작성자 닉네임이 자동 공개됩니다. 전시관의 ‘내 작품’에서 삭제할 수 있습니다.</p>
+    <p id="board-gallery-status" role="status"></p>
+   </div>
    <div class="board-sticky-actions">
     <button id="b_savePng" type="button" class="board-btn primary">⬇ PNG 대필판 저장</button>
     <button id="b_saveSettings" type="button" class="board-btn">💾 설정 저장</button>
@@ -1536,9 +2117,13 @@ window.closeAdmin=()=>{
    공통
 ===================================================== */
 
-function switchTab(tabId){
- if(window.logActivity)window.logActivity("기능 열기",{feature:({clothes:"옷 추출",guns:"총기 카드 자르기",merge:"이미지 합치기",board:"대필판 만들기"})[tabId]||tabId});
- ["clothes","guns","merge","board"].forEach(id=>{
+function switchTab(tabId, silent=false){
+ if(window.canUseFeature && !window.canUseFeature(tabId)){
+   if(!silent)window.uiAlert?.('현재 회원 등급에서는 이 기능을 이용할 수 없습니다. 내 이용 정보에서 등급을 확인하세요.');
+   return;
+ }
+ if(!silent && window.logActivity)window.logActivity("기능 열기",{feature:({clothes:"옷 추출",guns:"총기 카드 자르기",merge:"이미지 합치기",kill:"킬로그 커팅",board:"대필판 만들기"})[tabId]||tabId});
+ ["clothes","guns","kill","merge","board","gallery"].forEach(id=>{
   document.getElementById("btn-"+id).classList.remove("active");
   document.getElementById(id+"-tab").classList.remove("active");
  });
@@ -4605,11 +5190,19 @@ saveBtn.addEventListener("click",async()=>{
    const filename="daepil_board.png";
    const file=new File([blob],filename,{type:"image/png"});
    if(navigator.canShare&&navigator.canShare({files:[file]})){
-    try{await navigator.share({files:[file]});}catch(e){if(e.name!=="AbortError")throw e;}
+    try{await navigator.share({files:[file]});}catch(e){if(e.name==="AbortError")return;throw e;}
    }else{
     const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=filename;a.style.display="none";document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url);},1000);
    }
    if(window.logActivity)window.logActivity("대필판 PNG 저장",{clothes:state.clothes.length,guns:state.guns.length,width:info.width,height:info.height});
+   // 원본 PNG 저장 성공 이후에만 전시관에 등록한다. 전시관 등록 실패는 PNG 저장을 취소하지 않는다.
+   if(window.addBoardToGallery){
+    const title=document.getElementById('board-work-title')?.value.trim()||'나의 대필 작품';
+    window.addBoardToGallery(blob,{title}).catch(err=>{
+     console.warn('전시관 등록 실패',err);
+     const label=document.getElementById('board-gallery-status');if(label)label.textContent='전시관 등록에 실패했어요. PNG 저장은 완료됐습니다.';
+    });
+   }
   }catch(err){console.error(err);alert("이미지를 저장하지 못했습니다. 사진 수를 줄이거나 브라우저의 저장 권한을 확인해 주세요.");}
  }
  $("b_savePng").addEventListener("click",savePNG);
@@ -4618,5 +5211,414 @@ saveBtn.addEventListener("click",async()=>{
  if(document.fonts&&document.fonts.load)document.fonts.load('24px "Jua"').then(()=>scheduleDraw()).catch(()=>{});
 })();
 </script>
+
+<div id="kl-preview-modal" style="display:none;position:fixed;inset:0;z-index:999999;background:#050912ed;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:15px" role="dialog" aria-modal="true" aria-label="킬로그 결과 크게 보기"><div style="display:flex;justify-content:space-between;width:min(95vw,980px);align-items:center"><strong id="kl-preview-title">추출 결과</strong><button id="kl-preview-close" type="button" style="padding:12px;border-radius:10px;background:#273951;color:white">닫기 ✕</button></div><div id="kl-preview-area" style="width:min(95vw,980px);max-height:72vh;overflow:auto;background:repeating-conic-gradient(#303746 0% 25%,#172032 0% 50%) 50%/18px 18px;border-radius:12px"><img id="kl-preview-img" alt="킬로그 확대 보기" style="width:100%;display:block;height:auto"></div><div style="display:flex;gap:15px;align-items:center"><button id="kl-preview-minus" style="padding:10px 20px;background:#273951;color:#fff;border-radius:10px">−</button><span id="kl-preview-percent">100%</span><button id="kl-preview-plus" style="padding:10px 20px;background:#273951;color:#fff;border-radius:10px">＋</button></div></div>
+<script>
+/* 킬로그 커팅 독립 기능 - 막대 내부는 보존, 바깥 장식만 분리 */
+(()=>{
+ 'use strict';
+ const $=id=>document.getElementById(id);
+ const photos=[],results=[];
+ let active=-1,busy=false;
+ const view=$('kl-source'), ctx=view.getContext('2d',{willReadFrequently:true});
+ const overlay=$('kl-selection-overlay'), mark=overlay.getContext('2d');
+ const OUTPUT_W=760,MIN_OUTPUT_H=190;
+ const viewport=$('kl-viewport'), stage=$('kl-stage');
+ let zoom=1,pinch=null,suppressClickUntil=0;
+ const MIN_ZOOM=1,MAX_ZOOM=4;
+ // CSS로 사진과 표시선만 확대한다. 원본 캔버스 픽셀은 바뀌지 않는다.
+ function applyZoom(next,pointX,pointY){
+  const newZoom=clamp(Math.round(next*100)/100,MIN_ZOOM,MAX_ZOOM);
+  if(!Number.isFinite(newZoom))return;
+  const box=viewport.getBoundingClientRect();
+  const px=clamp(pointX??(box.left+box.width/2),box.left,box.right);
+  const py=clamp(pointY??(box.top+box.height/2),box.top,box.bottom);
+  const focusX=px-box.left,focusY=py-box.top;
+  const oldW=stage.getBoundingClientRect().width || box.width;
+  const oldH=stage.getBoundingClientRect().height || box.height;
+  const fractionX=(viewport.scrollLeft+focusX)/Math.max(1,oldW);
+  const fractionY=(viewport.scrollTop+focusY)/Math.max(1,oldH);
+  zoom=newZoom;
+  stage.style.width=Math.max(1,Math.round(viewport.clientWidth*zoom))+'px';
+  const newW=stage.getBoundingClientRect().width;
+  const newH=stage.getBoundingClientRect().height;
+  viewport.scrollLeft=Math.max(0,fractionX*newW-focusX);
+  viewport.scrollTop=Math.max(0,fractionY*newH-focusY);
+  $('kl-zoom-percent').textContent=Math.round(zoom*100)+'%';
+  $('kl-zoom-out').disabled=zoom<=MIN_ZOOM;
+  $('kl-zoom-in').disabled=zoom>=MAX_ZOOM;
+ }
+ $('kl-zoom-out').addEventListener('click',()=>applyZoom(zoom-.25));
+ $('kl-zoom-in').addEventListener('click',()=>applyZoom(zoom+.25));
+ $('kl-zoom-reset').addEventListener('click',()=>applyZoom(1));
+ const dist=(a,b)=>Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+ viewport.addEventListener('touchstart',e=>{
+  if(e.touches.length===2){
+   pinch={initialDistance:Math.max(1,dist(e.touches[0],e.touches[1])),initialZoom:zoom};
+   suppressClickUntil=Date.now()+800;
+  }
+ },{passive:true});
+ viewport.addEventListener('touchmove',e=>{
+  if(e.touches.length!==2||!pinch)return;
+  e.preventDefault();
+  const one=e.touches[0],two=e.touches[1];
+  applyZoom(pinch.initialZoom*dist(one,two)/pinch.initialDistance,
+   (one.clientX+two.clientX)/2,(one.clientY+two.clientY)/2);
+  suppressClickUntil=Date.now()+800;
+ },{passive:false});
+ viewport.addEventListener('touchend',e=>{
+  if(e.touches.length<2)pinch=null;
+ },{passive:true});
+ viewport.addEventListener('touchcancel',()=>{pinch=null},{passive:true});
+ // Ctrl+휠 확대도 사진 영역만 변경한다.
+ viewport.addEventListener('wheel',e=>{
+  if(!e.ctrlKey&&!e.metaKey)return;
+  e.preventDefault();
+  applyZoom(zoom*(e.deltaY<0?1.15:1/1.15),e.clientX,e.clientY);
+ },{passive:false});
+ window.addEventListener('resize',()=>{if(view.width>1)applyZoom(zoom)});
+ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+ const I=(x,y,w)=>y*w+x, P=(x,y,w)=>4*(y*w+x);
+ const status=text=>{$('kl-status').textContent=text;};
+
+ function drawSelections(){
+  overlay.width=view.width;overlay.height=view.height;
+  mark.clearRect(0,0,overlay.width,overlay.height);
+  if(active<0)return;
+  results.filter(r=>r.photo===active&&r.bounds).forEach(r=>{
+   const b=r.bounds;
+   mark.save();
+   mark.fillStyle='rgba(36,180,255,.22)';mark.fillRect(b.x,b.y,b.w,b.h);
+   mark.strokeStyle='#29d6ff';mark.lineWidth=Math.max(3,view.width*.0025);
+   mark.setLineDash([Math.max(9,view.width*.008),Math.max(5,view.width*.004)]);
+   mark.strokeRect(b.x,b.y,b.w,b.h);mark.setLineDash([]);
+   const radius=Math.max(12,view.width*.011),cx=b.x+b.w-8,cy=b.y+8;
+   mark.beginPath();mark.arc(cx,cy,radius,0,Math.PI*2);mark.fillStyle='#00b9f2';mark.fill();
+   mark.fillStyle='#061726';mark.textAlign='center';mark.textBaseline='middle';
+   mark.font=`bold ${Math.round(radius*1.2)}px sans-serif`;mark.fillText('✓',cx,cy+1);
+   mark.restore();
+  });
+ }
+ function loadImage(file){return new Promise((resolve,reject)=>{
+  const url=URL.createObjectURL(file),im=new Image();
+  im.onload=()=>{URL.revokeObjectURL(url);resolve(im)};
+  im.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('이미지 읽기 실패'))};im.src=url;
+ });}
+ function redraw(){
+  const holder=$('kl-photos');holder.replaceChildren();
+  photos.forEach((p,i)=>{
+   const b=document.createElement('button');b.className='photo-button'+(i===active?' active':'');
+   b.textContent=`사진 ${i+1} (${results.filter(r=>r.photo===i).length}개)`;b.onclick=()=>{active=i;redraw()};holder.append(b);
+  });
+  if(active<0||!photos[active]){
+   view.width=1;view.height=1;ctx.clearRect(0,0,1,1);
+   status('사진을 추가해 주세요.');applyZoom(1);drawSelections();return;
+  }
+  const im=photos[active].image;
+  view.width=im.naturalWidth;view.height=im.naturalHeight;
+  ctx.clearRect(0,0,view.width,view.height);ctx.drawImage(im,0,0);
+  applyZoom(1);viewport.scrollLeft=0;viewport.scrollTop=0;status('사진 속 ‘킬 알림’ 막대를 눌러주세요.');drawSelections();
+ }
+ async function encodeResult(r){
+  // 실제 킬로그 영역만 찾아 배경 없는 PNG로 저장한다.
+  const w=r.work.width,h=r.work.height,rgba=r.work.getContext('2d').getImageData(0,0,w,h).data;
+  let l=w,t=h,rr=-1,bb=-1;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+   if(rgba[(y*w+x)*4+3]<12)continue;
+   if(x<l)l=x;if(x>rr)rr=x;if(y<t)t=y;if(y>bb)bb=y;
+  }
+  if(rr<l||bb<t)return false;
+  l=Math.max(0,l-3);t=Math.max(0,t-3);rr=Math.min(w-1,rr+3);bb=Math.min(h-1,bb+3);
+  const cropW=rr-l+1,cropH=bb-t+1;
+  const scale=(OUTPUT_W-12)/cropW;
+  const dw=Math.max(1,Math.round(cropW*scale));
+  const dh=Math.max(1,Math.round(cropH*scale));
+  const outH=Math.max(MIN_OUTPUT_H,dh+12);
+  const canvas=document.createElement('canvas');canvas.width=OUTPUT_W;canvas.height=outH;
+  const g=canvas.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+  g.drawImage(r.work,l,t,cropW,cropH,Math.round((OUTPUT_W-dw)/2),Math.round((outH-dh)/2),dw,dh);
+  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+  if(!blob)return false;
+  if(r.url)URL.revokeObjectURL(r.url);
+  r.blob=blob;r.url=URL.createObjectURL(blob);r.outputH=outH;r.contentWidth=dw;
+  return true;
+ }
+
+ function updatePhotoCounts(){photos.forEach((p,i)=>{const button=$('kl-photos').children[i];if(button)button.textContent=`사진 ${i+1} (${results.filter(r=>r.photo===i).length}개)`;});}
+ function resultWarning(r){
+  if(!r.work)return '이미지 확인 필요';
+  const w=r.work.width,h=r.work.height;
+  if(!w||!h)return '추출 내용이 비어 있음';
+  const rgba=r.work.getContext('2d',{willReadFrequently:true}).getImageData(0,0,w,h).data;
+  let l=w,rt=-1,t=h,bt=-1,count=0;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+   if(rgba[(y*w+x)*4+3]<20)continue;
+   l=Math.min(l,x);rt=Math.max(rt,x);t=Math.min(t,y);bt=Math.max(bt,y);count++;
+  }
+  if(rt<l)return '내용이 거의 없음';
+  const a=rt-l+1,b=bt-t+1;
+  if(a/b<2)return '가로가 지나치게 짧을 수 있음';
+  if(a/b>18)return '세로가 지나치게 얇을 수 있음';
+  if(count/(a*b)<.07)return '일부 영역이 누락됐을 수 있음';
+  return '';
+ }
+ let previewZoom=1;
+ const previewModal=$('kl-preview-modal'),previewImg=$('kl-preview-img');
+ function setPreviewZoom(v){previewZoom=clamp(v,1,4);previewImg.style.width=Math.round(previewZoom*100)+'%';$('kl-preview-percent').textContent=Math.round(previewZoom*100)+'%';}
+ function showPreview(r,i){previewImg.src=r.url;$('kl-preview-title').textContent=`킬로그 ${i+1} · 사진 ${r.photo+1}`;previewModal.style.display='flex';setPreviewZoom(1);}
+ function hidePreview(){previewModal.style.display='none';previewImg.removeAttribute('src');}
+ $('kl-preview-close').onclick=hidePreview;
+ $('kl-preview-minus').onclick=()=>setPreviewZoom(previewZoom-.25);
+ $('kl-preview-plus').onclick=()=>setPreviewZoom(previewZoom+.25);
+ previewModal.addEventListener('click',e=>{if(e.target===previewModal)hidePreview();});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&previewModal.style.display==='flex')hidePreview();});
+ function resultView(){
+  const wrap=$('kl-results');wrap.replaceChildren();
+  $('kl-count').textContent=results.length+'개';$('kl-save-all').disabled=!results.length;
+  if(!results.length){const d=document.createElement('div');d.className='empty';
+   d.textContent='아직 선택된 킬로그가 없습니다.';wrap.append(d);return;}
+  results.forEach((r,i)=>{
+   const card=document.createElement('div');card.className='card';
+   const img=document.createElement('img');img.src=r.url;img.alt='누르면 확대해서 볼 수 있습니다';img.style.cursor='zoom-in';img.onclick=()=>showPreview(r,i);
+   img.style.cssText='display:block;width:100%;height:auto;max-height:none;object-fit:contain;background:repeating-conic-gradient(#ddd 0% 25%,#fff 0% 50%) 50%/16px 16px';
+   const info=document.createElement('div');info.className='card-info';
+   info.textContent=`킬로그 ${i+1} · 사진 ${r.photo+1} · ${OUTPUT_W}×${r.outputH} · 가로 길이 통일`;
+   const warn=resultWarning(r);if(warn){const note=document.createElement('div');note.textContent='⚠ 결과 확인 권장: '+warn;note.style.cssText='padding:5px;color:#ffc67a;font-size:11px';card.append(note);}const save=document.createElement('button');save.className='save';save.textContent='개별 저장';save.onclick=()=>saveFiles([r],i);
+   const del=document.createElement('button');del.className='save';del.textContent='삭제';del.style.borderColor='#805568';
+   del.onclick=()=>{URL.revokeObjectURL(r.url);results.splice(i,1);resultView();drawSelections();updatePhotoCounts()};
+   card.append(img,info,save,del);wrap.append(card);
+  });
+ }
+ async function saveFiles(list,startIndex=0){
+  const files=list.map((r,i)=>new File([r.blob],`킬로그_${String(startIndex+i+1).padStart(2,'0')}.png`,{type:'image/png'}));
+  try{if(navigator.canShare&&navigator.canShare({files})){await navigator.share({files});return;}}
+  catch(e){if(e.name==='AbortError')return;}
+  for(const f of files){
+   const u=URL.createObjectURL(f),a=document.createElement('a');a.href=u;a.download=f.name;
+   document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000);
+   await new Promise(r=>setTimeout(r,220));
+  }
+ }
+ $('kl-save-all').onclick=()=>saveFiles(results,0);
+ $('kl-files').addEventListener('change',async e=>{
+  const files=[...e.target.files];if(!files.length)return;
+  status('사진 불러오는 중…');let ok=0;
+  for(const f of files){try{const im=await loadImage(f);photos.push({image:im,name:f.name});ok++;}
+   catch(err){console.warn(err);}}
+  if(ok){active=photos.length-ok;redraw();window.logActivity?.('킬로그 사진 추가',{images:ok,total:photos.length});}
+  else status('사진을 읽지 못했습니다.');e.target.value='';
+ });
+ $('kl-clear').onclick=()=>{
+  photos.length=0;active=-1;
+  for(const r of results)URL.revokeObjectURL(r.url);
+  results.length=0;redraw();resultView();drawSelections();
+ };
+
+ function blur1D(array,radius=5){
+  const n=array.length,out=new Float32Array(n);
+  for(let i=0;i<n;i++){
+   let sum=0,wt=0;
+   for(let j=-radius;j<=radius;j++){
+    const x=clamp(i+j,0,n-1),q=radius+1-Math.abs(j);
+    sum+=array[x]*q;wt+=q;
+   }
+   out[i]=sum/wt;
+  }
+  return out;
+ }
+ function quantile55(values,start,end){
+  const arr=[];
+  for(let i=clamp(start,0,values.length);i<clamp(end,0,values.length);i++)arr.push(values[i]);
+  if(!arr.length)return 60;
+  arr.sort((a,b)=>a-b);return arr[Math.floor((arr.length-1)*.55)];
+ }
+
+ async function extractKilllog(tx,ty){
+  const W=view.width,H=view.height;
+  const sx=W/1536,sy=H/709;
+  // 실제 게임 원본 19장의 공통 킬로그 레이아웃을 기준으로 분석.
+  // 사진을 확대해도 클릭 좌표는 자연 크기로 들어오므로 정확한 좌표로 처리한다.
+  if(W<500||H<240||W/H<1.98||W/H>2.45)return null;
+  const rgba=ctx.getImageData(0,0,W,H).data;
+  function rgb(x,y){
+   x=clamp(Math.round(x*sx),0,W-1);y=clamp(Math.round(y*sy),0,H-1);
+   const p=4*(y*W+x);return [rgba[p],rgba[p+1],rgba[p+2]];
+  }
+  function delta(a,b){return Math.max(Math.abs(a[0]-b[0]),Math.abs(a[1]-b[1]),Math.abs(a[2]-b[2]));}
+  // 색상에 관계없이 막대가 실제로 존재하는지 먼저 확인한다.
+  // 선택 실패 시 근처 배경을 임의의 킬로그로 만드는 과거 강제 보정은 사용하지 않음.
+  let visual=0,total=0;
+  for(let x=600;x<=825;x+=8){
+   const bg1=rgb(x,115),bg2=rgb(x,220);
+   for(let y=158;y<=180;y+=11){
+    const c=rgb(x,y);
+    const background=[(bg1[0]+bg2[0])/2,(bg1[1]+bg2[1])/2,(bg1[2]+bg2[2])/2];
+    visual+=Math.max(0,delta(c,background)-17);total++;
+   }
+  }
+  if(visual/Math.max(1,total)<24)return null;
+  let warmth=0,warmTotal=0;
+  for(let y=160;y<185;y+=3)for(let x=750;x<900;x+=5){
+   const [R,G,B]=rgb(x,y);warmTotal++;
+   if(R>145&&R>B*1.6&&G>70)warmth++;
+  }
+  const fire=warmth/Math.max(1,warmTotal)>.42;
+  const centerColor=rgb(760,182);
+  const darkRed=!fire&&centerColor[0]<85&&centerColor[1]<75&&centerColor[2]<85&&centerColor[0]>centerColor[1]*1.04;
+  // 실제 장식형인지 색상·위치·배경 차이로 판별. 평범한 바에서는 기존 마스크 그대로.
+  let upperDecorCount=0,lowerRedCount=0;
+  for(let x=490;x<=780;x+=4){
+   const refBg=rgb(x,75);
+   for(let y=94;y<=138;y+=3){
+    const c=rgb(x,y),sat=Math.max(...c)-Math.min(...c);
+    if(delta(c,refBg)>36&&sat>27&&Math.max(...c)>95)upperDecorCount++;
+   }
+   for(let y=201;y<=225;y+=3){
+    const c=rgb(x,y);
+    if(c[0]>118&&c[0]>c[1]*1.2&&delta(c,refBg)>35)lowerRedCount++;
+   }
+  }
+  const largeOrnament=!fire&&(upperDecorCount>25||lowerRedCount>13);
+
+  const ux=tx/sx,uy=ty/sy;
+  const inBar=ux>=540&&ux<=950&&uy>=143&&uy<=197;
+  const inFire=fire&&ux>=476&&ux<=980&&uy>=99&&uy<=217;
+  const hitColor=rgb(ux,uy),hitSat=Math.max(...hitColor)-Math.min(...hitColor);
+  const inLargeDecoration=largeOrnament&&ux>=478&&ux<=810&&uy>=95&&uy<=221&&
+   delta(hitColor,rgb(ux,75))>48&&hitSat>36&&Math.max(...hitColor)>105;
+  if(!inBar&&!inFire&&!inLargeDecoration)return null;
+
+  // 빈 배경만 눌렀을 때는 막대가 존재하는 화면이라도 통과시키지 않는다.
+  let nearby=0,samples=0;
+  for(let y=uy-8;y<=uy+8;y+=4)for(let x=ux-10;x<=ux+10;x+=4){
+   const c=rgb(x,y),t=rgb(x,largeOrnament?75:115),b=rgb(x,largeOrnament?238:221);
+   const bg=[(t[0]+b[0])/2,(t[1]+b[1])/2,(t[2]+b[2])/2];
+   if(delta(c,bg)>24)nearby++;
+   samples++;
+  }
+  if(nearby/Math.max(1,samples)<.20)return null;
+
+  const leftBand=fire?490:545;
+  const topBand=darkRed?153:fire?146:149;
+  const bottomBand=darkRed?195:fire?192:190;
+  const sourceX0=fire?460:(largeOrnament?455:510),sourceX1=fire?990:(largeOrnament?995:978);
+  const sourceY0=fire?86:(largeOrnament?75:130),sourceY1=fire?237:(largeOrnament?243:224);
+  // 주변 장식이 잘리지 않도록 원본 영역을 조금 더 확보한다.
+  const x0=clamp(Math.floor(sourceX0*sx),0,W-2);
+  const x1=clamp(Math.ceil(sourceX1*sx),x0+1,W);
+  const y0=clamp(Math.floor(sourceY0*sy),0,H-2);
+  const y1=clamp(Math.ceil(sourceY1*sy),y0+1,H);
+  const w=x1-x0,h=y1-y0;
+  const raw=new Uint8Array(w*h*4),alpha=new Uint8Array(w*h);
+  const bandT=topBand*sy-y0,bandB=bottomBand*sy-y0;
+  const topSample=Math.round((largeOrnament?75:115)*sy),bottomSample=Math.round((largeOrnament?238:221)*sy);
+  const cb=ctx.getImageData(x0,y0,w,h).data;
+  const ctop=ctx.getImageData(x0,topSample,w,1).data;
+  const cbot=ctx.getImageData(x0,bottomSample,w,1).data;
+  for(let y=0;y<h;y++){
+   const yRef=(y+y0)/sy;
+   const blend=largeOrnament?clamp((yRef-75)/163,0,1):clamp((yRef-115)/106,0,1);
+   for(let x=0;x<w;x++){
+    const i=(y*w+x)*4,bi=x*4;
+    const R=cb[i],G=cb[i+1],B=cb[i+2],maxv=Math.max(R,G,B),minv=Math.min(R,G,B),sat=maxv-minv;
+    raw[i]=R;raw[i+1]=G;raw[i+2]=B;raw[i+3]=255;
+    const bx=(x+x0)/sx;
+    let d=0;
+    for(let c=0;c<3;c++)d=Math.max(d,Math.abs(cb[i+c]-(ctop[bi+c]*(1-blend)+cbot[bi+c]*blend)));
+    const inStripe=yRef>=topBand&&yRef<=bottomBand&&bx>=leftBand&&bx<=975;
+    let a=0;
+    if(inStripe){
+     // 완전 불투명한 글자·총 아이콘을 보존하면서 오른쪽만 부드럽게 퇴색.
+     a=255;
+     if(bx>860){const t=clamp((970-bx)/110,0,1);a=Math.round(255*t*t*(3-2*t));}
+    }
+    if(fire){
+     const warm=R>115&&R>B*1.25&&G>45&&d>30;
+     const bright=R>110&&R>B*1.08&&sat>55&&d>55;
+     if(bx>=465&&bx<980&&yRef>=96&&yRef<=221&&(warm||bright))a=255;
+    }else{
+     const decorative=largeOrnament
+       ? d>36&&sat>27&&maxv>95&&bx>=478&&bx<810&&yRef>=94&&yRef<=(bx<615?203:221)
+       : d>32&&sat>22&&maxv>95&&bx<Math.max(710,leftBand+215)&&yRef>=topBand-20&&yRef<=bottomBand+8;
+     const pinkExtra=R>G*1.25&&sat>35&&d>38&&bx>=545&&bx<=815&&yRef>=bottomBand&&yRef<=220;
+     const redFlame=largeOrnament&&lowerRedCount>13&&R>118&&R>G*1.20&&R>B*1.30&&d>33&&bx>=540&&bx<=980&&yRef>=120&&yRef<=210;
+     // 보라빛 막대 아래의 파편만 보호. 다른 스킨의 총기 UI는 추가하지 않음.
+     const cc=rgb(710,170),purple=cc[2]>cc[0]*1.35&&cc[0]>cc[1]*1.2;
+     if(decorative||(purple&&pinkExtra)||redFlame)a=255;
+    }
+    alpha[y*w+x]=a;
+   }
+  }
+
+  // 불꽃/장식 바깥의 작은 배경 잡티만 제거. 막대 본체 픽셀은 건드리지 않는다.
+  const seen=new Uint8Array(w*h);
+  const stack=[];
+  for(let i=0;i<alpha.length;i++){
+   if(seen[i]||alpha[i]<16)continue;
+   const comp=[];stack.length=0;stack.push(i);seen[i]=1;
+   while(stack.length){
+    const p=stack.pop(),px=p%w,py=(p/w)|0;comp.push(p);
+    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+     const xx=px+dx,yy=py+dy;if(xx<0||yy<0||xx>=w||yy>=h)continue;
+     const q=yy*w+xx;if(!seen[q]&&alpha[q]>15){seen[q]=1;stack.push(q);}
+    }
+   }
+   if(comp.length<(largeOrnament?40:16))for(const p of comp)alpha[p]=0;
+  }
+  let minX=w,minY=h,maxX=-1,maxY=-1;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+   if(alpha[y*w+x]<8)continue;
+   minX=Math.min(x,minX);maxX=Math.max(x,maxX);minY=Math.min(y,minY);maxY=Math.max(y,maxY);
+  }
+  if(maxX<minX||maxY<minY)return null;
+  minX=clamp(minX-Math.ceil(4*sx),0,w-1);maxX=clamp(maxX+Math.ceil(4*sx),minX,w-1);
+  minY=clamp(minY-Math.ceil(4*sy),0,h-1);maxY=clamp(maxY+Math.ceil(4*sy),minY,h-1);
+  // 장식을 보존할 수 있도록 여유 공간을 확보한다.
+  const marginX=Math.round(35*sx),marginY=Math.round(23*sy);
+  minX=clamp(minX-marginX,0,w-1);maxX=clamp(maxX+marginX,minX,w-1);
+  minY=clamp(minY-marginY,0,h-1);maxY=clamp(maxY+marginY,minY,h-1);
+  const cropW=maxX-minX+1,cropH=maxY-minY+1;
+  const temp=document.createElement('canvas');temp.width=cropW;temp.height=cropH;
+  const masked=temp.getContext('2d').createImageData(cropW,cropH);
+  for(let y=0;y<cropH;y++)for(let x=0;x<cropW;x++){
+   const ii=((y+minY)*w+x+minX),dst=4*(y*cropW+x),src=ii*4;
+   for(let c=0;c<3;c++)masked.data[dst+c]=raw[src+c];
+   masked.data[dst+3]=alpha[ii];
+  }
+  temp.getContext('2d').putImageData(masked,0,0);
+  const result={blob:null,url:null,outputH:MIN_OUTPUT_H,work:temp,
+   bounds:{x:x0+minX,y:y0+minY,w:cropW,h:cropH}};
+  if(!(await encodeResult(result)))return null;
+  window.__killlogLastDebug={
+   fire,darkRed,largeOrnament,upperDecorCount,lowerRedCount,body:[leftBand*sx,topBand*sy,970*sx,bottomBand*sy],bounds:[x0+minX,y0+minY,cropW,cropH],touch:[tx,ty]};
+  return result;
+ }
+
+ stage.addEventListener('click',async e=>{
+  if(Date.now()<suppressClickUntil)return;
+  if(active<0||busy)return;
+  const rect=view.getBoundingClientRect(),W=view.width,H=view.height;
+  if(e.clientX<rect.left||e.clientX>rect.right||e.clientY<rect.top||e.clientY>rect.bottom)return;
+  const tx=clamp(Math.round((e.clientX-rect.left)*W/rect.width),0,W-1);
+  const ty=clamp(Math.round((e.clientY-rect.top)*H/rect.height),0,H-1);
+  if(results.some(r=>r.photo===active&&r.bounds&&tx>=r.bounds.x&&tx<r.bounds.x+r.bounds.w&&ty>=r.bounds.y&&ty<r.bounds.y+r.bounds.h)){
+   const selectedIndex=results.findIndex(r=>r.photo===active&&r.bounds&&tx>=r.bounds.x&&tx<r.bounds.x+r.bounds.w&&ty>=r.bounds.y&&ty<r.bounds.y+r.bounds.h);
+   if(selectedIndex>=0){URL.revokeObjectURL(results[selectedIndex].url);results.splice(selectedIndex,1);resultView();drawSelections();updatePhotoCounts();status('킬로그 선택을 해제했어요.');}
+   return;
+  }
+  busy=true;status('킬로그를 자르는 중…');
+  try{
+   const picked=await extractKilllog(tx,ty);
+   if(!picked){status('킬로그를 인식하지 못했어요. 사진 위쪽 ‘킬 알림’ 막대를 눌러주세요.');return;}
+   results.push({...picked,photo:active});resultView();drawSelections();updatePhotoCounts();
+   status('킬로그 추출 완료! 아래에서 확인하고 저장하세요.');
+   window.logActivity?.('킬로그 추출',{photo:active+1,width:picked.bounds.w,height:picked.bounds.h});
+  }catch(err){console.error(err);status('추출 중 오류가 발생했습니다.');}
+  finally{busy=false;}
+ });
+ redraw();resultView();
+})();
+</script>
+
 </body>
 </html>
