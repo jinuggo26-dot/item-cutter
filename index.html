@@ -744,6 +744,11 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 .admin-name-edit .member-controls{margin-top:8px}
 .admin-name-edit [hidden]{display:none!important}
 
+
+/* iPad와 iPhone에서 인식 사진의 손가락 입력 좌표를 안정적으로 유지 */
+#clothes-tab #c_imageCanvas{touch-action:manipulation;-webkit-user-select:none;user-select:none;}
+#clothes-tab #c_selectionCanvas{pointer-events:none!important;}
+
 </style>
 </head>
 
@@ -2238,7 +2243,7 @@ window.closeAdmin=()=>{
    </div>
    <div class="board-row">
     <div class="board-field"><label for="b_shadowColor">공통 그림자 색상 (모든 문구·이름·레벨)</label><input id="b_shadowColor" type="color" value="#777777" style="width:100%;height:44px;border-radius:10px;cursor:pointer;border:1px solid #43516b;background:#1c2940;padding:4px"></div>
-    <div class="board-field"><label for="b_shadowStrength">그림자 윤곽 두께 <output id="b_shadowStrengthValue">85%</output></label><input id="b_shadowStrength" class="board-range" type="range" min="10" max="100" step="5" value="85"></div>
+    <div class="board-field"><label for="b_shadowStrength">공통 그림자 두께 (배경색과 무관 · 글자 테두리와 독립) <output id="b_shadowStrengthValue">85%</output></label><input id="b_shadowStrength" class="board-range" type="range" min="10" max="100" step="5" value="85"></div>
     <div class="board-field"><label for="b_shadowX">그림자 좌우 위치 <output id="b_shadowXValue">2</output></label><input id="b_shadowX" class="board-range" type="range" min="-5" max="8" step="0.5" value="2"></div>
     <div class="board-field"><label for="b_shadowY">그림자 상하 위치 <output id="b_shadowYValue">2</output></label><input id="b_shadowY" class="board-range" type="range" min="-5" max="8" step="0.5" value="2"></div>
    </div>
@@ -2577,7 +2582,7 @@ function isTierPixel(r,g,b){
  return false;
 }
 
-function detectCards(){
+function legacyDetectCards(){
 
  cards=[];
 
@@ -2809,52 +2814,211 @@ function detectCards(){
  });
 }
 
-imageCanvas.addEventListener("click",event=>{
+// 카드 배경(보라/빨강/금색)의 연결 영역도 감지한다.
+// 과거 색상 인식기는 예비 방식으로 남겨 둔다.
+function isItemBackground(r,g,b){
+  const high=Math.max(r,g,b),low=Math.min(r,g,b);
+  if(high<47 || high-low<13)return false;
+  const purple=b>=r*1.12 && r>=g*1.10 && b>=g*1.24;
+  const reddish=r>=g*1.27 && r>=b*1.10 && r>70;
+  const yellow=r>105 && g>80 && b<g*.85 && r>=g*.91;
+  const brightBlue=b>r*1.22 && b>g*1.14 && b>75 && g>35;
+  const cyan=g>r*1.18 && b>r*1.22 && b>64 && g>55;
+  return purple||reddish||yellow||brightBlue||cyan;
+}
+function detectColorPanels(){
+  const iw=imageCanvas.width,ih=imageCanvas.height;
+  if(!iw || !ih)return [];
+  // iPad에서 원본 사진이 커도 분석은 최대 1200px로 제한한다.
+  const ratio=Math.min(1,1200/Math.max(iw,ih));
+  const w=Math.round(iw*ratio),h=Math.round(ih*ratio);
+  const scratch=document.createElement('canvas');
+  scratch.width=w;scratch.height=h;
+  const ctx=scratch.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(image,0,0,w,h);
+  const pix=ctx.getImageData(0,0,w,h).data;
+  const mask=new Uint8Array(w*h);
+  let k=0;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++,k++){
+    const p=k*4;
+    if(isItemBackground(pix[p],pix[p+1],pix[p+2]))mask[k]=1;
+  }
+  const queue=new Int32Array(w*h);
+  const rects=[];
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    const origin=y*w+x;
+    if(mask[origin]!==1)continue;
+    let head=0,tail=1;
+    mask[origin]=2;queue[0]=origin;
+    let left=x,right=x,top=y,bottom=y;
+    while(head<tail){
+      const id=queue[head++];
+      const px=id%w,py=(id/w)|0;
+      if(px<left)left=px;if(px>right)right=px;
+      if(py<top)top=py;if(py>bottom)bottom=py;
+      let nei;
+      if(px>0 && mask[nei=id-1]===1){mask[nei]=2;queue[tail++]=nei;}
+      if(px+1<w && mask[nei=id+1]===1){mask[nei]=2;queue[tail++]=nei;}
+      if(py>0 && mask[nei=id-w]===1){mask[nei]=2;queue[tail++]=nei;}
+      if(py+1<h && mask[nei=id+w]===1){mask[nei]=2;queue[tail++]=nei;}
+    }
+    const rw=right-left+1,rh=bottom-top+1;
+    const boxArea=rw*rh;
+    if(rw<Math.max(15,w*.017)||rh<Math.max(15,h*.017)||
+       rw>w*.65||rh>h*.75||
+       boxArea<300||tail/boxArea<.24 ||
+       rw/rh<.53||rw/rh>1.85)continue;
+    rects.push({x:left/ratio,y:top/ratio,width:rw/ratio,height:rh/ratio,
+      centerX:(left+right+1)/(2*ratio),centerY:(top+bottom+1)/(2*ratio),fill:tail/boxArea});
+  }
+  if(!rects.length)return [];
+  // 작은 글자나 장식 영역보다 반복적인 카드 크기를 우선한다.
+  const byArea=rects.slice().sort((a,b)=>a.width*a.height-b.width*b.height);
+  const median=byArea[Math.floor(byArea.length/2)];
+  const mw=median.width,mh=median.height;
+  return rects.filter(r=> r.width>=mw*.55 && r.width<=mw*1.65 &&
+    r.height>=mh*.55 && r.height<=mh*1.65);
+}
+function cardOverlap(a,b){
+  const x=Math.max(0,Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x));
+  const y=Math.max(0,Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y));
+  const minArea=Math.min(a.width*a.height,b.width*b.height);
+  return minArea>0 ? x*y/minArea:0;
+}
+function detectCards(){
+  // 구형 인식 결과도 취득해 푸른 테두리 등 이전 사진과 호환한다.
+  legacyDetectCards();
+  const older=cards.slice();
+  const panels=detectColorPanels();
+  if(panels.length<2){cards=older;return;}
+  const ww=panels.map(r=>r.width).sort((a,b)=>a-b);
+  const hh=panels.map(r=>r.height).sort((a,b)=>a-b);
+  const boxW=ww[Math.floor(ww.length/2)];
+  const boxH=hh[Math.floor(hh.length/2)];
+  const vw=imageCanvas.width,vh=imageCanvas.height;
+  const padded=panels.map(p=>{
+    // 크기 통일은 검출된 카드 중심을 고정하고, 가장자리는 소폭만 다듬는다.
+    const fullW=Math.min(vw,Math.max(12,boxW));
+    const fullH=Math.min(vh,Math.max(12,boxH));
+    const x=Math.min(vw-fullW,Math.max(0,p.centerX-fullW/2));
+    const y=Math.min(vh-fullH,Math.max(0,p.centerY-fullH/2));
+    return {x:Math.round(x+fullW*.025),y:Math.round(y+fullH*.02),
+      width:Math.round(fullW*.95),height:Math.round(fullH*.95)};
+  });
+  // 기존 감지가 검출한 카드 중 새 카드와 겹치지 않는 것만 추가한다.
+  for(const prior of older){
+    if(!padded.some(p=>cardOverlap(p,prior)>.30)){
+      const sizeOkay=prior.width>=boxW*.65&&prior.width<=boxW*1.4&&
+        prior.height>=boxH*.65&&prior.height<=boxH*1.4;
+      if(sizeOkay)padded.push(prior);
+    }
+  }
+  // 다수의 카드를 정상 인식한 경우에만 동일한 행/열의 빈칸을 보완한다.
+  // 단순 고정 격자가 아니라 실제 발견된 카드 좌표로 행과 열을 추정한다.
+  if(padded.length>=9){
+    const centersX=padded.map(p=>p.x+p.width*.5).sort((a,b)=>a-b);
+    const centersY=padded.map(p=>p.y+p.height*.5).sort((a,b)=>a-b);
+    function clusters(numbers,tol){
+      const buckets=[];
+      for(const n of numbers){
+        const last=buckets[buckets.length-1];
+        if(last&&Math.abs(last.center-n)<=tol){
+          last.sum+=n;last.count++;last.center=last.sum/last.count;
+        }else buckets.push({sum:n,count:1,center:n});
+      }
+      return buckets;
+    }
+    const cols=clusters(centersX,boxW*.29);
+    const rows=clusters(centersY,boxH*.29);
+    const capacity=cols.length*rows.length;
+    if(cols.length>=3&&rows.length>=3&&capacity<=150&&padded.length>=capacity*.63){
+      // 칸 간격이 일정한 실제 격자에서만 누락된 칸을 보완한다.
+      function spacingOkay(buckets,size){
+        if(buckets.length<3)return false;
+        const steps=buckets.slice(1).map((b,i)=>b.center-buckets[i].center);
+        const typical=steps.slice().sort((a,b)=>a-b)[Math.floor(steps.length/2)];
+        return typical>size*.70&&typical<size*1.75&&steps.every(d=>Math.abs(d-typical)<typical*.27);
+      }
+      if(spacingOkay(cols,boxW)&&spacingOkay(rows,boxH)){
+        const raw=originalImageData.data,iw=imageCanvas.width,ih=imageCanvas.height;
+        const hasColoredCorners=(cx,cy)=>{
+          let score=0;
+          for(const dx of [-.36,.36])for(const dy of [-.31,.31]){
+            const px=Math.round(cx+dx*boxW),py=Math.round(cy+dy*boxH);
+            if(px<0||py<0||px>=iw||py>=ih)continue;
+            const k=(py*iw+px)*4;
+            if(isItemBackground(raw[k],raw[k+1],raw[k+2]))score++;
+          }
+          return score>=2;
+        };
+        for(const row of rows)for(const col of cols){
+          const cx=col.center,cy=row.center;
+          if(padded.some(p=>Math.abs(p.x+p.width*.5-cx)<boxW*.37&&
+                              Math.abs(p.y+p.height*.5-cy)<boxH*.37))continue;
+          if(!hasColoredCorners(cx,cy) && padded.length<capacity*.84)continue;
+          const fw=Math.min(vw,boxW),fh=Math.min(vh,boxH);
+          const x=Math.min(vw-fw,Math.max(0,cx-fw/2));
+          const y=Math.min(vh-fh,Math.max(0,cy-fh/2));
+          padded.push({x:Math.round(x+fw*.025),y:Math.round(y+fh*.02),
+            width:Math.round(fw*.95),height:Math.round(fh*.95)});
+        }
+      }
+    }
+  }
+  padded.sort((a,b)=>Math.abs(a.y-b.y)<boxH*.43?a.x-b.x:a.y-b.y);
+  cards=[];
+  for(const r of padded){
+    if(!cards.some(c=>cardOverlap(c,r)>.55))cards.push(r);
+  }
+}
 
- if(!originalImageData)return;
-
+// Pointer Events: iPad/Safari의 터치, 펜, 마우스 모두 동일한 좌표 변환 사용.
+// 확대된 화면에서도 이미지 캔버스의 '실제 표시 영역'으로 나누어 계산한다.
+let downPoint=null;
+let otherPointerDown=false;
+function chooseClothesAt(clientX,clientY){
+ if(!originalImageData||!photos[currentIndex])return;
  const rect=imageCanvas.getBoundingClientRect();
-
- const pt={
-
-  x:
-   (event.clientX-rect.left)*
-   imageCanvas.width/
-   rect.width,
-
-  y:
-   (event.clientY-rect.top)*
-   imageCanvas.height/
-   rect.height
-
- };
-
- const found=cards.find(c=>
-  pt.x>=c.x&&
-  pt.x<=c.x+c.width&&
-  pt.y>=c.y&&
-  pt.y<=c.y+c.height
- );
-
+ if(!rect.width||!rect.height)return;
+ const x=(clientX-rect.left)*imageCanvas.width/rect.width;
+ const y=(clientY-rect.top)*imageCanvas.height/rect.height;
+ if(x<0||y<0||x>imageCanvas.width||y>imageCanvas.height)return;
+ let found=cards.find(c=>x>=c.x&&x<=c.x+c.width&&y>=c.y&&y<=c.y+c.height);
+ // 작은 간격 때문에 터치가 누락되는 경우에만 카드 가장자리 10%까지 허용.
+ if(!found){
+   let best=null,dist=Infinity;
+   for(const c of cards){
+     const dx=Math.max(c.x-x,0,x-(c.x+c.width));
+     const dy=Math.max(c.y-y,0,y-(c.y+c.height));
+     const d=Math.hypot(dx,dy);
+     if(d<dist){dist=d;best=c;}
+   }
+   if(best&&dist<=Math.min(best.width,best.height)*.10)found=best;
+ }
  if(!found)return;
-
- const existing=selectedCards.findIndex(card=>
-  Math.abs(card.x-found.x)<=3&&
-  Math.abs(card.y-found.y)<=3
- );
-
- if(existing>=0)
-  selectedCards.splice(existing,1);
- else
-  selectedCards.push(found);
-
+ const existing=selectedCards.findIndex(card=>Math.abs(card.x-found.x)<=3&&Math.abs(card.y-found.y)<=3);
+ if(existing>=0)selectedCards.splice(existing,1);
+ else selectedCards.push(found);
  photos[currentIndex].selected=selectedCards;
-
- updateCount();
- updatePhotoButtons();
- drawSelections();
-
-});
+ updateCount();updatePhotoButtons();drawSelections();
+}
+if(window.PointerEvent){
+ imageCanvas.addEventListener('pointerdown',e=>{
+   if(downPoint)otherPointerDown=true;
+   else {otherPointerDown=false;downPoint={id:e.pointerId,x:e.clientX,y:e.clientY};}
+ });
+ imageCanvas.addEventListener('pointercancel',()=>{downPoint=null;otherPointerDown=false;});
+ imageCanvas.addEventListener('pointerup',e=>{
+   if(!downPoint)return;
+   const first=downPoint;
+   downPoint=null;
+   if(otherPointerDown||first.id!==e.pointerId||
+      Math.hypot(e.clientX-first.x,e.clientY-first.y)>12){otherPointerDown=false;return;}
+   chooseClothesAt(e.clientX,e.clientY);
+ });
+}else{
+ imageCanvas.addEventListener('click',e=>chooseClothesAt(e.clientX,e.clientY));
+}
 
 function drawSelections(){
 
@@ -4536,6 +4700,52 @@ saveBtn.addEventListener("click",async()=>{
    }));
   }
 
+  // Single opaque-shadow renderer for captions, names, and levels.
+  // Render glyph coverage independently of the photo; never alpha-blend a semitransparent
+  // shadow color with the clothing/gun background. Each full shadow pixel gets exact RGB.
+  const solidBoardShadowCache=new Map();
+  function solidBoardShadowMask(glyph,font,strokeSize,color){
+   const cacheKey=font+"|"+strokeSize.toFixed(3)+"|"+color+"|"+glyph;
+   const cached=solidBoardShadowCache.get(cacheKey);
+   if(cached)return cached;
+   // Antialias at 2x and then make coverage fully opaque before compositing.
+   const density=2;
+   const measure=document.createElement("canvas").getContext("2d");
+   measure.font=font;
+   const fm=/([0-9]+(?:\.[0-9]+)?)px/.exec(font);
+   const fs=fm?Number(fm[1]):32;
+   const pad=Math.ceil(Math.max(8,strokeSize*2+5));
+   const originX=pad;
+   const originY=pad+Math.ceil(fs*1.30);
+   const logicalW=Math.max(1,Math.ceil(measure.measureText(glyph).width+pad*2+3));
+   const logicalH=Math.max(1,Math.ceil(fs*2.6+pad*2));
+   // Extremely long text may exceed mobile GPU/Canvas limits; fall back to vector.
+   if(logicalW*density>8192||logicalH*density>4096)return null;
+   const layer=document.createElement("canvas");
+   layer.width=logicalW*density;
+   layer.height=logicalH*density;
+   const c=layer.getContext("2d",{willReadFrequently:true});
+   if(!c)return null;
+   c.scale(density,density);
+   c.font=font;c.textAlign="left";c.textBaseline="middle";
+   c.lineJoin="round";c.lineWidth=strokeSize;
+   c.strokeStyle="#ffffff";c.fillStyle="#ffffff";
+   c.strokeText(glyph,originX,originY);
+   c.fillText(glyph,originX,originY);
+   const pixels=c.getImageData(0,0,layer.width,layer.height);
+   const rr=parseInt(color.slice(1,3),16),gg=parseInt(color.slice(3,5),16),bb=parseInt(color.slice(5,7),16);
+   for(let n=0;n<pixels.data.length;n+=4){
+    const visible=pixels.data[n+3]>=48;
+    pixels.data[n]=rr;pixels.data[n+1]=gg;pixels.data[n+2]=bb;
+    pixels.data[n+3]=visible?255:0;
+   }
+   c.setTransform(1,0,0,1,0,0);
+   c.putImageData(pixels,0,0);
+   const output={canvas:layer,x:originX,y:originY,w:logicalW,h:logicalH};
+   if(solidBoardShadowCache.size<140)solidBoardShadowCache.set(cacheKey,output);
+   return output;
+  }
+
   function text(value,x,y,size,key,align="left",maxW=Infinity,options={}){
    if(value===null||value===undefined||String(value)==="")return;
    // Scale the font proportionally, as in the earlier working version.
@@ -4573,18 +4783,16 @@ saveBtn.addEventListener("click",async()=>{
    const shown=lines.slice(0,options.maxLines||2);
    const lineH=fs*1.10;
    const outline=Math.max(0,(Number($("b_outline").value)||0)*.43);
-   // One shared shadow style is used for both captions and all item names/levels.
+   // ONE fixed shadow style for every text role: inquiry/sub/owner, cloth/gun names and levels.
+   // Its color, thickness and pixel offsets must NOT depend on font size, label type,
+   // outline thickness, photo background or preview/export scaling.
    const shadowX=Number($("b_shadowX")?.value??2);
    const shadowY=Number($("b_shadowY")?.value??2);
-   // All captions, item names and levels use the exact same opaque gray.
-   // Do not derive shadow RGB from the strength slider: the resulting gray
-   // differed from the requested reference and could appear inconsistent.
    const shadowColor=/^#[0-9a-fA-F]{6}$/.test($("b_shadowColor")?.value||"")?$("b_shadowColor").value:"#777777";
-   // A translucent shadow is composited with the photo behind it, making the
-   // exact same shadow color appear different over white grids and red photos.
-   // Use an opaque, single-pass silhouette. The strength slider now controls
-   // shadow edge thickness instead of background-dependent transparency.
    const shadowStrength=Math.max(.1,Math.min(1,(Number($("b_shadowStrength")?.value)||85)/100));
+   // Previously this was outline*shadowStrength, so changing the black letter border
+   // silently changed the shadow's edge; small item labels looked unlike captions.
+   const shadowStroke=0.35+shadowStrength*2.0;
    g.shadowColor="transparent";g.shadowBlur=0;g.shadowOffsetX=0;g.shadowOffsetY=0;
    const pair=getColorPair(key);
    const ilseopPair=getColorPair("ilseop");
@@ -4598,19 +4806,25 @@ saveBtn.addEventListener("click",async()=>{
      grad.addColorStop(0,pair.a);grad.addColorStop(1,pair.b);g.fillStyle=grad;
     }
     const foregroundFill=g.fillStyle;
-    // 검은 테두리까지 포함한 글자의 실루엣을 먼저 회색으로 그립니다.
-    // 실제 글자와 그림자의 윤곽선 두께를 동일하게 유지합니다.
-    const dx=shadowX,dy=shadowY; // 동일한 캔버스 좌표 오프셋: 글자 크기에 따라 달라지지 않음
+    // Common *opaque* offset silhouette: shadow RGB cannot mix with source-photo RGB.
+    // Drawing with g.shadowBlur/glow here would give different-looking results over
+    // light stationery versus red/purple/yellow clothing and weapon backgrounds.
+    const dx=shadowX,dy=shadowY;
+    const shadowMask=solidBoardShadowMask(glyph,g.font,shadowStroke,shadowColor);
     g.save();
     g.globalAlpha=1;
     g.globalCompositeOperation="source-over";
     g.filter="none";
-    g.lineJoin="round";
-    g.strokeStyle=shadowColor;
-    g.lineWidth=Math.max(0,outline*shadowStrength);
-    g.fillStyle=shadowColor;
-    g.strokeText(glyph,gx+dx,gy+dy);
-    g.fillText(glyph,gx+dx,gy+dy);
+    g.shadowColor="transparent";g.shadowBlur=0;g.shadowOffsetX=0;g.shadowOffsetY=0;
+    if(shadowMask){
+     g.drawImage(shadowMask.canvas,gx+dx-shadowMask.x,gy+dy-shadowMask.y,shadowMask.w,shadowMask.h);
+    }else{
+     // Same fully opaque shadow on platforms with restrictive canvas limits.
+     g.lineJoin="round";g.lineWidth=shadowStroke;
+     g.strokeStyle=shadowColor;g.fillStyle=shadowColor;
+     g.strokeText(glyph,gx+dx,gy+dy);
+     g.fillText(glyph,gx+dx,gy+dy);
+    }
     g.restore();
 
     // 글자 색이 부분적으로 비는 현상을 줄이기 위해
@@ -4637,7 +4851,8 @@ saveBtn.addEventListener("click",async()=>{
       // because their baseline was close to the image row's bottom clip.
       // Measure the actual text ink and keep both fill and shadow inside the tile.
       const metrics=g.measureText(str);
-      const extra=Math.max(2,outline*1.5+Math.max(Math.abs(shadowX),Math.abs(shadowY))+2);
+      // Keep the complete, shared shadow inside an image tile instead of cutting its edge.
+      const extra=Math.max(2,Math.max(outline,shadowStroke)*.7+Math.max(Math.abs(shadowX),Math.abs(shadowY))+3);
       const ascent=Math.max(0,metrics.actualBoundingBoxAscent||fs*.52);
       const descent=Math.max(0,metrics.actualBoundingBoxDescent||fs*.48);
       const lo=Number(options.tileTop)+extra+ascent;
