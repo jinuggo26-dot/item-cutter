@@ -867,6 +867,8 @@ let authReady=false;
 window.logActivity=async(action,detail={})=>{
  try{
   if(!authUser)return;
+  // 기간 만료·승인 대기·차단 계정은 서버 규칙과 동일하게 로그를 생성하지 않는다.
+  if(!isAdminMode&&(!currentMember||currentMember.status!=='approved'||expired(currentMember)))return;
   const name=savedName||"이름 미확인";
   const now=new Date();
   const time=now.toLocaleString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
@@ -1046,12 +1048,31 @@ let isAdminMode=false;
 let accessExpiry=null;
 let userUnsubscribe=null;
 let waitingUnsubscribe=null;
+// 관리자 데이터 구독과 분리: 승인·만료·재승인 시 공지/전시관을 다시 연결한다.
+let memberContentUnsubscribes=[];
+function stopMemberContentSubscriptions(){
+ for(const unsub of memberContentUnsubscribes)try{unsub();}catch(e){console.warn('회원 콘텐츠 구독 종료 오류',e);}
+ memberContentUnsubscribes=[];
+ noticeItems=[];currentNotice=null;
+ const noticeOverlay=document.getElementById('member-notice-overlay');
+ if(noticeOverlay)noticeOverlay.style.display='none';
+ publicGalleryItems=[];
+ const galleryItems=document.getElementById('gallery-items');
+ if(galleryItems)galleryItems.replaceChildren();
+}
+function syncMemberContentSubscriptions(data){
+ const active=!!authUser&&!isAdminMode&&data?.status==='approved'&&!expired(data);
+ if(!active){if(memberContentUnsubscribes.length)stopMemberContentSubscriptions();return;}
+ if(memberContentUnsubscribes.length)return;
+ memberContentUnsubscribes.push(startGradeSubscription(),startNoticesSubscription(),startGallerySubscription());
+}
 let expiredHandled=false;
 let adminDataStarted=false;
 const DAY_MS=24*60*60*1000;
 const escapeText=(value)=>String(value??"");
 const dateLabel=(ms)=>{
- if(!Number.isFinite(Number(ms))||Number(ms)<=0)return "영구";
+ if(ms===Infinity)return "영구";
+ if(ms==null||!Number.isFinite(Number(ms))||Number(ms)<=0)return "미설정";
  return new Date(Number(ms)).toLocaleString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false});
 };
 const validUntil=(data)=>{
@@ -1062,8 +1083,11 @@ const validUntil=(data)=>{
   const end=Number(data.gradeExpiresAt);
   return Number.isFinite(end)&&end>0?end:0; // 설정이 누락되면 안전하게 이용 차단
  }
- // 기존 회원은 이전에 계약한 프로그램 기간을 그대로 인정한다 (관리자가 재설정하기 전까지).
- return data.expiresAt===null||data.plan==='permanent'||(!Number.isFinite(Number(data.expiresAt))&&data.status==='approved')?Infinity:Number(data.expiresAt||0);
+ // 기존 회원은 저장된 종전 이용권을 보존하되, 기간 누락을 영구권으로 오판하지 않는다.
+ // Firestore activeMember()와 동일하게 plan==='permanent' 또는 유효한 expiresAt만 인정한다.
+ if(data.plan==='permanent')return Infinity;
+ const oldEnd=data.expiresAt;
+ return typeof oldEnd==='number'&&Number.isFinite(oldEnd)&&oldEnd>0?oldEnd:0;
 };
 const expired=(data)=>data?.status==="approved"&&validUntil(data)!==Infinity&&Date.now()>=validUntil(data);
 const getUserState=(data)=>{
@@ -1095,6 +1119,7 @@ function showWaiting(message="승인을 기다리는 중입니다.",kind="pendin
 async function handleExpired(){
  if(isAdminMode)return;
  expiredHandled=true;accessExpiry=0;
+ if(memberContentUnsubscribes.length)stopMemberContentSubscriptions();
  showWaiting("로그인에 성공했지만 이용권 기간이 만료되었습니다. 기존 이메일로 재가입하지 말고 관리자에게 등급 기간 연장을 요청하세요. 연장되면 이 화면에서 다시 이용할 수 있습니다.","expired");
 }
 const downgradeAttempted=new Set();
@@ -1117,15 +1142,14 @@ function subscribeUser(name){
   if(isAdminMode)return;
   if(!snapshot.exists()){
    accessExpiry=0;
+   if(memberContentUnsubscribes.length)stopMemberContentSubscriptions();
    showWaiting("로그인은 완료됐지만 회원 이용 정보가 없습니다. 관리자에게 계정 UID를 확인해 달라고 요청하세요.","error");
    return;
   }
   const user=snapshot.data();
   savedName=user.name||'회원';
   currentMember=user;
-  if(authUser&&!isAdminMode&&!liveUnsubscribes.length){
-   liveUnsubscribes.push(startGradeSubscription(),startNoticesSubscription(),startGallerySubscription());
-  }
+  syncMemberContentSubscriptions(user);
   downgradeExpiredGrade(name,user);
   lastEffectiveGrade=effectiveGrade(user);
   refreshGradeUI();
@@ -1147,7 +1171,7 @@ function subscribeUser(name){
     showWaiting("로그인에 성공했습니다. 관리자 승인을 기다리고 있습니다.","pending");
    }
   }
- },err=>{console.warn("사용자 상태 확인 오류",err);showWaiting("로그인은 됐지만 회원 정보를 불러오지 못했습니다. 관리자에게 Firestore 접근 권한을 확인해 달라고 요청하세요.","error");});
+ },err=>{console.warn("사용자 상태 확인 오류",err);stopMemberContentSubscriptions();showWaiting("로그인은 됐지만 회원 정보를 불러오지 못했습니다. 관리자에게 Firestore 접근 권한을 확인해 달라고 요청하세요.","error");});
 }
 // Check every second while this page is open, including tabs that stay open overnight.
 setInterval(()=>{
@@ -1163,6 +1187,7 @@ const displayLogin=(message='')=>{
 };
 async function resetCurrentSession(){
  if(userUnsubscribe){userUnsubscribe();userUnsubscribe=null;}
+ if(memberContentUnsubscribes.length)stopMemberContentSubscriptions();
  for(const unsub of liveUnsubscribes)try{unsub();}catch(e){};
  liveUnsubscribes=[];
  authUser=null;savedName=null;currentMember=null;isAdminMode=false;
@@ -1194,9 +1219,11 @@ window.recheckMemberStatus=async()=>{
   const data=snapshot.data();
   if(data.status==='approved'&&!expired(data)){
    expiredHandled=false;accessExpiry=validUntil(data);currentMember=data;savedName=data.name||'회원';
-   refreshGradeUI();authScreen.style.display='none';
+   syncMemberContentSubscriptions(data);
+   refreshGradeUI();authScreen.style.display='none';nextNotice();
    return;
   }
+  if(memberContentUnsubscribes.length)stopMemberContentSubscriptions();
   if(data.status==='expired'||expired(data)){
    await handleExpired();return;
   }
@@ -1302,7 +1329,7 @@ async function afterAuthLogin(user){
  lastEffectiveGrade=effectiveGrade(currentMember);
  refreshGradeUI();
  subscribeUser(user.uid);
- liveUnsubscribes.push(startGradeSubscription(),startNoticesSubscription(),startGallerySubscription());
+ // 공지·전시관 구독은 사용자 문서가 승인되고 기한이 유효할 때 subscribeUser에서 시작.
  try{
   await addDoc(collection(db,'logs'),{uid:user.uid,name:savedName,time:new Date().toLocaleString('ko-KR',{hour12:false}),timestamp:Date.now()});
   window.logActivity('로그인 / 접속');
