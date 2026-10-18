@@ -751,11 +751,14 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
   <input type="text" id="userNameInput" class="auth-input" placeholder="회원가입 시 닉네임 (기존 회원도 입력)" maxlength="30">
   <button class="auth-btn" id="auth-login" type="button" onclick="window.requestAccess()">로그인</button>
   <button class="auth-btn" id="auth-signup" type="button" onclick="window.registerMember()" style="margin-top:8px;background:#233954">새 계정 회원가입</button>
+  <button class="auth-btn" id="auth-reset-password" type="button" onclick="window.resetLoginPassword()" style="margin-top:8px;background:#263242">비밀번호 재설정 이메일 받기</button>
   <p class="member-tip" id="auth-error" role="status">기존 회원은 가입 후 관리자에게 기존 이용권 연결을 요청하세요. 닉네임만으로 이전 권한이 연결되지 않습니다.</p>
  </div>
  <div class="auth-box" id="view-waiting" style="display:none">
   <div class="spinner"></div><h2>⏳ 승인 대기 중</h2>
   <p id="waiting-message">관리자 승인을 기다리는 중입니다.</p>
+  <p id="waiting-account-status" class="member-tip" style="margin:10px 0 8px;color:#c9dcff"></p>
+  <button class="auth-btn" id="waiting-recheck" type="button" onclick="window.recheckMemberStatus()" style="margin-bottom:8px">이용 상태 다시 확인</button>
   <button class="auth-btn" id="request-again" type="button" onclick="window.requestAgain()">로그아웃 / 다른 계정</button>
  </div>
 </div>
@@ -845,7 +848,7 @@ const firebaseConfig={
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
- createUserWithEmailAndPassword, signOut, getIdTokenResult } from
+ createUserWithEmailAndPassword, signOut, getIdTokenResult, sendPasswordResetEmail } from
  "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 const auth=getAuth(app);
 let authUser=null;let savedName=null;
@@ -1050,20 +1053,24 @@ const make=(tag,cls,content)=>{
  if(content!==undefined)element.textContent=String(content);
  return element;
 };
-function showWaiting(message="승인을 기다리는 중입니다."){
+function showWaiting(message="승인을 기다리는 중입니다.",kind="pending"){
  authScreen.style.display="flex";
  viewUserForm.style.display="none";
  viewWaiting.style.display="block";
  document.getElementById("waiting-message").textContent=message;
- const ended=message.includes("종료")||message.includes("권한이 없습니다");
- const title=viewWaiting.querySelector("h2");if(title)title.textContent=ended?"이용 기간 종료":"승인 대기 중";
+ const ended=kind==='expired'||kind==='revoked'||kind==='error';
+ const title=viewWaiting.querySelector("h2");
+ if(title)title.textContent=kind==='expired'?"이용 기간 만료":kind==='revoked'?"이용 중지":kind==='error'?"회원 정보 확인 필요":"승인 대기 중";
  const spinner=viewWaiting.querySelector(".spinner");if(spinner)spinner.style.display=ended?"none":"block";
- const retry=viewWaiting.querySelector("#request-again");if(retry)retry.style.display="block";
+ const account=document.getElementById('waiting-account-status');
+ if(account)account.textContent=auth.currentUser?.email?`로그인된 계정: ${auth.currentUser.email}`:'로그인 상태 확인 중';
+ const check=document.getElementById('waiting-recheck');
+ if(check)check.style.display=auth.currentUser?'block':'none';
 }
 async function handleExpired(){
- if(expiredHandled||isAdminMode)return;
+ if(isAdminMode)return;
  expiredHandled=true;accessExpiry=0;
- showWaiting("이용 기간이 종료됐습니다. 관리자에게 연장을 요청하세요.");
+ showWaiting("로그인은 정상적으로 완료됐습니다. 프로그램 이용 기간이 만료됐습니다. 기존 이메일로 다시 가입하지 말고 관리자에게 기간 연장을 요청하세요. 관리자가 연장하면 이 화면에서 자동으로 이용할 수 있습니다.","expired");
 }
 const downgradeAttempted=new Set();
 async function downgradeExpiredGrade(name,data){
@@ -1084,7 +1091,7 @@ function subscribeUser(name){
   if(isAdminMode)return;
   if(!snapshot.exists()){
    accessExpiry=0;
-   showWaiting("이용 권한이 없습니다. 관리자에게 문의하세요.");
+   showWaiting("로그인은 완료됐지만 회원 이용 정보가 없습니다. 관리자에게 계정 UID를 확인해 달라고 요청하세요.","error");
    return;
   }
   const user=snapshot.data();
@@ -1105,9 +1112,16 @@ function subscribeUser(name){
    nextNotice();
   }else{
    accessExpiry=0;
-   showWaiting(user.status==="expired"?"이용 기간이 종료됐습니다. 관리자에게 재승인을 요청하세요.":"승인을 기다리는 중입니다.");
+   if(user.status==="expired"){
+    expiredHandled=true;
+    showWaiting("로그인은 정상적으로 완료됐습니다. 이용 기간이 만료됐으니 관리자에게 연장을 요청하세요. 기존 이메일로 재가입할 필요는 없습니다.","expired");
+   }else if(user.status==="revoked"){
+    showWaiting("로그인은 완료됐지만 관리자가 이용을 중지한 계정입니다. 관리자에게 문의하세요.","revoked");
+   }else{
+    showWaiting("로그인에 성공했습니다. 관리자 승인을 기다리고 있습니다.","pending");
+   }
   }
- },err=>{console.warn("사용자 상태 확인 오류",err);authScreen.style.display="flex";});
+ },err=>{console.warn("사용자 상태 확인 오류",err);showWaiting("로그인은 됐지만 회원 정보를 불러오지 못했습니다. 관리자에게 Firestore 접근 권한을 확인해 달라고 요청하세요.","error");});
 }
 // Check every second while this page is open, including tabs that stay open overnight.
 setInterval(()=>{
@@ -1140,6 +1154,35 @@ window.confirmSignOutMember=async()=>{
  if(await window.uiConfirm('정말 로그아웃하시겠어요?'))await window.signOutMember();
 };
 window.requestAgain=()=>window.signOutMember();
+window.recheckMemberStatus=async()=>{
+ const user=auth.currentUser;
+ if(!user)return displayLogin('로그인 상태가 아닙니다. 다시 로그인해 주세요.');
+ const button=document.getElementById('waiting-recheck');
+ if(button){button.disabled=true;button.textContent='확인 중…';}
+ try{
+  const snapshot=await getDoc(doc(db,'users',user.uid));
+  if(!snapshot.exists()){
+   showWaiting('로그인은 정상적으로 완료됐지만 회원 이용 정보가 없습니다. 관리자에게 문의하세요.','error');
+   return;
+  }
+  const data=snapshot.data();
+  if(data.status==='approved'&&!expired(data)){
+   expiredHandled=false;accessExpiry=validUntil(data);currentMember=data;savedName=data.name||'회원';
+   refreshGradeUI();authScreen.style.display='none';
+   return;
+  }
+  if(data.status==='expired'||expired(data)){
+   await handleExpired();return;
+  }
+  if(data.status==='revoked'){
+   showWaiting('관리자가 이용을 중지한 상태입니다. 관리자에게 문의하세요.','revoked');return;
+  }
+  showWaiting('로그인에 성공했습니다. 관리자 승인을 기다리고 있습니다.','pending');
+ }catch(e){
+  console.warn('이용 상태 확인 오류',e);
+  showWaiting('로그인은 됐지만 이용권을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.','error');
+ }finally{if(button){button.disabled=false;button.textContent='이용 상태 다시 확인';}}
+};
 window.openAdminPrompt=async()=>{
  if(!auth.currentUser)return window.uiAlert?.('로그인이 필요합니다.');
  try{
@@ -1157,7 +1200,34 @@ window.requestAccess=async()=>{
  if(!email||!password)return authMsg('이메일과 비밀번호를 입력해 주세요.');
  authMsg('로그인 중…');
  try{await signInWithEmailAndPassword(auth,email,password);document.getElementById('auth-password').value='';}
- catch(e){console.warn(e);authMsg('로그인에 실패했습니다. 이메일·비밀번호를 확인해 주세요.');}
+ catch(e){
+  console.warn('Firebase 로그인 실패:',e.code,e);
+  const messages={
+   'auth/invalid-credential':'로그인 정보가 올바르지 않습니다. 가입한 이메일과 비밀번호를 확인해 주세요. (기간 만료와 별개의 오류입니다.)',
+   'auth/wrong-password':'비밀번호가 일치하지 않습니다.',
+   'auth/user-not-found':'등록되지 않은 이메일입니다.',
+   'auth/user-disabled':'로그인이 중지된 계정입니다. 관리자에게 문의하세요.',
+   'auth/too-many-requests':'로그인 시도가 많아 일시적으로 제한됐습니다. 잠시 후 다시 시도해 주세요.',
+   'auth/network-request-failed':'네트워크 연결 문제입니다. 인터넷 연결을 확인해 주세요.',
+   'auth/api-key-not-valid':'Firebase 설정 오류입니다. 관리자에게 API 키를 확인해 달라고 요청하세요.'
+  };
+  authMsg(messages[e.code]||`Firebase 로그인 오류: ${e.code||'unknown'} (관리자에게 알려주세요)`);
+ }
+};
+window.resetLoginPassword=async()=>{
+ const email=document.getElementById('auth-email').value.trim();
+ if(!email)return authMsg('비밀번호를 재설정할 이메일 주소부터 입력해 주세요.');
+ const b=document.getElementById('auth-reset-password');
+ if(b){b.disabled=true;b.textContent='재설정 이메일 보내는 중…';}
+ try{
+  await sendPasswordResetEmail(auth,email);
+  authMsg('비밀번호 재설정 이메일을 요청했어요. 받은편지함과 스팸함을 확인해 주세요.');
+ }catch(e){
+  console.warn('비밀번호 재설정 요청 오류',e.code,e);
+  authMsg(e.code==='auth/too-many-requests'?'요청이 많습니다. 잠시 후 다시 시도해 주세요.':
+          e.code==='auth/network-request-failed'?'네트워크 연결을 확인해 주세요.':
+          '이메일 전송에 실패했습니다. 입력한 이메일과 Firebase 설정을 확인해 주세요.');
+ }finally{if(b){b.disabled=false;b.textContent='비밀번호 재설정 이메일 받기';}}
 };
 window.registerMember=async()=>{
  const email=document.getElementById('auth-email').value.trim();
@@ -1219,7 +1289,7 @@ onAuthStateChanged(auth,async user=>{
  viewUserForm.style.display='none';viewWaiting.style.display='block';
  showWaiting('로그인 상태와 이용권을 확인하는 중…');
  try{await afterAuthLogin(user);}
- catch(e){console.error('계정 연결 오류',e);showWaiting('계정 정보 확인 실패. 잠시 후 다시 로그인하거나 관리자에게 문의해 주세요.');}
+ catch(e){console.error('계정 연결 오류',e);showWaiting('Firebase 로그인은 됐지만 회원 정보 확인에 실패했습니다. Firestore 권한과 회원 UID를 확인해 주세요.','error');}
 });
 let activityCache=[];
 function makeLogRow(log){
@@ -1335,30 +1405,23 @@ function loadAdminData(){
    gradeSelect.value=gradeDraft?.grade||effectiveGrade(data);
    const gradeDuration=make('select','admin-plan-select');gradeDuration.setAttribute('aria-label','등급 이용 기간');
    [['7','등급 7일'],['30','등급 30일'],['permanent','등급 영구']].forEach(([v,t])=>{const op=make('option',null,t);op.value=v;gradeDuration.append(op);});
-   // 고정 30일이 아니라 Firebase에 실제 저장된 기간을 표시한다.
    gradeDuration.value=gradeDraft?.duration||savedGradeDuration(data);
-   const rememberGradeDraft=()=>adminGradeDrafts.set(id,{grade:gradeSelect.value,duration:gradeDuration.value});
+   const planSelect=make('select','admin-plan-select');planSelect.setAttribute('aria-label','프로그램 이용 기간');
+   [['7','프로그램 7일'],['30','프로그램 30일'],['permanent','프로그램 영구']].forEach(([v,t])=>{const op=make('option',null,t);op.value=v;planSelect.append(op);});
+   planSelect.value=gradeDraft?.plan||(data.plan==='7'||data.plan==='30'?data.plan:'permanent');
+   const rememberGradeDraft=()=>adminGradeDrafts.set(id,{grade:gradeSelect.value,duration:gradeDuration.value,plan:planSelect.value});
    gradeSelect.addEventListener('change',rememberGradeDraft);
    gradeDuration.addEventListener('change',rememberGradeDraft);
-   const setGrade=make('button','admin-btn btn-approve','등급 저장');setGrade.type='button';
-   setGrade.onclick=async()=>{
-    const chosenGrade=gradeSelect.value,chosenDuration=gradeDuration.value;
-    setGrade.disabled=true;setGrade.textContent='저장 중…';
-    const success=await window.setUserGrade(id,chosenGrade,chosenDuration);
-    setGrade.disabled=false;setGrade.textContent='등급 저장';
+   planSelect.addEventListener('change',rememberGradeDraft);
+   const saveAll=make('button','admin-btn btn-approve','변경사항 저장');saveAll.type='button';
+   saveAll.onclick=async()=>{
+    const chosenGrade=gradeSelect.value,chosenDuration=gradeDuration.value,chosenPlan=planSelect.value;
+    saveAll.disabled=true;saveAll.textContent='저장 중…';
+    const success=await window.saveMemberSettings(id,chosenPlan,chosenGrade,chosenDuration);
+    saveAll.disabled=false;saveAll.textContent='변경사항 저장';
     if(success){adminGradeDrafts.delete(id);if(adminUserSnapshot)renderUserSnapshot(adminUserSnapshot);}
    };
-   actions.append(gradeSelect,gradeDuration,setGrade);
-   const planSelect=make("select","admin-plan-select");
-   planSelect.setAttribute("aria-label",`${data.name||id} 이용 기간`);
-   [["7","7일"],["30","30일"],["permanent","영구"]].forEach(([value,label])=>{
-    const opt=make("option",null,label);opt.value=value;planSelect.append(opt);
-   });
-   planSelect.value=data.plan==="7"||data.plan==="30"?data.plan:"permanent";
-   const approve=make("button","admin-btn btn-approve",data.status==="approved"?"기간 변경":"승인");
-   approve.type="button";
-   approve.addEventListener("click",()=>window.approveUser(id,planSelect.value));
-   actions.append(planSelect,approve);
+   actions.append(gradeSelect,gradeDuration,planSelect,saveAll);
    if(data.status==="approved"){
     const revoke=make("button","admin-btn btn-revoke","중지");
     revoke.type="button";revoke.addEventListener("click",()=>window.revokeUser(id));actions.append(revoke);
@@ -1389,6 +1452,27 @@ function loadAdminData(){
  const q=query(collection(db,"activityLogs"),orderBy("timestamp","desc"),limit(150));
  liveUnsubscribes.push(onSnapshot(q,snapshot=>{activityCache=snapshot.docs.map(s=>s.data());renderActivityLogs();},err=>console.warn("작업 로그 오류",err)));
 }
+window.saveMemberSettings=async(id,plan='permanent',grade='normal',duration='30')=>{
+ if(!isAdminMode||!auth.currentUser){window.uiAlert?.('최고 관리자만 변경할 수 있습니다.');return false;}
+ if(!['7','30','permanent'].includes(plan)||!['7','30','permanent'].includes(duration)||!GRADE_NAMES[grade]){
+  window.uiAlert?.('저장할 기간이나 등급이 올바르지 않습니다.');return false;
+ }
+ const now=Date.now();
+ const usageDays=plan==='7'?7:plan==='30'?30:null;
+ const gradeDays=duration==='7'?7:duration==='30'?30:null;
+ try{
+  // 한 번의 Firestore 쓰기로 프로그램 이용 기간/상태/등급/등급기간을 동시에 변경한다.
+  // 만료된 계정도 같은 UID를 유지하며 approved 상태로 복구된다.
+  await updateDoc(doc(db,'users',id),{
+   status:'approved',plan:plan,expiresAt:usageDays?now+usageDays*DAY_MS:null,approvedAt:now,
+   grade,gradeDuration:duration,gradeExpiresAt:grade==='normal'||!gradeDays?null:now+gradeDays*DAY_MS,
+   fallbackGrade:'normal',gradeUpdatedAt:now
+  });
+  window.logActivity?.('관리자: 회원 설정 변경',{user:id,plan,grade,gradeDuration:duration});
+  window.uiAlert?.('회원 이용 기간과 등급을 저장했습니다. 만료 계정도 동일한 이메일로 다시 이용할 수 있습니다.');
+  return true;
+ }catch(e){console.error('회원 설정 저장 오류',e);window.uiAlert?.(`변경 실패: ${e.code||'Firestore 권한을 확인해 주세요.'}`);return false;}
+};
 window.setUserGrade=async(id,grade='normal',duration='30')=>{
  if(!isAdminMode||!GRADE_NAMES[grade])return false;
  if(!['7','30','permanent'].includes(duration))return false;
