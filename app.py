@@ -1,3 +1,163 @@
+"""Content-based kill-notification segmentation API.
+No screenshot-size location, fixed percent ROI, or assumed y position.
+Finds notification text and the adjacent bright weapon/icon artwork globally.
+The foreground matte is estimated locally around the detected notification.
+"""
+from __future__ import annotations
+
+import asyncio
+import base64
+from pathlib import Path
+
+import cv2
+import numpy as np
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, Response
+
+app = FastAPI(title="Content-based killlog detector")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+    allow_credentials=False,
+)
+ROOT = Path(__file__).resolve().parent
+GATE = asyncio.Semaphore(2)
+MAX_BYTES = 10 * 1024 * 1024
+MAX_PIXELS = 7_000_000
+OUT_W, OUT_H = 760, 190
+
+# Small appearance examples of the words "킬 알림" from real notifications.
+# Templates contain only the rendered letters in a normalized brightness mask.
+# They do not encode any screenshot location or screenshot dimensions.
+TEMPLATE_PNG_B64 = ('iVBORw0KGgoAAAANSUhEUgAAAEEAAAAdCAAAAADQ0F4VAAADC0lEQVQ4EaXBf0icdRzA8ffHpz3rtluPe+pCsXlzSMpBtSGt+mMtENugH2Tpiob9HEiHgiGTKFmrMQoHhrlxTFhIgiwXG2zIyg0rdnRwUDoOSpmxee3oQM52dO5hZ8+efDy/q+Dk/rjXSyYsCzuTzdoeazL2S5I8jMYhm7xEEOEOj0V+LbFJViMlQkGB3b2gedPkJxTUOBNDq5phFUIhDWVD6BVXWY1QwN3tsW88gZ9YlVBA/eOjieoILnHIQyjgHfPi5h+SrE5YJg6uurEDx/iXONTWzZbLCP831vDKVygCfHgQ13g9g6/H/azYeKEOEhemjC5NXwReOIOrsxccug+jCFDVVDHn+YC5+zndmC4lx38NBt9gLnqzmfIkS5rMpOckoSDcMDr6UATYu8mT0Pv56CCnG+N+cq5XpEvZ8hvJL95nvnmcnJTZ1wEpMxhCESiZrsb14BVOvpx4gGXaTf3XAM0jRPaHYeg1oEa39Ql6O+GPso4+FAHMzZ2vwtgu+LJl/l5y2vrpvnUEnvs5QesAcH43rh1hSJntR1EE2PNpFWT883CqabqWFSfesnSN0WfXLbDvBKy75mNf/OpcGkiZrQMoUrbYehiY/uw48OMTw3tRul+q8PYcstm2feRPYLYSK6NpFsEzs5XtR1GkJ7nzeWA0PDN/Y23PQ6EDi6xoe7sqEz9nlRsl+9OA/3NN9/gM4n3DDsEQikxNag0GYKUtw4ShcHTaAgJGuqXFZ3k0DdgR5r9KD23btYAi5+3LZx85jhIZiFvZLGXV2YRol39nicNjUZRNqfXe7ebGU1dQZK2z6PDoFu67x1xf+Qzh9pgNuuH1Re/asJAFvH/x5CVcFddRjrWhCC4HZbwe5elvWVE7jWvrBC+etaFmilCb2OQILofhjzfot9JeM2KhvNtLR8SX1G2iLNs6geCaquk6giK4HEIDhp22dU+EOz55j66w18oYty+xbOf39H1taJlAP8EQUHKbJYLLQRl8E+Wp71ix5m9cZgrl4RiwZpElQrGEYgnFEoolFOsf79ELMz/+4NcAAAAASUVORK5CYII=', 'iVBORw0KGgoAAAANSUhEUgAAAEEAAAAdCAAAAADQ0F4VAAACOUlEQVQ4EZ3BUYTbYADA8f8nhFBCKOUoJZROrJRSjnsax7inPe1tNuaexs6e7mH2MNtejnEvm7GHsfftaYxjT31ZKSWUEgslhFhcCSH7llzTrG2uvdv9fkJyLQ4NCv0/tyssCMk1eIOdNku8SbVJTkiu5gSmzgrf1VrMCclVpmPFMlhnO1adjJBcwR3t6lwiGhgtUkKynT3rssEgaFdBSLYahbts1J/VLIRki+mwW2WL0NVMIdls4DeabDf2hWST6Xv/7l6Ff7waOafBwkxINhh9Mg51MnaLjK/q5CYmBSGBSFFZNznVXjE36JCJI53cxKQgfnYg1FnXn/oPVYj7e2C3uDCLtNlwn9TIoiBeHCsEBqtC24ydXVLf9sFukYncJrmRRUE8a9/HM1SWuU6tSYgOJAr0e2TGTRbGTQriy+enFhrLzvQOKa/GXL9HZmICsUqiMOhQEOfPVavXYEk0bnPBUepA7E9bFVJOgwW3TkHI0Umtc4/cmbpLIZhaLPErGrmJSUFI3toc17mEl+ywJlTjikLk1AwWhCR5ENyv3uESvqolYRInJrlhmxIh4fsRB4eaN50lYddiyaCeqJESVg3mArdNiZDA6Zvz35QFSZUVvt+iREhSt2wJJAorHKXOisBrkXG9LgUhSZ0cScrGlR1WBIFJiZCkgkcfDEomSoMV4aRDiZBkhoOz+kGPNZHGqlCnRMholtSAxz/aHzVuQPyKNUMDZq+/vutxA+I8VjWFlP1Eednh//0F5+vQuTu9NaUAAAAASUVORK5CYII=')
+TEMPLATES = tuple(
+    cv2.imdecode(np.frombuffer(base64.b64decode(s), dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
+    for s in TEMPLATE_PNG_B64
+)
+SCALES = (0.70, 0.84, 0.95, 1.00, 1.08, 1.22, 1.40)
+
+
+def _bright_letters(im: np.ndarray) -> np.ndarray:
+    hsv = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
+    sat = hsv[:, :, 1].astype(np.float32)
+    val = hsv[:, :, 2].astype(np.float32)
+    return (np.clip((val - 118.0) * 3.0, 0.0, 255.0)
+            * np.clip((140.0 - sat) / 85.0, 0.0, 1.0)).astype(np.uint8)
+
+
+def _icon_evidence(image: np.ndarray, x: int, y: int, scale: float) -> float:
+    # The word appears alongside a weapon icon or decoration: reject identical
+    # small words appearing in the game menu without the accompanying artwork.
+    H, W = image.shape[:2]
+    x0 = max(0, int(x - 178 * scale))
+    x1 = min(W, int(x - 15 * scale))
+    y0 = max(0, int(y - 10 * scale))
+    y1 = min(H, int(y + 34 * scale))
+    if x0 >= x1 or y0 >= y1:
+        return -1.0
+    hsv = cv2.cvtColor(image[y0:y1, x0:x1], cv2.COLOR_BGR2HSV)
+    white_fraction = np.mean((hsv[:, :, 2] > 160) & (hsv[:, :, 1] < 100))
+    saturated_fraction = np.mean((hsv[:, :, 2] > 110) & (hsv[:, :, 1] > 125))
+    return float(min(white_fraction, .35) * 1.4 + min(saturated_fraction, .20) * .8)
+
+
+def detect_notification(image: np.ndarray) -> tuple[int, int, float, float]:
+    # Search the FULL screenshot. No positional percentage or absolute coordinate.
+    mask = _bright_letters(image)
+    candidates = []
+    for template in TEMPLATES:
+        for scale in SCALES:
+            w = max(12, round(template.shape[1] * scale))
+            h = max(8, round(template.shape[0] * scale))
+            if w >= mask.shape[1] or h >= mask.shape[0]:
+                continue
+            scaled = cv2.resize(template, (w, h), interpolation=cv2.INTER_AREA if scale < 1 else cv2.INTER_CUBIC)
+            response = cv2.matchTemplate(mask, scaled, cv2.TM_CCOEFF_NORMED)
+            # Several candidates are necessary because the game menu contains
+            # the same Korean words, without the notification's weapon icon.
+            scores = response.copy()
+            for _ in range(4):
+                _, match, _, (x, y) = cv2.minMaxLoc(scores)
+                if match < .30:
+                    break
+                icon = _icon_evidence(image, x, y, scale)
+                # Menus may contain the same label but not the adjacent artwork.
+                # Do not accept the words alone as a notification.
+                if icon >= 0.10:
+                    candidates.append((float(match + icon), float(match), int(x), int(y), float(scale)))
+                scores[max(0,y-40):y+41, max(0,x-70):x+71] = -1
+    if not candidates:
+        raise ValueError("킬 알림 글자와 아이콘을 찾지 못했습니다. 원본 게임 화면을 선택해 주세요.")
+    quality, match, x, y, scale = max(candidates)
+    if quality < 0.93 or match < .40:
+        raise ValueError("킬 알림을 확실하게 구분하지 못했습니다. 다른 원본으로 다시 시도해 주세요.")
+    return x, y, scale, quality
+
+
+def _local_crop(image: np.ndarray, anchor: tuple[int, int, float, float]):
+    x, y, sc, _ = anchor
+    H, W = image.shape[:2]
+    # Bounds are offsets from the DETECTED TEXT and its measured glyph size.
+    # They are not based on the full photo's width, height, or aspect ratio.
+    x0 = max(0, int(round(x - 260 * sc)))
+    x1 = min(W, int(round(x + 335 * sc)))
+    y0 = max(0, int(round(y - 65 * sc)))
+    y1 = min(H, int(round(y + 74 * sc)))
+    if x1 <= x0 or y1 <= y0:
+        raise ValueError("킬로그가 화면 가장자리에서 잘렸습니다.")
+    return image[y0:y1, x0:x1].copy(), (x0, y0, x1, y1), (x-x0,y-y0,sc)
+
+
+def _background(image: np.ndarray, rect: tuple[int,int,int,int], sc: float) -> np.ndarray:
+    H, W = image.shape[:2]
+    x0,y0,x1,y1=rect
+    h,w=y1-y0,x1-x0
+    t0=max(0,round(y0-10*sc)); t1=max(t0+1,round(y0-3*sc))
+    b0=min(H-2,round(y1+3*sc)); b1=min(H,round(y1+11*sc))
+    top=image[t0:t1,x0:x1]
+    bottom=image[b0:b1,x0:x1]
+    if top.size==0:top=image[y0:y0+1,x0:x1]
+    if bottom.size==0:bottom=image[y1-1:y1,x0:x1]
+    t=cv2.resize(cv2.GaussianBlur(top,(0,0),3),(w,1),interpolation=cv2.INTER_AREA)[0]
+    b=cv2.resize(cv2.GaussianBlur(bottom,(0,0),3),(w,1),interpolation=cv2.INTER_AREA)[0]
+    yy=np.arange(h,dtype=np.float32)[:,None,None]/max(1,h-1)
+    bg=t.astype(np.float32)[None,:,:]*(1-yy)+b.astype(np.float32)[None,:,:]*yy
+    return cv2.GaussianBlur(bg,(9,3),0).astype(np.uint8)
+
+
+def _alpha_matte(image: np.ndarray, roi: np.ndarray, bg: np.ndarray, ax: float, ay: float, scale: float) -> np.ndarray:
+    h,w=roi.shape[:2]
+    fore_lab=cv2.cvtColor(roi,cv2.COLOR_BGR2LAB).astype(np.float32)
+    back_lab=cv2.cvtColor(bg,cv2.COLOR_BGR2LAB).astype(np.float32)
+    diff=np.sqrt(((fore_lab-back_lab)**2).sum(axis=2))
+    hsv=cv2.cvtColor(roi,cv2.COLOR_BGR2HSV)
+    sat=hsv[:,:,1].astype(np.float32)
+    val=hsv[:,:,2].astype(np.float32)
+    # Pixels with strong color/brightness contrast against local surroundings.
+    strength=np.maximum.reduce([
+        np.clip((diff-12)*7,0,255),
+        np.clip((sat-75)*1.8,0,130)*np.clip((diff-6)/24,0,1),
+        np.clip((val-130)*2.1,0,160)*np.clip((diff-9)/28,0,1),
+    ])
+    hard=(strength>47).astype(np.uint8)*255
+    close_k=cv2.getStructuringElement(cv2.MORPH_RECT,(max(7,int(17*scale)//2*2+1),3))
+    joined=cv2.morphologyEx(hard,cv2.MORPH_CLOSE,close_k)
+    n,labels,stats,_=cv2.connectedComponentsWithStats(joined,8)
+    # Prioritize a long horizontal component close to the DETECTED GLYPH,
+    # not the vertical game weapon, UI, or arbitrary colored particles.
+    plausible=[]
+    for i in range(1,n):
+        cx,cy,cw,ch,area=map(int,stats[i])
+        if cw < 70*scale or ch < 8*scale or area < 100*scale*scale:
+            continue
+        ydist=abs((cy+ch/2)-(ay+15*scale))
+        xdist=max(0,(ax-175*scale)-(cx+cw),cx-(ax+200*scale))
+        score=cw*3.0+area*.2-ydist*6.0-xdist*5.0
+        plausible.append((score,i,cx,cy,cw,ch))
+    if not plausible:
         # Banner can be very pale; its alpha is initially conservative.
         chosen=np.where(strength>39,255,0).astype(np.uint8)
     else:
