@@ -922,6 +922,13 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 @media(max-width:540px){#kl8-edge-controls label{min-width:100%;justify-content:space-between}#kl8-edge-controls input[type=range]{max-width:none}}
 #kl8-manual-canvas{cursor:crosshair}
 @media(max-width:510px){#kl8-compare-panel .kl8-comparison{grid-template-columns:1fr}}
+
+/* v12 additional controls */
+.sna-export-label{display:inline-flex;gap:8px;align-items:center;color:#e3edff;font-size:13px}
+.sna-export-label select{background:#182844;color:white;border:1px solid #6686b6;border-radius:8px;padding:9px}
+.sna-quality-warning{font-size:12px;color:#ffce86;background:#3e301e;padding:7px;border:1px solid #986b3b;border-radius:7px;margin-top:5px}
+.board-item-preview,.board-drag-hint{touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.sna-version-bar{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 6px);left:8px;z-index:987;background:#17263d;color:#c2d7ff;border:1px solid #425977;border-radius:14px;font:11px system-ui;padding:5px 9px;opacity:.82}
 </style>
 <style>
 #sna-report-open{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:100001;min-height:42px;padding:9px 14px;border:1px solid #7892bc;background:#263c5e;color:#f4f7ff;border-radius:25px;font-weight:750;box-shadow:0 4px 16px #0008;display:none}
@@ -2496,7 +2503,7 @@ window.closeAdmin=()=>{
   <strong>사진 목록</strong>
   <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span id="c_totalSelected" style="color:#91b8ff;font-weight:800">전체 선택 0개</span><span id="c_photoCountLabel">0장</span></span>
  </div>
- <div id="c_photoList" class="photo-list"></div>
+ <div class="kl8-toolbar"><button id="c_v12undo" class="kl8-btn" type="button" disabled>옷 ↶ 취소</button><button id="c_v12redo" class="kl8-btn" type="button" disabled>↷ 다시 실행</button><button id="c_v12restore" class="kl8-btn" type="button">작업 자동 복구</button></div><div id="c_photoList" class="photo-list"></div>
 </section>
 
 <div style="display:flex;justify-content:space-between;margin:16px 2px 9px;font-size:13px">
@@ -2648,7 +2655,7 @@ window.closeAdmin=()=>{
   <strong>사진 목록</strong>
   <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span id="g_totalSelected" style="color:#91b8ff;font-weight:800">전체 선택 0개</span><span id="g_photoCountLabel">0장</span></span>
  </div>
- <div id="g_photoList" class="photo-list"></div>
+ <div class="kl8-toolbar"><button id="g_v12undo" class="kl8-btn" type="button" disabled>총 ↶ 취소</button><button id="g_v12redo" class="kl8-btn" type="button" disabled>↷ 다시 실행</button><button id="g_v12restore" class="kl8-btn" type="button">작업 자동 복구</button></div><div id="g_photoList" class="photo-list"></div>
 </section>
 
 <div style="display:flex;justify-content:space-between;margin:16px 2px 9px;font-size:13px">
@@ -2760,6 +2767,8 @@ window.closeAdmin=()=>{
    <div id="kl8-edge-controls" class="kl8-edge-controls">
      <label>윗변 위치 <input id="kl8-top-edge" type="range" min="0" max="189" value="50"><output id="kl8-top-val">50</output></label>
      <label>아랫변 위치 <input id="kl8-bottom-edge" type="range" min="0" max="189" value="120"><output id="kl8-bottom-val">120</output></label>
+     <label>오른쪽 수직변 위치 <input id="kl8-right-edge" type="range" min="0" max="760" value="680"><output id="kl8-right-val">680</output></label>
+     <label class="kl8-check"><input id="kl8-rightlock" type="checkbox" checked> 오른쪽 변 90° 직각 고정</label>
      <button type="button" id="kl8-edge-auto" class="kl8-btn">기준선 자동 맞춤</button>
    </div>
   </div>
@@ -2805,6 +2814,7 @@ window.closeAdmin=()=>{
   <span id="m_photoCount">0장</span>
  </div>
 
+ <div class="kl8-toolbar"><button type="button" id="m_undo" class="kl8-btn" disabled>↶ 되돌리기</button><button type="button" id="m_redo" class="kl8-btn" disabled>↷ 다시 실행</button><button type="button" id="m_restore" class="kl8-btn">이전 합치기 작업 복원</button></div>
  <button id="m_positionBtn" class="action" style="width:100%;min-height:44px;background:#242832">
   📍 위치 변경 모드 켜기
  </button>
@@ -3032,7 +3042,8 @@ window.closeAdmin=()=>{
   <section class="board-section">
    <h2>6. 미리보기</h2>
    
-   <div id="b_previewMeta" class="board-counter">옷 0장 · 총기 0장 · 대기 중</div>
+   <div class="board-row"><label class="kl8-check"><input type="checkbox" id="b_autoAlign" checked> 글자 이탈 자동 제한</label><button type="button" class="board-btn" id="b_alignNow">옷·총 및 글자 자동 정렬</button><span class="board-small">자동 제한을 꺼도 기존 수동 조절값은 유지</span></div>
+    <div id="b_previewMeta" class="board-counter">옷 0장 · 총기 0장 · 대기 중</div>
    <div id="b_touch-sort-hint" style="margin-top:8px;border:1px solid #3a5279;background:#0e1c34;color:#d6e6ff;padding:11px 12px;border-radius:12px;font-size:13px;text-align:center">옷 순서 바꾸기: 미리보기에서 <b>첫 번째 옷</b>을 누르고, <b>바꿀 옷</b>을 누르세요.</div>
    <div class="board-preview-wrap" style="margin-top:10px"><canvas id="b_preview" width="900" height="1300"></canvas></div>
    <div class="member-panel" style="margin:10px 0"><h3>🏛️ 대필 전시관 자동 등록</h3>
@@ -3042,8 +3053,11 @@ window.closeAdmin=()=>{
     <p id="board-gallery-status" role="status"></p>
    </div>
    <div class="board-sticky-actions">
-    <button id="b_savePng" type="button" class="board-btn primary">⬇ PNG 대필판 저장</button>
+    <label class="sna-export-label">PNG 화질 <select id="b_exportScale" aria-label="대필판 저장 화질"><option value="1">표준</option><option value="2">2배</option><option value="4">4배</option></select></label>
+     <button id="b_savePng" type="button" class="board-btn primary">↗ PNG 공유 / 저장</button>
     <button id="b_saveSettings" type="button" class="board-btn">💾 설정 저장</button>
+     <button id="b_undo" type="button" class="board-btn" disabled>↶ 되돌리기</button>
+     <button id="b_redo" type="button" class="board-btn" disabled>↷ 다시 실행</button>
    </div>
    <div class="board-row" style="margin-top:8px;align-items:center">
     <input type="text" id="sna-preset-title" maxlength="40" placeholder="내 설정 이름 (예: 스나 기본)" aria-label="프리셋 이름" style="width:100%;min-height:44px;background:#182844;color:white;border:1px solid #53678c;border-radius:9px;padding:10px">
@@ -3094,84 +3108,32 @@ function switchTab(tabId, silent=false){
    (아이폰, 갤럭시 등 모바일에서 네이티브 공유창/저장창 띄우기)
 ===================================================== */
 
-async function downloadFile(dataURL, filename) {
-  const arr = dataURL.split(',');
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while(n--){
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  
-  const blob = new Blob([u8arr], {type: 'image/jpeg'});
-  const finalFilename = filename.endsWith('.jpg') ? filename : filename + '.jpg';
-  const file = new File([blob], finalFilename, { type: 'image/jpeg' });
+// v12: unified one-shot native sharing, with download fallback for browsers without file sharing.
+window.SnaShareFiles=async function(files){
+ const list=Array.from(files||[]).filter(Boolean);if(!list.length)return false;
+ if(window.snaSamsungSaveLimit&&list.length>10&&window.snaSamsungSaveLimit.shouldBlock(list.length))return false;
+ const payload={files:list};
+ try{if(navigator.share && navigator.canShare?.(payload)){
+   await navigator.share(payload);return true;
+ }}catch(err){if(err?.name==='AbortError')return false;console.warn('공유창 열기 실패',err);}
+ for(const file of list){const u=URL.createObjectURL(file),a=document.createElement('a');a.href=u;a.download=file.name||'image';a.style.display='none';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),30000);}
+ return true;
+};
+window.SnaDataFile=function(dataURL,filename){
+ const [head,encoded]=String(dataURL).split(',');const mime=(head.match(/^data:([^;]+)/)||[])[1]||'image/jpeg';
+ const raw=atob(encoded),buf=new Uint8Array(raw.length);for(let j=0;j<raw.length;j++)buf[j]=raw.charCodeAt(j);
+ return new File([buf],filename,{type:mime});
+};
+window.SnaShareData=async(dataURL,filename)=>window.SnaShareFiles([window.SnaDataFile(dataURL,filename)]);
 
-  // 모바일 네이티브 공유창(Web Share API) 지원 여부 확인
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try {
-      await navigator.share({
-        files: [file]
-      });
-    } catch (err) {
-      console.log("공유 창 닫힘 또는 에러:", err);
-    }
-  } else {
-    // API를 지원하지 않는 PC나 특정 브라우저용 일반 다운로드
-    const blobUrl = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = blobUrl;
-    link.download = finalFilename;
-    link.style.display = "none";
-    document.body.appendChild(link);
-    link.click();
-    setTimeout(() => {
-      link.remove();
-      URL.revokeObjectURL(blobUrl);
-    }, 150);
-  }
+async function downloadFile(dataURL, filename){
+ return window.SnaShareData(dataURL,filename.endsWith('.jpg')?filename:filename+'.jpg');
 }
 
-async function downloadMultipleFiles(dataURLs, prefix) {
-  const files = [];
-  for(let i=0; i<dataURLs.length; i++) {
-    const arr = dataURLs[i].split(',');
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while(n--){
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    const blob = new Blob([u8arr], {type: 'image/jpeg'});
-    files.push(new File([blob], `${prefix}_${i+1}.jpg`, { type: 'image/jpeg' }));
-  }
-
-  // 여러 파일을 한 번에 공유창으로 넘기기
-  if (navigator.canShare && navigator.canShare({ files: files })) {
-    try {
-      await navigator.share({ files: files });
-    } catch (err) {
-      console.log("공유 창 닫힘 또는 에러:", err);
-    }
-  } else {
-    // 지원하지 않는 경우 반복문으로 다운로드 강제 실행
-    for (const file of files) {
-      const blobUrl = URL.createObjectURL(file);
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = file.name;
-      link.style.display = "none";
-      document.body.appendChild(link);
-      link.click();
-      setTimeout(() => {
-        link.remove();
-        URL.revokeObjectURL(blobUrl);
-      }, 150);
-      await new Promise(r => setTimeout(r, 200));
-    }
-  }
+async function downloadMultipleFiles(dataURLs,prefix){
+ const files=dataURLs.map((url,i)=>window.SnaDataFile(url,`${prefix}_${i+1}.jpg`));
+ return window.SnaShareFiles(files);
 }
-
 
 // 카카오톡이 공유 대상에 없더라도 JPG를 단말에 직접 저장해
 // 삼성 「내 파일 > 다운로드」 또는 갤러리에서 카카오톡으로 전송할 수 있습니다.
@@ -3237,6 +3199,26 @@ const snaSamsungSaveLimit = (() => {
   };
 })();
 
+
+
+// v12: advisory image QA. Never deletes images without an explicit click.
+window.SnaQuality=(()=>{
+ const seen={cloth:new Map(),gun:new Map()};
+ function inspect(url,kind,onRemove){
+  const img=new Image();img.onload=()=>{
+   const c=document.createElement('canvas');c.width=24;c.height=24;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(img,0,0,24,24);
+   const d=g.getImageData(0,0,24,24).data;let min=255,max=0,bright=0,edges=0,ink=0,h=2166136261;
+   for(let i=0;i<576;i++){const j=i*4,v=Math.round(d[j]*.299+d[j+1]*.587+d[j+2]*.114);min=Math.min(min,v);max=Math.max(max,v);if(v>215)bright++;if(v<30)ink++;const bit=v>125?1:0;h=Math.imul(h^bit,16777619)>>>0;if(i<24||i>=552||i%24===0||i%24===23){if(v>210||v<15)edges++;}}
+   const hash=h.toString(16)+'-'+Math.round((bright/576)*20);const warn=[];
+   if(max-min<18||bright>555||ink>550)warn.push('빈칸/단색 의심');
+   if(edges>85)warn.push('테두리/잘림 확인');
+   if(bright>465)warn.push('과도한 여백 의심');
+   if(seen[kind].has(hash))warn.push('중복 이미지 의심');else seen[kind].set(hash,true);
+   if(onRemove && warn.length){const host=document.createElement('div');host.className='sna-quality-warning';host.textContent='검토: '+warn.join(' · ');onRemove(host);}
+  };img.src=url;
+ }
+ return {inspect};
+})();
 
 /* =====================================================
    👕 옷 추출
@@ -3514,6 +3496,7 @@ document.getElementById("c_uploadLabel")
 
 fileInput.addEventListener("change",event=>{
 
+ cHist();
  const files=[...event.target.files];
 
  if(!files.length)return;
@@ -3546,6 +3529,7 @@ fileInput.addEventListener("change",event=>{
     image:img,
     url,
     name:file.name,
+    file,
     selected:[]
    };
 
@@ -3553,7 +3537,7 @@ fileInput.addEventListener("change",event=>{
 
    if(loaded===files.length){
     makePhotoButtons();
-    showPhoto(0);
+    showPhoto(0);window.SnaDraft?.queue('clothes');
    }
   };
 
@@ -3578,6 +3562,12 @@ function makePhotoButtons(){
   button.onclick=()=>showPhoto(index);
 
   photo.button=button;
+  button.draggable=true;
+  button.addEventListener('dragstart',e=>{photoList.dataset.dragFrom=String(index);e.dataTransfer?.setData('text/plain',String(index));});
+  button.addEventListener('dragover',e=>e.preventDefault());
+  button.addEventListener('drop',e=>{e.preventDefault();const from=Number(photoList.dataset.dragFrom),to=index;
+   if(from>=0&&from<photos.length&&to>=0&&to<photos.length&&from!==to){cHist();const photo=photos.splice(from,1)[0];photos.splice(to,0,photo);makePhotoButtons();showPhoto(to);window.SnaDraft?.queue('clothes');}
+  });
   photoList.appendChild(button);
  });
 
@@ -4223,7 +4213,7 @@ function chooseClothesAt(clientX,clientY){
  const existing=selectedCards.findIndex(card=>Math.abs(card.x-found.x)<=3&&Math.abs(card.y-found.y)<=3);
  if(existing>=0)selectedCards.splice(existing,1);
  else selectedCards.push(found);
- photos[currentIndex].selected=selectedCards;
+ photos[currentIndex].selected=selectedCards;window.SnaDraft?.queue('clothes');
  updateCount();updatePhotoButtons();drawSelections();drawClothTrimPreview();
 }
 if(window.PointerEvent){
@@ -4383,7 +4373,7 @@ window.c_extractSelected=()=>{
    .95
   );
 
-  croppedCards.push(dataURL);
+  croppedCards.push(dataURL);window.SnaDraft?.queue('clothes');
 
   const resultCard=document.createElement("div");
 
@@ -4401,6 +4391,13 @@ window.c_extractSelected=()=>{
   `;
 
   results.appendChild(resultCard);
+  window.SnaQuality.inspect(dataURL,'cloth',node=>{
+    const btn=document.createElement('button');btn.type='button';btn.className='save';btn.textContent='검토 후 이 결과 삭제';btn.onclick=()=>{
+     const at=[...results.querySelectorAll('.card')].indexOf(resultCard);if(at<0)return;
+     croppedCards.splice(at,1);resultCard.remove();resultCountText.textContent=String(croppedCards.length);resultCountTitle.textContent=String(croppedCards.length);saveAllButton.disabled=!croppedCards.length;
+     document.getElementById('c_saveAllTop').disabled=!croppedCards.length;window.SnaDraft?.queue('clothes');
+    };resultCard.append(node,btn);
+   });
 
  });
 
@@ -4416,35 +4413,35 @@ window.c_extractSelected=()=>{
 // Android에서 공유를 받는 앱 목록은 OS와 앱 지원 형태에 따라 달라집니다.
 window.c_saveAllCards=async()=>{
  if(!croppedCards.length)return;
- let files;
- try{
-  files=croppedCards.map((dataURL,i)=>{
-   const raw=atob(dataURL.split(',')[1]);
-   const bytes=new Uint8Array(raw.length);
-   for(let k=0;k<raw.length;k++)bytes[k]=raw.charCodeAt(k);
-   return new File([bytes],`clothes_${String(i+1).padStart(3,'0')}.jpg`,{type:'image/jpeg'});
-  });
- }catch(error){
-  console.error('JPG 파일 준비 실패:',error);
-  window.uiAlert?.('사진을 공유할 JPG로 준비하는 중 문제가 발생했습니다.');
-  return;
- }
- // jpg 이미지 파일만 전달해야 가능한 많은 사진 수신 앱과 호환됩니다.
- // title/text/url을 섞으면 일부 수신 앱이 목록에서 제외될 수 있으므로 사용하지 않습니다.
- const payload={files};
- if(typeof navigator.share!=='function'||!navigator.canShare?.(payload)){
-  window.uiAlert?.('이 브라우저는 JPG '+files.length+'장 동시 공유를 지원하지 않습니다. Chrome 또는 삼성 인터넷에서 HTTPS로 접속해 다시 시도하세요. 카카오톡/갤러리 표시 여부는 운영체제가 결정합니다.');
-  return;
- }
- try{
-  await navigator.share(payload); // N개를 N번 공유하지 않음. 단 1회 호출.
- }catch(error){
-  if(error?.name==='AbortError')return; // 공유 창을 직접 닫은 경우
-  console.warn('일괄 공유 실패:',error);
-  window.uiAlert?.('선택한 JPG를 공유하지 못했습니다. 사진 수가 너무 많으면 공유 대상 앱이 거절할 수 있습니다. 사진을 나누어 시도하거나 갤러리/내 파일에서 공유하세요.');
- }
+ if(snaSamsungSaveLimit.shouldBlock(croppedCards.length))return;
+ const files=croppedCards.map((url,i)=>window.SnaDataFile(url,`clothes_${String(i+1).padStart(3,'0')}.jpg`));
+ await window.SnaShareFiles(files);
 };
 
+// v12 selection and reordering undo history / IndexedDB adapter.
+const cHistory=[],cRedo=[];let restoringCloth=false;
+function cSnap(){return {photos:photos.filter(Boolean).map(p=>({file:p.file,selected:(p.selected||[]).map(r=>({...r}))})),results:[...croppedCards],current:currentIndex};}
+function cHist(){if(restoringCloth)return;cHistory.push(cSnap());if(cHistory.length>25)cHistory.shift();cRedo.length=0;cButtons();}
+function cButtons(){document.getElementById('c_v12undo').disabled=!cHistory.length;document.getElementById('c_v12redo').disabled=!cRedo.length;}
+async function cRestore(data){if(!data)return;restoringCloth=true;
+ try{photos.forEach(p=>p?.url&&URL.revokeObjectURL(p.url));photos=[];croppedCards=[...(data.results||[])];currentIndex=0;
+  await Promise.all((data.photos||[]).map(async (p,index)=>{if(!(p.file instanceof Blob))return;
+   const url=URL.createObjectURL(p.file),img=new Image();await new Promise(ok=>{img.onload=ok;img.onerror=ok;img.src=url;});
+   photos[index]={image:img,url,name:p.file.name,file:p.file,selected:p.selected||[]};}));
+  makePhotoButtons();if(photos.length)showPhoto(Math.min(photos.length-1,data.current||0));
+  results.replaceChildren();for(const [idx,url] of croppedCards.entries()){const card=document.createElement('div');card.className='card';const img=document.createElement('img');img.src=url;const btn=document.createElement('button');btn.className='save';btn.textContent='↗ JPG 공유 / 저장';btn.onclick=()=>shareFile(url,`clothes_${idx+1}.jpg`);card.append(img,btn);results.append(card);}
+  resultCountTitle.textContent=String(croppedCards.length);resultCountText.textContent=String(croppedCards.length);saveAllButton.disabled=!croppedCards.length;
+  document.getElementById('c_saveAllTop').disabled=!croppedCards.length;
+ }finally{restoringCloth=false;cButtons();}}
+window.SnaClothes={snapshot:cSnap,restore:cRestore};
+for(const [id,from,to] of [['c_v12undo',cHistory,cRedo],['c_v12redo',cRedo,cHistory]])document.getElementById(id).onclick=async()=>{if(!from.length)return;to.push(cSnap());await cRestore(from.pop());cButtons();window.SnaDraft?.queue('clothes');};
+const cRestoreBtn=document.getElementById('c_v12restore');cRestoreBtn.onclick=()=>window.SnaDraft?.resume('clothes');
+photoList.addEventListener('pointerdown',e=>{if(e.target.closest('.photo-button')){window._snaClothHold={start:e.target.closest('.photo-button'),x:e.clientX,y:e.clientY,t:Date.now()};}});
+document.addEventListener('pointerup',e=>{const p=window._snaClothHold;window._snaClothHold=null;if(!p||Date.now()-p.t<360)return;
+ const dst=document.elementFromPoint(e.clientX,e.clientY)?.closest('.photo-button'),arr=[...photoList.children],from=arr.indexOf(p.start),to=arr.indexOf(dst);
+ if(from>=0&&to>=0&&from!==to){cHist();const item=photos.splice(from,1)[0];photos.splice(to,0,item);makePhotoButtons();showPhoto(to);window.SnaDraft?.queue('clothes');}
+});
+imageCanvas.addEventListener('pointerdown',()=>cHist(),{capture:true});
 function resizeSelectionCanvas(){
 
  const rect=imageCanvas.getBoundingClientRect();
@@ -4518,6 +4515,7 @@ document.getElementById("g_uploadLabel")
 
 fileInput.addEventListener("change",event=>{
 
+ gHist();
  const files=[...event.target.files];
 
  if(!files.length)return;
@@ -4547,6 +4545,7 @@ fileInput.addEventListener("change",event=>{
     image:img,
     url,
     name:file.name,
+    file,
     selected:[]
    };
 
@@ -4554,7 +4553,7 @@ fileInput.addEventListener("change",event=>{
 
    if(loaded===files.length){
     makePhotoButtons();
-    showPhoto(0);
+    showPhoto(0);window.SnaDraft?.queue('guns');
    }
   };
 
@@ -4580,6 +4579,12 @@ function makePhotoButtons(){
   button.onclick=()=>showPhoto(index);
 
   photo.button=button;
+  button.draggable=true;
+  button.addEventListener('dragstart',e=>{photoList.dataset.dragFrom=String(index);e.dataTransfer?.setData('text/plain',String(index));});
+  button.addEventListener('dragover',e=>e.preventDefault());
+  button.addEventListener('drop',e=>{e.preventDefault();const from=Number(photoList.dataset.dragFrom),to=index;
+   if(from>=0&&from<photos.length&&to>=0&&to<photos.length&&from!==to){gHist();const photo=photos.splice(from,1)[0];photos.splice(to,0,photo);makePhotoButtons();showPhoto(to);window.SnaDraft?.queue('guns');}
+  });
   photoList.appendChild(button);
  });
 
@@ -5234,7 +5239,7 @@ window.g_extractSelected=()=>{
   );
 
 
-  croppedCards.push(dataURL);
+  croppedCards.push(dataURL);window.SnaDraft?.queue('guns');
 
 
   const resultCard=document.createElement("div");
@@ -5248,15 +5253,19 @@ window.g_extractSelected=()=>{
    </div>
    <button class="save"
     onclick="shareFile('${dataURL}','gun_${index+1}.jpg')">
-    ↗ 공유 / 저장
-   </button>
-   <button class="save" style="margin-top:6px;background:#253b59;color:#dbe9ff"
-    onclick="saveJpgForKakao('${dataURL}','gun_${index+1}.jpg')">
-    📥 JPG 직접 저장
+    ↗ JPG 공유 / 저장
    </button>
   `;
 
   results.appendChild(resultCard);
+  window.SnaQuality.inspect(dataURL,'gun',node=>{
+    const btn=document.createElement('button');btn.type='button';btn.className='save';btn.textContent='검토 후 이 결과 삭제';btn.onclick=()=>{
+     const at=[...results.querySelectorAll('.card')].indexOf(resultCard);if(at<0)return;
+     croppedCards.splice(at,1);resultCard.remove();resultCountText.textContent=String(croppedCards.length);resultCountTitle.textContent=String(croppedCards.length);saveAllButton.disabled=!croppedCards.length;
+     const gTop=document.getElementById('g_saveAllTop');if(gTop)gTop.disabled=!croppedCards.length;
+     window.SnaDraft?.queue('guns');
+    };resultCard.append(node,btn);
+   });
 
  });
 
@@ -5278,6 +5287,30 @@ function finalGunHeight(card){
 }
 
 
+// v12 selection and reordering undo history / IndexedDB adapter.
+const gHistory=[],gRedo=[];let restoringGun=false;
+function gSnap(){return {photos:photos.filter(Boolean).map(p=>({file:p.file,selected:(p.selected||[]).map(r=>({...r}))})),results:[...croppedCards],current:currentIndex};}
+function gHist(){if(restoringGun)return;gHistory.push(gSnap());if(gHistory.length>25)gHistory.shift();gRedo.length=0;gButtons();}
+function gButtons(){document.getElementById('g_v12undo').disabled=!gHistory.length;document.getElementById('g_v12redo').disabled=!gRedo.length;}
+async function gRestore(data){if(!data)return;restoringGun=true;
+ try{photos.forEach(p=>p?.url&&URL.revokeObjectURL(p.url));photos=[];croppedCards=[...(data.results||[])];currentIndex=0;
+  await Promise.all((data.photos||[]).map(async (p,index)=>{if(!(p.file instanceof Blob))return;
+   const url=URL.createObjectURL(p.file),img=new Image();await new Promise(ok=>{img.onload=ok;img.onerror=ok;img.src=url;});
+   photos[index]={image:img,url,name:p.file.name,file:p.file,selected:p.selected||[]};}));
+  makePhotoButtons();if(photos.length)showPhoto(Math.min(photos.length-1,data.current||0));
+  results.replaceChildren();for(const [idx,url] of croppedCards.entries()){const card=document.createElement('div');card.className='card';const img=document.createElement('img');img.src=url;const btn=document.createElement('button');btn.className='save';btn.textContent='↗ JPG 공유 / 저장';btn.onclick=()=>shareFile(url,`guns_${idx+1}.jpg`);card.append(img,btn);results.append(card);}
+  resultCountTitle.textContent=String(croppedCards.length);resultCountText.textContent=String(croppedCards.length);saveAllButton.disabled=!croppedCards.length;
+  document.getElementById('g_saveAllTop').disabled=!croppedCards.length;
+ }finally{restoringGun=false;gButtons();}}
+window.SnaGuns={snapshot:gSnap,restore:gRestore};
+for(const [id,from,to] of [['g_v12undo',gHistory,gRedo],['g_v12redo',gRedo,gHistory]])document.getElementById(id).onclick=async()=>{if(!from.length)return;to.push(gSnap());await gRestore(from.pop());gButtons();window.SnaDraft?.queue('guns');};
+const gRestoreBtn=document.getElementById('g_v12restore');gRestoreBtn.onclick=()=>window.SnaDraft?.resume('guns');
+photoList.addEventListener('pointerdown',e=>{if(e.target.closest('.photo-button')){window._snaGunHold={start:e.target.closest('.photo-button'),x:e.clientX,y:e.clientY,t:Date.now()};}});
+document.addEventListener('pointerup',e=>{const p=window._snaGunHold;window._snaGunHold=null;if(!p||Date.now()-p.t<360)return;
+ const dst=document.elementFromPoint(e.clientX,e.clientY)?.closest('.photo-button'),arr=[...photoList.children],from=arr.indexOf(p.start),to=arr.indexOf(dst);
+ if(from>=0&&to>=0&&from!==to){gHist();const item=photos.splice(from,1)[0];photos.splice(to,0,item);makePhotoButtons();showPhoto(to);window.SnaDraft?.queue('guns');}
+});
+imageCanvas.addEventListener('pointerdown',()=>gHist(),{capture:true});
 window.g_saveAllCards=async()=>{
 
  if(croppedCards.length){
@@ -5342,6 +5375,20 @@ let order=[];
 let images=[];
 let positionMode=false;
 let firstPos=null;
+const mergeUndo=[],mergeRedo=[];let mergeRestoring=false;
+const mergeSnapshot=()=>({files:[...files],order:[...order],cols:colsInput.value,rows:rowsInput.value});
+function mergeButtons(){document.getElementById('m_undo').disabled=!mergeUndo.length;document.getElementById('m_redo').disabled=!mergeRedo.length;}
+function saveMergeHistory(){if(mergeRestoring)return;mergeUndo.push(mergeSnapshot());if(mergeUndo.length>30)mergeUndo.shift();mergeRedo.length=0;mergeButtons();}
+async function restoreMerge(data){if(!data)return;mergeRestoring=true;
+ try{files=[...(data.files||[])];colsInput.value=data.cols||'6';rowsInput.value=data.rows||'7';order=(data.order||files.map((_,i)=>i)).filter(i=>i>=0&&i<files.length);status.textContent=files.length+'장';resultCount.textContent=files.length+'장 배치 완료';
+  images=await Promise.all(files.map(f=>new Promise(ok=>{const img=new Image(),u=URL.createObjectURL(f);img.onload=()=>{URL.revokeObjectURL(u);ok(img)};img.onerror=()=>{URL.revokeObjectURL(u);ok(null)};img.src=u;})));
+  if(files.length)makeComposite();else{mergeWrap.style.display='none';empty.style.display='flex';}
+ }finally{mergeRestoring=false;mergeButtons();}
+}
+window.SnaMerge={snapshot:mergeSnapshot,restore:restoreMerge};
+for(const [id,from,to] of [['m_undo',mergeUndo,mergeRedo],['m_redo',mergeRedo,mergeUndo]])document.getElementById(id).onclick=async()=>{if(!from.length)return;to.push(mergeSnapshot());await restoreMerge(from.pop());mergeButtons();window.SnaDraft?.queue('merge');};
+document.getElementById('m_restore').onclick=()=>window.SnaDraft?.resume('merge');
+
 
 
 uploadLabel.addEventListener(
@@ -5361,7 +5408,7 @@ imageInput.addEventListener(
   fileName.textContent=
    `${selectedFiles.length}장의 이미지가 선택됨`;
 
-  files=selectedFiles;
+  saveMergeHistory();files=selectedFiles;
 
   order=files.map((_,i)=>i);
 
@@ -5391,7 +5438,7 @@ imageInput.addEventListener(
   );
 
 
-  makeComposite();
+  makeComposite();window.SnaDraft?.queue('merge');
 
   imageInput.value="";
  }
@@ -5469,8 +5516,22 @@ function updateOverlay(cols,rows){
 
  order.forEach((_,pos)=>{
 
-  const cell=document.createElement("div");
-
+  const cell=document.createElement("div");cell.dataset.mergeIndex=String(pos);
+  cell.draggable=true;
+  cell.addEventListener('dragstart',e=>{overlay.dataset.drag=String(pos);if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(pos));}});
+  cell.addEventListener('dragover',e=>{e.preventDefault();});
+  cell.addEventListener('drop',e=>{e.preventDefault();const from=Number(overlay.dataset.drag),to=pos;
+   if(from>=0&&from<order.length&&from!==to){saveMergeHistory();const item=order.splice(from,1)[0];order.splice(to,0,item);makeComposite();window.SnaDraft?.queue('merge');}
+  });
+  let touchTimer=null,touchStart=null,touchReady=false;
+  cell.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'||!positionMode)return;touchReady=false;touchStart={x:e.clientX,y:e.clientY};
+   touchTimer=setTimeout(()=>{touchReady=true;cell.style.outline='3px solid #85b9ff';},360);
+  });
+  cell.addEventListener('pointerup',e=>{clearTimeout(touchTimer);cell.style.outline='';if(!touchReady)return;touchReady=false;
+   const dst=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-merge-index]'),to=Number(dst?.dataset.mergeIndex);
+   if(Number.isInteger(to)&&to!==pos&&to>=0&&to<order.length){saveMergeHistory();const item=order.splice(pos,1)[0];order.splice(to,0,item);makeComposite();window.SnaDraft?.queue('merge');}
+  });
+  cell.addEventListener('pointercancel',()=>{clearTimeout(touchTimer);touchReady=false;cell.style.outline='';});
   cell.onclick=e=>{
 
    if(!positionMode)return;
@@ -5485,14 +5546,14 @@ function updateOverlay(cols,rows){
 
    }else{
 
-    const temp=order[firstPos];
+    saveMergeHistory();const temp=order[firstPos];
 
     order[firstPos]=order[pos];
     order[pos]=temp;
 
     firstPos=null;
 
-    makeComposite();
+    makeComposite();window.SnaDraft?.queue('merge');
 
    }
   };
@@ -5528,19 +5589,13 @@ positionBtn.addEventListener("click",()=>{
 });
 
 
-colsInput.addEventListener(
- "change",
- makeComposite
-);
+colsInput.addEventListener("change",()=>{saveMergeHistory();makeComposite();window.SnaDraft?.queue("merge");});
 
-rowsInput.addEventListener(
- "change",
- makeComposite
-);
+rowsInput.addEventListener("change",()=>{saveMergeHistory();makeComposite();window.SnaDraft?.queue("merge");});
 
 
 clearBtn.addEventListener("click",()=>{
-
+ saveMergeHistory();window.SnaDraft?.queue("merge");
  files=[];
  order=[];
  images=[];
@@ -5753,6 +5808,7 @@ saveBtn.addEventListener("click",async()=>{
    alert("사진 파일을 선택해 주세요. PNG, JPG, WEBP 형식을 권장합니다.");
    return;
   }
+   historyPush();
   valid.forEach(file=>target.push(makeItem(file,type)));
   renderItems(type);
   updateLoadStatus();scheduleDraw();
@@ -5766,6 +5822,7 @@ saveBtn.addEventListener("click",async()=>{
   if(!arr.length)return;
   const label=type==="clothes"?"옷 사진":"총기·차량 사진";
   if(!await window.uiConfirm(`추가된 ${label} ${arr.length}장을 모두 삭제하시겠습니까?`))return;
+   historyPush();
   arr.forEach(item=>{item.removed=true;if(item?.url){try{URL.revokeObjectURL(item.url);}catch(_){}}});
   arr.splice(0,arr.length);
   const input=$(type==="clothes"?"b_clothesFiles":"b_gunFiles");
@@ -5780,6 +5837,7 @@ saveBtn.addEventListener("click",async()=>{
  function moveItem(type,index,delta){
   const arr=type==="clothes"?state.clothes:state.guns;
   const to=index+delta;if(to<0||to>=arr.length)return;
+   historyPush();
   [arr[index],arr[to]]=[arr[to],arr[index]];
   renderItems(type);scheduleDraw();
   if(window.logActivity)window.logActivity("대필판: 사진 순서 변경",{type,from:index+1,to:to+1});
@@ -5788,6 +5846,7 @@ saveBtn.addEventListener("click",async()=>{
   const arr=type==="clothes"?state.clothes:state.guns;
   to=Math.max(0,Math.min(arr.length-1,Number(to)||0));
   if(index===to||!arr[index])return;
+   historyPush();
   const moved=arr.splice(index,1)[0];arr.splice(to,0,moved);
   renderItems(type);scheduleDraw();
   if(window.logActivity)window.logActivity("대필판: 사진 직접 순서 지정",{type,from:index+1,to:to+1});
@@ -5799,6 +5858,7 @@ saveBtn.addEventListener("click",async()=>{
  }
  function removeItem(type,index){
   const arr=type==="clothes"?state.clothes:state.guns;
+   historyPush();
   const removed=arr.splice(index,1)[0];if(removed){removed.removed=true;if(removed.url)URL.revokeObjectURL(removed.url);}updateLoadStatus();
   renderItems(type);scheduleDraw();
  }
@@ -5816,7 +5876,7 @@ saveBtn.addEventListener("click",async()=>{
    const prev=document.createElement("div");prev.className="board-item-preview";
    const img=document.createElement("img");img.src=item.url;img.alt=item.fileName;img.loading="lazy";prev.appendChild(img);
    const controls=document.createElement("div");controls.className="board-item-controls";
-   const hint=document.createElement("div");hint.className="board-drag-hint";hint.textContent="☰ "+(index+1)+"번 · PC에서는 끌어서 이동";
+   const hint=document.createElement("div");hint.className="board-drag-hint";hint.textContent="☰ "+(index+1)+"번 · PC: 드래그 · 모바일: 사진을 길게 누른 뒤 옮기기";
    const name=document.createElement("input");name.type="text";name.maxLength=45;name.placeholder="표시 이름을 입력해 주세요";name.value=item.name;name.setAttribute("aria-label","사진 "+(index+1)+" 이름");
    name.addEventListener("input",()=>{item.name=name.value;scheduleDraw();});
    const level=document.createElement("input");level.type="text";level.maxLength=24;level.placeholder="레벨을 입력해 주세요 (예: 7Lv)";level.value=item.level;level.setAttribute("aria-label","사진 "+(index+1)+" 레벨");
@@ -5842,6 +5902,19 @@ saveBtn.addEventListener("click",async()=>{
    card.append(prev,controls);host.appendChild(card);
 
    // 데스크톱 마우스 끌어서 놓기. 모바일은 바로 위의 이동 버튼을 사용합니다.
+   let holdTimer=null,holdSource=null;
+   const holdArea=prev;
+   holdArea.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;
+    const sx=e.clientX,sy=e.clientY;
+    holdTimer=setTimeout(()=>{holdSource={sx,sy,index};card.style.outline='3px solid #90b9ff';},380);
+   });
+   holdArea.addEventListener('pointermove',e=>{if(holdTimer&&!holdSource){clearTimeout(holdTimer);holdTimer=null;}});
+   holdArea.addEventListener('pointerup',e=>{clearTimeout(holdTimer);holdTimer=null;card.style.outline='';if(!holdSource)return;
+    const at=document.elementFromPoint(e.clientX,e.clientY)?.closest('.board-item');
+    const to=Number(at?.dataset?.sortIndex);holdSource=null;
+    if(Number.isInteger(to)&&to!==index&&to>=0&&to<arr.length)moveItemTo(type,index,to);
+   });
+   holdArea.addEventListener('pointercancel',()=>{clearTimeout(holdTimer);holdTimer=null;holdSource=null;card.style.outline='';});
    card.addEventListener("dragstart",e=>{
     state.sortDrag={type,index,item};
     card.classList.add("dragging");
@@ -5857,7 +5930,7 @@ saveBtn.addEventListener("click",async()=>{
     if(!state.sortDrag||state.sortDrag.type!==type)return;
     e.preventDefault();
     const from=arr.indexOf(state.sortDrag.item),to=arr.indexOf(item);
-    if(from>=0&&to>=0&&from!==to){const moved=arr.splice(from,1)[0];arr.splice(to,0,moved);if(window.logActivity)window.logActivity("대필판: 끌어서 순서 변경",{type,from:from+1,to:to+1});}
+    if(from>=0&&to>=0&&from!==to){historyPush();const moved=arr.splice(from,1)[0];arr.splice(to,0,moved);if(window.logActivity)window.logActivity("대필판: 끌어서 순서 변경",{type,from:from+1,to:to+1});}
     state.sortDrag=null;renderItems(type);scheduleDraw();
    });
    card.addEventListener("dragend",()=>{state.sortDrag=null;host.querySelectorAll(".board-item").forEach(n=>n.classList.remove("dragging","drag-over"));});
@@ -6332,9 +6405,10 @@ saveBtn.addEventListener("click",async()=>{
   }
   // On mobile, oversized canvas surfaces silently fail to paint some rows.
   // Cap total pixels and dimensions, while keeping the logical board geometry intact.
-  const idealScale=preview?Math.max(1,Math.min(2,window.devicePixelRatio||1.25)):3;
-  const pixelBudget=preview?10000000:22000000;
-  const scale=Math.max(.25,Math.min(idealScale,12000/Math.max(width,height),Math.sqrt(pixelBudget/(width*height))));
+  const ratio=preview?1:Math.max(1,Math.min(4,Number($('b_exportScale')?.value)||1));
+  const idealScale=preview?Math.max(1,Math.min(2,window.devicePixelRatio||1.25)):3*ratio;
+  const pixelBudget=preview?10000000:ratio===1?22000000:ratio===2?42000000:64000000;
+  const scale=Math.max(.25,Math.min(idealScale,14000/Math.max(width,height),Math.sqrt(pixelBudget/(width*height))));
   target.width=Math.round(width*scale);target.height=Math.round(height*scale);
   g=target.getContext("2d");g.setTransform(scale,0,0,scale,0,0);g.clearRect(0,0,width,height);
   g.fillStyle="#FBE2E8";g.fillRect(0,0,width,height);
@@ -6896,13 +6970,62 @@ saveBtn.addEventListener("click",async()=>{
   const out={};inputIds.forEach(id=>out[id]=$(id).value);
   out.b_photoFineEnabled=$("b_photoFineEnabled").checked;
   out.b_photoFineFill=$("b_photoFineFill").checked;
+   out.b_exportScale=$('b_exportScale').value;out.b_autoAlign=$('b_autoAlign').checked;
   colorDefs.forEach(d=>{out["b_"+d.key+"A"]=$("b_"+d.key+"A").value;out["b_"+d.key+"B"]=$("b_"+d.key+"B").value;});
   return out;
  }
+  const BOARD_HISTORY=25,boardUndo=[],boardRedo=[];let boardRestoring=false,boardStart=null;
+  function boardSnapshot(){return {settings:currentSettings(),clothes:state.clothes.map(x=>({file:x.file,name:x.name,level:x.level})),guns:state.guns.map(x=>({file:x.file,name:x.name,level:x.level}))};}
+  function historyButtons(){$('b_undo').disabled=!boardUndo.length;$('b_redo').disabled=!boardRedo.length;}
+  function historyPush(snapshot=boardSnapshot()){
+   if(boardRestoring)return;boardUndo.push(snapshot);if(boardUndo.length>BOARD_HISTORY)boardUndo.shift();boardRedo.length=0;historyButtons();
+  }
+  async function restoreBoardHistory(data){
+   boardRestoring=true;
+   try{
+    state.clothes.forEach(x=>{x.removed=true;if(x.url)URL.revokeObjectURL(x.url);});state.guns.forEach(x=>{x.removed=true;if(x.url)URL.revokeObjectURL(x.url);});
+    state.clothes.length=0;state.guns.length=0;
+    applySettings(data.settings);
+    for(const type of ['clothes','guns'])for(const spec of data[type]||[]){
+     if(!(spec.file instanceof Blob))continue;
+     const item=makeItem(spec.file,type);item.name=spec.name||'';item.level=spec.level||'';state[type].push(item);
+    }
+    renderItems('clothes');renderItems('guns');updateLoadStatus();scheduleDraw();
+   }finally{boardRestoring=false;window.SnaDraft?.queue('board');}
+  }
+  $('b_undo').onclick=async()=>{if(!boardUndo.length)return;boardRedo.push(boardSnapshot());await restoreBoardHistory(boardUndo.pop());historyButtons();};
+  $('b_redo').onclick=async()=>{if(!boardRedo.length)return;boardUndo.push(boardSnapshot());await restoreBoardHistory(boardRedo.pop());historyButtons();};
+  // Snapshot once per editing gesture, not on every keystroke.
+  const historyPanel=$('board-tab');
+  historyPanel.addEventListener('focusin',e=>{if(e.target.matches('input,textarea,select'))boardStart=boardSnapshot();});
+  historyPanel.addEventListener('focusout',e=>{if(boardStart&&e.target.matches('input,textarea,select')){
+   const changedSettings=JSON.stringify(boardStart.settings)!==JSON.stringify(currentSettings());
+   const names=type=>state[type].map(x=>[x.name,x.level]);
+   const changedNames=JSON.stringify(boardStart.clothes.map(x=>[x.name,x.level]))!==JSON.stringify(names('clothes'))||JSON.stringify(boardStart.guns.map(x=>[x.name,x.level]))!==JSON.stringify(names('guns'));
+   if(changedSettings||changedNames)historyPush(boardStart);
+   boardStart=null;
+  }});
+  historyPanel.addEventListener('pointerdown',e=>{if(e.target.matches('input[type="range"],input[type="color"]')&&!boardStart)boardStart=boardSnapshot();},{passive:true});
+  $('b_autoAlign').onchange=()=>scheduleDraw();
+  $('b_alignNow').onclick=()=>{historyPush();
+   const ids=['b_inquiryX','b_subX','b_clothNameX','b_gunNameX','b_gunLevelX'];
+   for(const id of ids){const el=$(id);if(el)el.value='0';}
+   for(const id of ['b_clothesFineX','b_clothesFineY','b_gunsFineX','b_gunsFineY']){if($(id))$(id).value='0';}
+   scheduleDraw();window.SnaDraft?.queue('board');
+  };
+  // Preserve explicit manual edits when automatic constraint is disabled.
+  historyPanel.addEventListener('input',e=>{if(!$('b_autoAlign').checked)return;
+   const id=e.target.id;
+   if(!['b_inquiryX','b_subX','b_clothNameX','b_gunNameX','b_gunLevelX'].includes(id))return;
+   const n=Number(e.target.value);if(Number.isFinite(n)&&Math.abs(n)>130)e.target.value=String(Math.sign(n)*130);
+  },true);
+
  function applySettings(obj){
   if(!obj||typeof obj!=="object")return;
   inputIds.forEach(id=>{if(typeof obj[id]==="string")$(id).value=obj[id];});
-  $("b_photoFineEnabled").checked=false;
+   $('b_exportScale').value=['1','2','4'].includes(obj.b_exportScale)?obj.b_exportScale:'1';
+   $('b_autoAlign').checked=obj.b_autoAlign!==false;
+   $("b_photoFineEnabled").checked=false;
   $("b_photoFineFill").checked=obj.b_photoFineFill!==false;
   refreshFineValues();
   colorDefs.forEach(d=>{
@@ -6943,24 +7066,29 @@ saveBtn.addEventListener("click",async()=>{
  };
 
  async function savePNG(){
-  try{await document.fonts.load('24px "Jua"');}catch(e){}
+  try{document.fonts.load('24px "Jua"').catch(()=>{});}catch(e){}
   const currentTemplate=boardTemplates[$("b_boardSize").value]||boardTemplates.medium;
   if(!currentTemplate.complete||!currentTemplate.naturalWidth){
-   try{await currentTemplate.decode();}catch(e){}
+   await window.uiAlert?.('대필판 배경 이미지를 아직 불러오지 못했습니다. 불러온 후 다시 저장해 주세요.');return;
   }
   const missing=[...state.clothes,...state.guns].filter(item=>!item.loaded||!item.img?.naturalWidth);
   if(missing.length){await window.uiAlert(`${missing.length}장의 사진이 아직 준비되지 않았습니다. 불러오는 중이라면 잠시 기다리고, 실패한 사진은 ‘사진 전체 다시 불러오기’를 눌러주세요.`);return;}
   let exportCanvas=document.createElement("canvas");
-  const info=buildLayout(exportCanvas,false);
-  try{
-   const blob=await new Promise((resolve,reject)=>exportCanvas.toBlob(b=>b?resolve(b):reject(new Error("PNG 변환 실패")),"image/png"));
-   const filename="daepil_board.png";
-   const file=new File([blob],filename,{type:"image/png"});
-   if(navigator.canShare&&navigator.canShare({files:[file]})){
-    try{await navigator.share({files:[file]});}catch(e){if(e.name==="AbortError")return;throw e;}
-   }else{
-    const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=filename;a.style.display="none";document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url);},1000);
+   const info=buildLayout(exportCanvas,false);
+   if($('b_exportScale').value!=='1'){
+    $('sna-session-status').textContent=`저장 이미지 실제 크기 ${exportCanvas.width}×${exportCanvas.height} · 기기 메모리 제한 시 선택 배율보다 작을 수 있어요.`;
    }
+  try{
+   // For iOS a Web Share call after awaiting canvas.toBlob can lose the user's click activation.
+   // On file-share capable browsers produce the PNG synchronously, then invoke share immediately.
+   const filename="daepil_board.png";
+   let file;
+   const mobileNative=!!(navigator.share&&navigator.canShare);
+   if(mobileNative){file=window.SnaDataFile(exportCanvas.toDataURL('image/png'),filename);}
+   else{const png=await new Promise((resolve,reject)=>exportCanvas.toBlob(b=>b?resolve(b):reject(new Error("PNG 변환 실패")),'image/png'));file=new File([png],filename,{type:'image/png'});}
+   const shared=await window.SnaShareFiles([file]);
+   if(!shared)return;
+   const blob=file;
    if(window.logActivity)window.logActivity("대필판 PNG 저장",{clothes:state.clothes.length,guns:state.guns.length,width:info.width,height:info.height});
    // 원본 PNG 저장 성공 이후에만 전시관에 등록한다. 전시관 등록 실패는 PNG 저장을 취소하지 않는다.
    if(window.addBoardToGallery){
@@ -6975,9 +7103,18 @@ saveBtn.addEventListener("click",async()=>{
  $("b_savePng").addEventListener("click",savePNG);
 
  window.SnaBoard={getSettings:currentSettings,applySettings,
-  snapshot:()=>({settings:currentSettings(),clothes:state.clothes.filter(x=>x.file instanceof Blob).map(x=>x.file).slice(0,40),guns:state.guns.filter(x=>x.file instanceof Blob).map(x=>x.file).slice(0,40)}),
+  snapshot:()=>({settings:currentSettings(),quality:$('b_exportScale').value,autoAlign:$('b_autoAlign').checked,
+   clothes:state.clothes.filter(x=>x.file instanceof Blob).slice(0,40).map(x=>({file:x.file,name:x.name,level:x.level})),
+   guns:state.guns.filter(x=>x.file instanceof Blob).slice(0,40).map(x=>({file:x.file,name:x.name,level:x.level}))}),
   restore:async draft=>{if(!draft)return;state.clothes.forEach(x=>x.url&&URL.revokeObjectURL(x.url));state.guns.forEach(x=>x.url&&URL.revokeObjectURL(x.url));state.clothes.length=0;state.guns.length=0;
-    if(draft.settings)applySettings(draft.settings);if(draft.clothes?.length)addFiles(draft.clothes,'clothes');if(draft.guns?.length)addFiles(draft.guns,'guns');scheduleDraw();}
+    if(draft.settings)applySettings(draft.settings);
+    if(draft.quality)$('b_exportScale').value=draft.quality;
+    if(draft.autoAlign!==undefined)$('b_autoAlign').checked=!!draft.autoAlign;
+    for(const type of ['clothes','guns']){
+     const list=draft[type]||[];for(const row of list){const file=row?.file||row;if(!(file instanceof Blob))continue;const item=makeItem(file,type);item.name=row?.name||item.name;item.level=row?.level||item.level;state[type].push(item);}
+     renderItems(type);
+    }
+    updateLoadStatus();scheduleDraw();}
  };
  buildColorSettings();renderItems("clothes");renderItems("guns");updateLoadStatus();scheduleDraw();
  if(document.fonts&&document.fonts.load)document.fonts.load('24px "Jua"').then(()=>scheduleDraw()).catch(()=>{});
@@ -7006,7 +7143,7 @@ function revoke(i){if(i.sourceUrl)URL.revokeObjectURL(i.sourceUrl);if(i.url)URL.
 function urlFor(blob){return URL.createObjectURL(blob);}
 function download(blob,filename){const u=urlFor(blob),a=document.createElement('a');a.href=u;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);}
 function canShare(f){try{return !!(navigator.canShare&&navigator.share&&navigator.canShare({files:f}));}catch(_){return false;}}
-async function shareOne(i){if(!i.blob)return;const f=new File([i.blob],name(i),{type:'image/png'});if(canShare([f])){try{await navigator.share({files:[f]});return;}catch(e){if(e.name==='AbortError')return;}}download(i.blob,name(i));}
+async function shareOne(i){if(!i.blob)return;const f=new File([i.blob],name(i),{type:'image/png'});await window.SnaShareFiles([f]);}
 function pngBlob(c){return new Promise((ok,no)=>c.toBlob(b=>b?ok(b):no(Error('PNG 생성 실패')),'image/png'));}
 function loadImage(blob){return new Promise((ok,no)=>{const u=urlFor(blob),image=new Image();image.onload=()=>{URL.revokeObjectURL(u);ok(image);};image.onerror=()=>{URL.revokeObjectURL(u);no(Error('이미지를 열 수 없습니다.'));};image.src=u;});}
 function newCanvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}
@@ -7137,7 +7274,7 @@ async function zipFiles(arr){const enc=new TextEncoder(),local=[],central=[];let
  const c=new Uint8Array(46+fn.length),v=new DataView(c.buffer);set32(v,0,0x02014b50);set16(v,4,20);set16(v,6,20);set16(v,8,0x0800);set32(v,16,crc);set32(v,20,dat.length);set32(v,24,dat.length);set16(v,28,fn.length);set32(v,42,offset);c.set(fn,46);central.push(c);offset+=h.length+dat.length;}
  const t=new Uint8Array(22),v=new DataView(t.buffer);set32(v,0,0x06054b50);set16(v,8,arr.length);set16(v,10,arr.length);set32(v,12,central.reduce((s,b)=>s+b.length,0));set32(v,16,offset);return new Blob([...local,...central,t],{type:'application/zip'});
 }
-$('kl8-saveall').onclick=async()=>{const ready=items.filter(i=>i.blob);if(!ready.length)return;const fs=ready.map(i=>new File([i.blob],name(i),{type:'image/png'}));if(canShare(fs)){try{await navigator.share({files:fs});return;}catch(e){if(e.name==='AbortError')return;}}try{download(await zipFiles(ready),'killlog_'+ready.length+'photos.zip');status('킬로그 결과를 ZIP 파일로 저장했습니다.');}catch(e){status('저장 실패 · '+e.message);}};
+$('kl8-saveall').onclick=async()=>{const ready=items.filter(i=>i.blob);if(!ready.length)return;const fs=ready.map(i=>new File([i.blob],name(i),{type:'image/png'}));try{if(snaSamsungSaveLimit.shouldBlock(fs.length))return;await window.SnaShareFiles(fs);status('공유 / 저장 요청을 완료했습니다.');}catch(e){status('저장 실패 · '+e.message);}};
 
 // Manual selection: drawn directly on the original image, independent of the server or auto-detection.
 function imageBox(r){return {x:r.x,y:r.y,w:r.w,h:r.h};}
@@ -7243,7 +7380,7 @@ function autoBarEdges(){
  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(ink((y*w+x)*4)){
   l=Math.min(l,x);r=Math.max(r,x);upper=Math.min(upper,y);lower=Math.max(lower,y);
  }
- if(r<l)return {top:Math.round(h*.32),bottom:Math.round(h*.68),xFrom:Math.round(w*.30),xTo:Math.round(w*.85)};
+ if(r<l)return {top:Math.round(h*.32),bottom:Math.round(h*.68),xFrom:Math.round(w*.30),xTo:Math.round(w*.85),right:Math.round(w*.85)};
  const span=r-l,scanL=Math.round(l+span*.43),scanR=Math.round(l+span*.86),run=new Uint16Array(h);
  for(let y=0;y<h;y++)for(let x=scanL;x<=scanR;x++)if(ink((y*w+x)*4))run[y]++;
  // Discard sparse outliers (e.g. the bottom corner of the screenshot) before measuring the bar.
@@ -7253,13 +7390,14 @@ function autoBarEdges(){
  if(rows.length>=12){
   top=clamp(rows[0]-3,0,h-2);bottom=clamp(rows[rows.length-1]+3,top+2,h-1);
  }else{top=clamp(upper+4,0,h-2);bottom=clamp(lower-4,top+2,h-1);}
- return {top,bottom,xFrom:clamp(Math.round(l+span*.15),0,w-1),xTo:clamp(r+7,0,w)};
+ return {top,bottom,xFrom:clamp(Math.round(l+span*.15),0,w-1),xTo:clamp(r+7,0,w),right:clamp(r+7,0,w-1)};
 }
 function syncBarSliders(){if(!barLockInfo)return;
  for(const [id,val] of [['kl8-top-edge',barLockInfo.top],['kl8-bottom-edge',barLockInfo.bottom]]){
   const input=$(id);input.max=String(E.current.height-1);input.value=String(val);
  }
  $('kl8-top-val').textContent=String(barLockInfo.top);$('kl8-bottom-val').textContent=String(barLockInfo.bottom);
+ const edge=$('kl8-right-edge');edge.max=String(E.current.width-1);edge.value=String(barLockInfo.right??barLockInfo.xTo);$('kl8-right-val').textContent=edge.value;
  $('kl8-edge-controls').style.opacity=$('kl8-barlock').checked?'1':'.52';
 }
 function setBarEdge(edge,value){if(!editing||!barLockInfo)return;
@@ -7267,6 +7405,8 @@ function setBarEdge(edge,value){if(!editing||!barLockInfo)return;
  else barLockInfo.bottom=clamp(value,barLockInfo.top+2,E.current.height-1);
  syncBarSliders();redraw();
 }
+$('kl8-right-edge').oninput=e=>{if(!barLockInfo)return;barLockInfo.right=clamp(Number(e.target.value),0,E.current.width-1);barLockInfo.xTo=barLockInfo.right;syncBarSliders();redraw();};
+$('kl8-rightlock').onchange=redraw;
 $('kl8-top-edge').oninput=e=>setBarEdge('top',Number(e.target.value));
 $('kl8-bottom-edge').oninput=e=>setBarEdge('bottom',Number(e.target.value));
 $('kl8-edge-auto').onclick=()=>{if(!editing)return;barLockInfo=autoBarEdges();syncBarSliders();redraw();feedback('바형 기준선을 자동으로 다시 맞췄습니다. 위치가 다르면 슬라이더로 조정하세요.');};
@@ -7326,7 +7466,7 @@ function redraw(){if(!editing)return;const w=E.current.width,h=E.current.height;
  if($('kl8-show-protect').checked){E.viewCtx.drawImage(E.protectOverlay,0,0);}
  if($('kl8-show-keep').checked){E.overlayCtx.clearRect(0,0,w,h);E.overlayCtx.fillStyle='#3aff9b';E.overlayCtx.fillRect(0,0,w,h);E.overlayCtx.globalCompositeOperation='destination-in';E.overlayCtx.drawImage(E.keep,0,0);E.overlayCtx.globalCompositeOperation='source-over';E.viewCtx.save();E.viewCtx.globalAlpha=.35;E.viewCtx.drawImage(E.overlay,0,0);E.viewCtx.restore();}
  redrawCompare();
- if($('kl8-barlock').checked&&barLockInfo&&E.mode==='keep'){E.viewCtx.save();E.viewCtx.strokeStyle='#96ddff';E.viewCtx.lineWidth=1;E.viewCtx.setLineDash([8,5]);E.viewCtx.beginPath();E.viewCtx.moveTo(barLockInfo.xFrom,barLockInfo.top+.5);E.viewCtx.lineTo(barLockInfo.xTo,barLockInfo.top+.5);E.viewCtx.moveTo(barLockInfo.xFrom,barLockInfo.bottom+.5);E.viewCtx.lineTo(barLockInfo.xTo,barLockInfo.bottom+.5);E.viewCtx.stroke();E.viewCtx.restore();}
+ if($('kl8-barlock').checked&&barLockInfo){E.viewCtx.save();E.viewCtx.strokeStyle='#96ddff';E.viewCtx.lineWidth=1;E.viewCtx.setLineDash([8,5]);E.viewCtx.beginPath();E.viewCtx.moveTo(barLockInfo.xFrom,barLockInfo.top+.5);E.viewCtx.lineTo(barLockInfo.xTo,barLockInfo.top+.5);E.viewCtx.moveTo(barLockInfo.xFrom,barLockInfo.bottom+.5);E.viewCtx.lineTo(barLockInfo.xTo,barLockInfo.bottom+.5);if($('kl8-rightlock').checked){const r=barLockInfo.right??barLockInfo.xTo;E.viewCtx.moveTo(r+.5,barLockInfo.top);E.viewCtx.lineTo(r+.5,barLockInfo.bottom);}E.viewCtx.stroke();E.viewCtx.restore();}
 }
 function mode(next){E.mode=next;$('kl8-keep').classList.toggle('kl8-primary',next==='keep');$('kl8-erase').classList.toggle('kl8-primary',next==='erase');feedback(next==='erase'?'지우기: 실제 킬로그는 보호하고, 살리기로 되살린 배경은 다시 지울 수 있습니다.':'살리기: 원본 색을 복원합니다. 잘못 살린 배경은 지우기로 지울 수 있습니다.');redraw();updateCursor(E.pointer);}
 $('kl8-keep').onclick=()=>mode('keep');$('kl8-erase').onclick=()=>mode('erase');$('kl8-barlock').onchange=()=>{syncBarSliders();redraw();};$('kl8-show-keep').onchange=redraw;$('kl8-show-protect').onchange=redraw;
@@ -7334,7 +7474,7 @@ function stamp(x,y){const w=E.current.width,h=E.current.height,r=Number($('kl8-b
  let changed=0;const lx=clamp(Math.floor(x-r),0,w-1),rx=clamp(Math.ceil(x+r),0,w-1),ty=clamp(Math.floor(y-r),0,h-1),by=clamp(Math.ceil(y+r),0,h-1);
  for(let yy=ty;yy<=by;yy++)for(let xx=lx;xx<=rx;xx++){if((xx-x)**2+(yy-y)**2>r*r)continue;const pix=yy*w+xx,k=pix*4;
   if(E.mode==='keep'){
-   if($('kl8-barlock').checked&&barLockInfo&&xx>=barLockInfo.xFrom&&xx<=barLockInfo.xTo&&(yy<barLockInfo.top||yy>barLockInfo.bottom))continue;
+   if($('kl8-barlock').checked&&barLockInfo&&((xx>=barLockInfo.xFrom&&xx<=barLockInfo.xTo&&(yy<barLockInfo.top||yy>barLockInfo.bottom))||($('kl8-rightlock').checked&&xx>(barLockInfo.right??barLockInfo.xTo))))continue;
    if(ref[k+3]===0)continue;
    cur[k]=ref[k];cur[k+1]=ref[k+1];cur[k+2]=ref[k+2];cur[k+3]=ref[k+3];keep[k]=255;keep[k+1]=255;keep[k+2]=255;keep[k+3]=255;changed++;
   }else if(!protectedP[pix]){
@@ -7363,7 +7503,7 @@ async function openEditor(i){if(!i.blob||i.working||editing||M.item)return;editi
   for(const c of [E.current,E.base,E.reference,E.keep,E.overlay,el.canvas]){c.width=cut.width;c.height=cut.height;}
   E.curCtx.clearRect(0,0,cut.width,cut.height);E.curCtx.drawImage(cut,0,0);E.baseCtx.drawImage(base,0,0);E.refCtx.drawImage(ref,0,0);E.keepCtx.clearRect(0,0,cut.width,cut.height);if(mask)E.keepCtx.drawImage(mask,0,0);
   E.curData=E.curCtx.getImageData(0,0,cut.width,cut.height);E.refData=E.refCtx.getImageData(0,0,cut.width,cut.height);E.baseData=E.baseCtx.getImageData(0,0,cut.width,cut.height);E.keepData=E.keepCtx.getImageData(0,0,cut.width,cut.height);E.protected=makeProtection();renderProtectOverlay();E.undo=[];E.redo=[];updateHistoryButtons();$('kl8-compare-panel').hidden=true;$('kl8-compare').classList.remove('kl8-primary');$('kl8-source-thumb').src=i.sourceUrl;
-  barLockInfo=i.barLock?{...i.barLock}:autoBarEdges();$('kl8-barlock').checked=i.barLockEnabled!==false;syncBarSliders();zoom=1;E.pointer=null;el.cursor.hidden=true;mode('keep');fitEditor();redraw();status('보정 중 · 추출 중인 다른 사진도 계속 처리됩니다.');
+  barLockInfo=i.barLock?{...i.barLock}:autoBarEdges();$('kl8-barlock').checked=i.barLockEnabled!==false;$('kl8-rightlock').checked=i.rightLockEnabled!==false;syncBarSliders();zoom=1;E.pointer=null;el.cursor.hidden=true;mode('keep');fitEditor();redraw();status('보정 중 · 추출 중인 다른 사진도 계속 처리됩니다.');
  }catch(e){editing=null;el.modal.hidden=true;updateCard(i);status('보정 창 오류 · '+e.message);}
 }
 function closeEditor(){const i=editing;E.undo=[];E.redo=[];updateHistoryButtons();editing=null;painting=false;lastPoint=null;E.pointer=null;el.cursor.hidden=true;el.modal.hidden=true;barLockInfo=null;if(i)updateCard(i);}
@@ -7373,12 +7513,12 @@ $('kl8-clear-keep').onclick=()=>{if(!editing)return;pushHistory();E.keepCtx.clea
 $('kl8-save').onclick=async()=>{if(!editing)return;const i=editing;$('kl8-save').disabled=true;
  try{
   const [blob,keepBlob]=await Promise.all([pngBlob(E.current),pngBlob(E.keep)]);
-  if(i.url)URL.revokeObjectURL(i.url);i.blob=blob;i.keepBlob=keepBlob;i.barLock=barLockInfo?{...barLockInfo}:null;i.barLockEnabled=$('kl8-barlock').checked;i.url=urlFor(blob);closeEditor();status('보정 저장 완료 · 킬로그 보호와 바형 기준선 유지');window.logActivity?.('킬로그 보정 저장',{mode:'normal'});saveQueue();
+  if(i.url)URL.revokeObjectURL(i.url);i.blob=blob;i.keepBlob=keepBlob;i.barLock=barLockInfo?{...barLockInfo}:null;i.barLockEnabled=$('kl8-barlock').checked;i.rightLockEnabled=$('kl8-rightlock').checked;i.url=urlFor(blob);closeEditor();status('보정 저장 완료 · 킬로그 보호와 바형 기준선 유지');window.logActivity?.('킬로그 보정 저장',{mode:'normal'});saveQueue();
  }catch(e){feedback('보정 저장 실패 · '+e.message);}finally{$('kl8-save').disabled=false;}
 };
 $('kl8-resume').onclick=()=>window.SnaDraft?.resume('kill');$('kl8-draft').onclick=()=>window.SnaDraft?.save('kill',true);
-window.SnaKilllog={save:async()=>{const e={photos:[],results:[]};for(const i of items.slice(0,24)){e.photos.push(i.file);if(i.blob)e.results.push({photo:e.photos.length-1,master:i.blob,original:i.baseBlob,reference:i.refBlob,keep:i.keepBlob,manual:i.manual,cropBox:i.cropBox,shift:i.shift,barLock:i.barLock,barLockEnabled:i.barLockEnabled});}return {mode:'normal',albums:{normal:e}};},
- restore:async(data)=>{if(!data?.albums)return false;for(const i of items)revoke(i);items.length=0;const a=data.albums.normal;if(a){for(const f of a.photos||[])add(f,false);for(const r of a.results||[]){const i=items[r.photo];if(!i)continue;i.blob=r.master||r.blob;i.baseBlob=r.original||i.blob;i.refBlob=r.reference||null;i.keepBlob=r.keep||null;i.manual=!!r.manual;i.cropBox=r.cropBox||null;i.shift=r.shift||{x:0,y:0};i.barLock=r.barLock||null;i.barLockEnabled=r.barLockEnabled!==false;i.url=urlFor(i.blob);}}render();return true;}};
+window.SnaKilllog={save:async()=>{const e={photos:[],results:[]};for(const i of items.slice(0,24)){e.photos.push(i.file);if(i.blob)e.results.push({photo:e.photos.length-1,master:i.blob,original:i.baseBlob,reference:i.refBlob,keep:i.keepBlob,manual:i.manual,cropBox:i.cropBox,shift:i.shift,barLock:i.barLock,barLockEnabled:i.barLockEnabled,rightLockEnabled:i.rightLockEnabled});}return {mode:'normal',albums:{normal:e}};},
+ restore:async(data)=>{if(!data?.albums)return false;for(const i of items)revoke(i);items.length=0;const a=data.albums.normal;if(a){for(const f of a.photos||[])add(f,false);for(const r of a.results||[]){const i=items[r.photo];if(!i)continue;i.blob=r.master||r.blob;i.baseBlob=r.original||i.blob;i.refBlob=r.reference||null;i.keepBlob=r.keep||null;i.manual=!!r.manual;i.cropBox=r.cropBox||null;i.shift=r.shift||{x:0,y:0};i.barLock=r.barLock||null;i.barLockEnabled=r.barLockEnabled!==false;i.rightLockEnabled=r.rightLockEnabled!==false;i.url=urlFor(i.blob);}}render();return true;}};
 const input=$('kl8-api-input'),settings=$('kl8-server-settings');input.value=API;if(!API)settings.open=true;
 async function health(){if(!API){status('Render 서버 주소를 위에 등록하세요. 수동 박스 지정은 서버 없이도 가능합니다.');settings.open=true;return false;}
  status('Render 연결 확인 중…');try{const c=new AbortController();const timeout=setTimeout(()=>c.abort(),12000);let r;try{r=await fetch(API+'/health',{cache:'no-store',signal:c.signal});}finally{clearTimeout(timeout);}if(!r.ok)throw Error('HTTP '+r.status);const d=await r.json();if(d.ok!==true||!(d.endpoint||'').includes('/extract-killlog'))throw Error('킬로그 전용 서버가 아닙니다.');pairSupported=String(d.pair_endpoint||'').includes('/extract-killlog-pair');status(pairSupported?'Render 연결됨 · 빠른 보정 지원':'Render 연결됨 · 기존 서버 호환 모드');$('kl8-api-note').textContent='연결된 주소: '+API+' · 이 기기에 저장됨';settings.open=false;return true;
@@ -7519,18 +7659,20 @@ render();health();
   });
  }
  const key=type=>'user:'+uid+':'+type;
- const label=type=>type==='board'?'대필판':'킬로그';
- const sink=type=>type==='board'?'sna-session-status':'kl8-status';
+ const label=type=>({board:'대필판',kill:'킬로그',merge:'합치기',clothes:'옷 추출',guns:'총 자르기'}[type]||type);
+ const sink=type=>({board:'sna-session-status',kill:'kl8-status',merge:'m_resultCount',clothes:'c_resultCountTitle',guns:'g_resultCountTitle'}[type]||'kl8-status');
  const sizeOf=files=>files.reduce((a,f)=>a+(f?.size||0),0);
  async function save(type,manual=false){
   if(!uid)return false;
   if(saving[type])return false;
   saving[type]=true;
   try{
-   const data=type==='board'?window.SnaBoard?.snapshot():await window.SnaKilllog?.save();
+   const source={board:window.SnaBoard,kill:window.SnaKilllog,merge:window.SnaMerge,clothes:window.SnaClothes,guns:window.SnaGuns}[type];
+   const data=await source?.snapshot?.()||await source?.save?.();
    if(!data)return false;
-   const files=type==='board'?[...(data.clothes||[]),...(data.guns||[])]:
-    Object.values(data.albums||{}).flatMap(a=>[...(a.photos||[]),...(a.results||[]).map(r=>r.master)]);
+   const files=type==='board'?[...(data.clothes||[]),...(data.guns||[])].map(x=>x?.file||x):
+    type==='merge'||type==='clothes'||type==='guns'?(data.files||data.photos||[]).map(x=>x?.file||x):
+    Object.values(data.albums||{}).flatMap(a=>[...(a.photos||[]),...(a.results||[]).flatMap(r=>[r.master,r.reference,r.keep])]);
    if(sizeOf(files)>60*1024*1024){status(sink(type),'임시 저장 보류: 원본 합계가 60MB를 넘습니다. 사진 수를 줄이세요.');return false;}
    await tx('put',key(type),{key:key(type),savedAt:Date.now(),data});
    if(manual)status(sink(type),`${label(type)} 작업이 이 기기에 저장되었습니다.`);
@@ -7550,8 +7692,7 @@ render();health();
    if(!rec){status(sink(type),'저장된 임시 작업이 없습니다.');return;}
    const confirm=await window.uiConfirm?.(`${new Date(rec.savedAt).toLocaleString('ko-KR')}에 저장된 ${label(type)} 작업을 불러올까요? 현재 화면의 같은 종류 작업은 교체됩니다.`);
    if(!confirm)return;
-   if(type==='board')await window.SnaBoard?.restore(rec.data);
-   else await window.SnaKilllog?.restore(rec.data);
+   await ({board:window.SnaBoard,kill:window.SnaKilllog,merge:window.SnaMerge,clothes:window.SnaClothes,guns:window.SnaGuns}[type])?.restore?.(rec.data);
    status(sink(type),'임시 작업을 불러왔습니다.');
   }catch(e){console.warn(e);status(sink(type),'불러오기 실패: 사진 파일 또는 저장소를 확인해 주세요.');}
  }
@@ -7561,7 +7702,20 @@ render();health();
   await tx('delete',key(type));status(sink(type),'저장된 임시 작업을 삭제했습니다.');
  }
  window.SnaDraft={
-  setUser(next){uid=next||null;for(const timer of Object.values(timers))clearTimeout(timer);timers={};},
+  setUser(next){const old=uid;uid=next||null;for(const timer of Object.values(timers))clearTimeout(timer);timers={};
+   if(uid&&uid!==old){const current=uid;
+    setTimeout(async()=>{if(uid!==current)return;
+     for(const type of ['board','kill','merge','clothes','guns']){
+      if(uid!==current)break;
+      try{const rec=await tx('get',key(type));if(!rec||uid!==current)continue;
+       const target={board:window.SnaBoard,kill:window.SnaKilllog,merge:window.SnaMerge,clothes:window.SnaClothes,guns:window.SnaGuns}[type];
+       if(target?.restore)await target.restore(rec.data);
+       if(type==='board')status(sink(type),'마지막 작업 자동 복구 · '+new Date(rec.savedAt).toLocaleString('ko-KR'));
+      }catch(e){console.warn('자동 복구 실패',type,e);}
+     }
+    },1800);
+   }
+  },
   queue,save,resume,clear
  };
  document.getElementById('sna-session-save')?.addEventListener('click',()=>save('board',true));
@@ -7578,5 +7732,13 @@ render();health();
 
 </script>
 
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12 · 전체 편집기</div>
+<div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
+ <strong>v12 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. 이전 저장 설정은 유지합니다.</div>
+ <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
+</div>
+<script>
+(()=>{const version='12.0';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12: 자동복구 · 되돌리기 · 고화질 · 길게 눌러 정렬 · 검토 표시 · 공유 통합 · 킬로그 오른쪽 직각 고정';}}catch(_){} })();
+</script>
 </body>
 </html>
