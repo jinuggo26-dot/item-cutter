@@ -902,10 +902,21 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 @media(max-width:640px){.guide-body{padding:12px}.guide-body section{padding:12px}.guide-header{padding:13px}.guide-footer{padding:10px 12px}.global-tabs > #btn-guide{font-size:clamp(11.5px,3.25vw,14px)!important;min-height:48px!important;}}
 
 
-/* Killlog v9 manual selection and protected editing */
+/* Killlog v10 protected editor, adjustment handles, comparison, background cleaning */
 #kl8-manual-modal .kl8-manual-scroll{display:flex;justify-content:center;align-items:center;overflow:auto;max-height:63dvh;min-height:120px;background:#08111e;border:1px solid #4c668e;border-radius:12px;margin:9px 0;padding:4px;overscroll-behavior:contain}
 #kl8-manual-canvas{display:block;width:auto;height:auto;max-width:100%;max-height:59dvh;object-fit:contain;touch-action:none;user-select:none;-webkit-user-select:none;cursor:crosshair}
 #kl8-editor[hidden],#kl8-manual-modal[hidden]{display:none!important}
+#kl8-compare-panel[hidden]{display:none!important}
+#kl8-compare-panel{margin:10px 0;padding:11px;border:1px solid #547097;border-radius:13px;background:#0c1a30}
+#kl8-compare-panel .kl8-comparison{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#kl8-compare-panel .kl8-comparison>div{min-width:0}
+#kl8-compare-panel canvas{width:100%;height:auto;max-height:230px;object-fit:contain;display:block;background:repeating-conic-gradient(#233a59 0% 25%,#4b6484 0% 50%) 50%/14px 14px;border:1px solid #567192;border-radius:9px}
+#kl8-compare-panel strong{display:block;font-size:12px;margin:5px;color:#cadfff}
+#kl8-source-thumb{max-height:110px;max-width:100%;object-fit:contain;border-radius:9px;display:block;margin-top:6px}
+#kl8-barlock-row{padding:9px 10px;border:1px solid #526d91;border-radius:10px;background:#1b3150;margin:8px 0!important}
+#kl8-barlock-row label{font-weight:800!important;color:#e5f0ff!important}
+#kl8-manual-canvas{cursor:crosshair}
+@media(max-width:510px){#kl8-compare-panel .kl8-comparison{grid-template-columns:1fr}}
 </style>
 <style>
 #sna-report-open{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:100001;min-height:42px;padding:9px 14px;border:1px solid #7892bc;background:#263c5e;color:#f4f7ff;border-radius:25px;font-weight:750;box-shadow:0 4px 16px #0008;display:none}
@@ -2728,18 +2739,22 @@ window.closeAdmin=()=>{
   <div class="kl8-toolbar kl8-between"><h2>직접 네모박스 지정</h2><button type="button" id="kl8-manual-cancel" class="kl8-btn">닫기 ✕</button></div>
   <p class="kl8-hint">원본 사진에서 킬로그 장식까지 포함하여 손가락이나 마우스로 드래그하세요. 위치와 화면 비율은 상관없습니다.</p>
   <div class="kl8-manual-scroll"><canvas id="kl8-manual-canvas" width="760" height="428" aria-label="원본 사진에서 킬로그 선택"></canvas></div>
-  <p id="kl8-manual-feedback" class="kl8-status">박스를 그리면 선택한 내용이 PNG 정중앙에 배치됩니다.</p>
-  <div class="kl8-toolbar"><button type="button" id="kl8-manual-reset" class="kl8-btn">박스 다시 그리기</button><button type="button" id="kl8-manual-confirm" class="kl8-btn kl8-primary">이 영역 추출</button></div>
+  <p id="kl8-manual-feedback" class="kl8-status">박스 안을 끌면 이동, 모서리 점을 끌면 크기 수정, 빈 곳을 끌면 새 박스를 그립니다.</p>
+  <div class="kl8-toolbar"><button type="button" id="kl8-manual-reset" class="kl8-btn">박스 다시 그리기</button><button type="button" id="kl8-manual-confirm" class="kl8-btn kl8-primary">수정한 영역 추출</button></div>
  </div>
 </div>
 <div class="kl8-modal" id="kl8-editor" aria-modal="true" role="dialog" aria-label="킬로그 보정" hidden>
  <div class="kl8-editorbox">
   <div class="kl8-toolbar kl8-between"><h2>킬로그 보정</h2><button type="button" id="kl8-close" class="kl8-btn">닫기 ✕</button></div>
   <div class="kl8-toolbar"><button type="button" id="kl8-keep" class="kl8-btn kl8-primary">살리기</button><button type="button" id="kl8-erase" class="kl8-btn">지우기</button><span class="kl8-hint">칠하면 바로 적용</span></div>
-  <div class="kl8-toolbar"><label>붓 크기 <input id="kl8-brush" type="range" min="4" max="90" value="24"><output id="kl8-brushval">24</output></label></div>
-  <div class="kl8-toolbar"><button type="button" id="kl8-minus" class="kl8-btn">－</button><span id="kl8-zoom-label">100%</span><button type="button" id="kl8-plus" class="kl8-btn">＋</button><button type="button" id="kl8-zoomreset" class="kl8-btn">확대 초기화</button><label class="kl8-check"><input id="kl8-barlock" type="checkbox" checked> 바형 킬로그 윗·아랫변 고정</label><label class="kl8-check"><input id="kl8-show-keep" type="checkbox" checked> 살리기 영역 표시</label></div>
+  <div class="kl8-toolbar"><label>붓 크기 <input id="kl8-brush" type="range" min="4" max="90" value="24"><output id="kl8-brushval">24</output></label>
+   <button type="button" id="kl8-undo" class="kl8-btn" disabled>↶ 되돌리기</button><button type="button" id="kl8-redo" class="kl8-btn" disabled>↷ 다시 실행</button>
+   <button type="button" id="kl8-cleanup" class="kl8-btn">회청색 잔배경 제거</button><button type="button" id="kl8-compare" class="kl8-btn">원본·보정본 비교</button></div>
+  <div class="kl8-toolbar" id="kl8-barlock-row"><label class="kl8-check"><input id="kl8-barlock" type="checkbox" checked> 바형 킬로그 윗·아랫변 고정</label><span class="kl8-hint">살리기 작업에서 바형 테두리 밖으로 번지는 것을 방지</span></div>
+  <div class="kl8-toolbar"><button type="button" id="kl8-minus" class="kl8-btn">－</button><span id="kl8-zoom-label">100%</span><button type="button" id="kl8-plus" class="kl8-btn">＋</button><button type="button" id="kl8-zoomreset" class="kl8-btn">확대 초기화</button><label class="kl8-check"><input id="kl8-show-protect" type="checkbox"> 킬로그 보호 영역 표시</label><label class="kl8-check"><input id="kl8-show-keep" type="checkbox" checked> 살리기 보호 영역 표시</label></div>
   <div id="kl8-scroll" class="kl8-scroll"><div id="kl8-stage" class="kl8-stage"><canvas id="kl8-canvas" width="760" height="190" aria-label="킬로그를 직접 보정하는 캔버스"></canvas><div id="kl8-cursor" class="kl8-cursor" hidden></div></div></div>
-  <p id="kl8-feedback" role="status" class="kl8-status" style="margin-top:9px">원래 킬로그와 살리기로 복원한 부분은 지우기에서 보호됩니다.</p>
+  <p id="kl8-feedback" role="status" class="kl8-status" style="margin-top:9px">파랑: 원래 킬로그 보호, 초록: 살리기 보호 (표시는 PNG에 저장되지 않음)</p>
+  <div id="kl8-compare-panel" hidden><div class="kl8-comparison"><div><strong>최초 추출본</strong><canvas id="kl8-before-canvas" width="760" height="190"></canvas></div><div><strong>현재 보정본 (실시간)</strong><canvas id="kl8-after-canvas" width="760" height="190"></canvas></div></div><strong>업로드 원본 화면</strong><img id="kl8-source-thumb" alt="원본 스크린샷"></div>
   <div class="kl8-toolbar"><button type="button" id="kl8-clear-keep" class="kl8-btn">살리기 보호 표시 해제</button><button type="button" id="kl8-reset" class="kl8-btn">처음으로</button><button type="button" id="kl8-save" class="kl8-btn kl8-primary">보정 저장</button></div>
  </div>
 </div>
@@ -6958,7 +6973,7 @@ saveBtn.addEventListener("click",async()=>{
 </script>
 
 <script>
-/* Killlog v9: independent parallel extraction, manual drag-crop, immediate editing, persisted paint masks. */
+/* Killlog v10: safe protected editing, undo/redo, editable auto box, before/after and slate-background cleanup. */
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id);
@@ -6969,9 +6984,9 @@ let pairSupported=false,editing=null,zoom=1,painting=false,lastPoint=null,barLoc
 const items=[], LIMIT=2, saveQueue=()=>window.SnaDraft?.queue('kill');
 const W=760,H=190;
 const el={modal:$('kl8-editor'),canvas:$('kl8-canvas'),stage:$('kl8-stage'),scroll:$('kl8-scroll'),cursor:$('kl8-cursor'),manual:$('kl8-manual-modal'),manualCanvas:$('kl8-manual-canvas')};
-const E={current:document.createElement('canvas'),base:document.createElement('canvas'),reference:document.createElement('canvas'),keep:document.createElement('canvas'),overlay:document.createElement('canvas'),mode:'keep',pointer:null};
-E.curCtx=E.current.getContext('2d',{willReadFrequently:true});E.baseCtx=E.base.getContext('2d',{willReadFrequently:true});E.refCtx=E.reference.getContext('2d',{willReadFrequently:true});E.keepCtx=E.keep.getContext('2d',{willReadFrequently:true});E.overlayCtx=E.overlay.getContext('2d');E.viewCtx=el.canvas.getContext('2d');
-const M={item:null,image:null,dragging:false,start:null,rect:null};
+const E={current:document.createElement('canvas'),base:document.createElement('canvas'),reference:document.createElement('canvas'),keep:document.createElement('canvas'),overlay:document.createElement('canvas'),protectOverlay:document.createElement('canvas'),mode:'keep',pointer:null,undo:[],redo:[]};
+E.curCtx=E.current.getContext('2d',{willReadFrequently:true});E.baseCtx=E.base.getContext('2d',{willReadFrequently:true});E.refCtx=E.reference.getContext('2d',{willReadFrequently:true});E.keepCtx=E.keep.getContext('2d',{willReadFrequently:true});E.overlayCtx=E.overlay.getContext('2d');E.protectCtx=E.protectOverlay.getContext('2d');E.viewCtx=el.canvas.getContext('2d');
+const M={item:null,image:null,dragging:false,start:null,rect:null,operation:null,initial:null};
 const status=t=>{$('kl8-status').textContent=t;}, feedback=t=>{$('kl8-feedback').textContent=t;};
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const name=i=>(i.file?.name||'manual').replace(/\.[^.]+$/,'').slice(0,70)+'_killlog.png';
@@ -6991,6 +7006,32 @@ async function placeInOutput(image,src={x:0,y:0,w:image.width,h:image.height}){
  for(const c of [out,ref])c.getContext('2d').drawImage(image,src.x,src.y,src.w,src.h,px,py,dw,dh);
  return {cut:await pngBlob(out),ref:await pngBlob(ref),manual:true};
 }
+// Removes exterior-like blue-gray residue without stripping red/gold/name artwork.
+// Only solid blue-gray connected regions (>= 14 pixels) qualify; one-pixel antialias fringe is softened.
+function slateLike(r,g,b,a){return a>12&&r>=12&&r<135&&b<180&&b-r>18&&b-g>6&&g-r>=5;}
+function stripSlateData(data,w,h,kept=null){
+ const a=data.data||data, n=w*h, hit=new Uint8Array(n), visited=new Uint8Array(n), queue=new Int32Array(n);
+ for(let k=0;k<n;k++){const j=k*4;if(slateLike(a[j],a[j+1],a[j+2],a[j+3])&&!(kept&&kept[j+3]>0))hit[k]=1;}
+ let removed=0;
+ for(let first=0;first<n;first++){
+  if(!hit[first]||visited[first])continue;
+  let front=0,end=1;queue[0]=first;visited[first]=1;
+  while(front<end){const v=queue[front++],x=v%w,y=(v/w)|0;
+   if(x>0&&hit[v-1]&&!visited[v-1]){visited[v-1]=1;queue[end++]=v-1;}
+   if(x+1<w&&hit[v+1]&&!visited[v+1]){visited[v+1]=1;queue[end++]=v+1;}
+   if(y>0&&hit[v-w]&&!visited[v-w]){visited[v-w]=1;queue[end++]=v-w;}
+   if(y+1<h&&hit[v+w]&&!visited[v+w]){visited[v+w]=1;queue[end++]=v+w;}
+  }
+  if(end<14)continue;
+  for(let k=0;k<end;k++){const q=queue[k]*4;a[q]=0;a[q+1]=0;a[q+2]=0;a[q+3]=0;removed++;}
+ }
+ return removed;
+}
+async function cleanedAutoBlob(blob){
+ const im=await loadImage(blob),c=newCanvas(im.naturalWidth,im.naturalHeight),ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(im,0,0);
+ const pixels=ctx.getImageData(0,0,c.width,c.height);const count=stripSlateData(pixels,c.width,c.height);
+ if(!count)return blob;ctx.putImageData(pixels,0,0);return pngBlob(c);
+}
 async function recenterAuto(cut,ref){
  const im=await loadImage(cut),scan=newCanvas(im.width,im.height),ctx=scan.getContext('2d',{willReadFrequently:true});ctx.drawImage(im,0,0);
  const w=scan.width,h=scan.height,data=ctx.getImageData(0,0,w,h).data;
@@ -7006,10 +7047,10 @@ async function recenterAuto(cut,ref){
 }
 function updateResult(i,cut,ref=null,manual=false){
  if(i.url)URL.revokeObjectURL(i.url);
- i.blob=cut;i.baseBlob=cut;i.url=urlFor(cut);i.refBlob=ref;i.refPromise=null;i.error='';i.manual=manual;i.keepBlob=null;
+ i.blob=cut;i.baseBlob=cut;i.url=urlFor(cut);i.refBlob=ref;i.refPromise=null;i.error='';i.manual=manual;i.keepBlob=null;if(!manual)i.cropBox=null;
  updateCard(i);saveQueue();
 }
-function add(file,refresh=true){const i={file,sourceUrl:urlFor(file),url:null,blob:null,baseBlob:null,refBlob:null,refPromise:null,keepBlob:null,shift:{x:0,y:0},error:'',working:false,manual:false,card:null};items.push(i);if(refresh)render();return i;}
+function add(file,refresh=true){const i={file,sourceUrl:urlFor(file),url:null,blob:null,baseBlob:null,refBlob:null,refPromise:null,keepBlob:null,shift:{x:0,y:0},error:'',working:false,manual:false,cropBox:null,card:null};items.push(i);if(refresh)render();return i;}
 $('kl8-files').onchange=e=>{for(const f of [...(e.target.files||[])].filter(f=>f.type.startsWith('image/')))add(f,false);e.target.value='';render();saveQueue();};
 $('kl8-clear').onclick=()=>{if(activeJobs||editing||M.item)return status('진행 중인 작업을 마친 후 사진함을 비워 주세요.');for(const i of items)revoke(i);items.length=0;render();saveQueue();};
 function createBtn(label,cls,fn){const b=document.createElement('button');b.type='button';b.className='kl8-btn'+(cls?' '+cls:'');b.textContent=label;b.onclick=fn;return b;}
@@ -7023,12 +7064,13 @@ function render(){
   const result=document.createElement('div');result.className='kl8-result';
   const toolbar=document.createElement('div');toolbar.className='kl8-toolbar';
   const run=createBtn('추출','kl8-primary',()=>extract(i));
-  const manual=createBtn('수동 박스 지정','',()=>openManual(i));
+  const manual=createBtn('수동 박스 지정','',()=>openManual(i,false));
+  const adjust=createBtn('감지 박스 수정','',()=>openManual(i,true));
   const edit=createBtn('보정','',()=>openEditor(i));
   const save=createBtn('PNG 저장 / 공유','',()=>shareOne(i));
   const del=createBtn('삭제','',()=>{if(i.working||editing===i||M.item===i)return;const at=items.indexOf(i);if(at>=0){items.splice(at,1);revoke(i);}render();saveQueue();});
-  toolbar.append(run,manual,edit,save,del);card.append(title,orig,result,toolbar);results.append(card);
-  i.card=card;i.widgets={tab,result,run,manual,edit,save,del};list.append(tab);updateCard(i,n);
+  toolbar.append(run,manual,adjust,edit,save,del);card.append(title,orig,result,toolbar);results.append(card);
+  i.card=card;i.widgets={tab,result,run,manual,adjust,edit,save,del};list.append(tab);updateCard(i,n);
  }
  if(!items.length){const e=document.createElement('div');e.className='empty';e.textContent='원본 사진을 추가해 주세요.';results.append(e);}
  updateCounters();
@@ -7036,12 +7078,13 @@ function render(){
 function updateCounters(){ $('kl8-count').textContent=items.filter(p=>p.blob).length+'개';$('kl8-saveall').disabled=!items.some(p=>p.blob);$('kl8-all').disabled=!items.length||batchWorking;}
 function updateCard(i,number){
  if(!i.widgets)return;
- const {tab,result,run,manual,edit,save,del}=i.widgets;
+ const {tab,result,run,manual,adjust,edit,save,del}=i.widgets;
  const no=number===undefined?items.indexOf(i):number;
  tab.textContent=`사진 ${no+1} · ${i.working?'추출 중':i.blob?'완료':i.error?'실패':'대기'}`;
  result.replaceChildren();if(i.url){const img=document.createElement('img');img.alt='킬로그 결과';img.src=i.url;result.append(img);}else result.textContent=i.error||'추출 전';
  run.textContent=i.working?'추출 중…':'추출';run.disabled=i.working||editing===i||M.item===i;
  manual.disabled=i.working||editing===i||M.item===i;
+ adjust.disabled=!i.blob||i.working||editing===i||M.item===i;
  edit.disabled=!i.blob||editing===i||M.item===i;
  save.disabled=!i.blob;
  del.disabled=i.working||editing===i||M.item===i;
@@ -7065,6 +7108,7 @@ async function extract(i){if(i.working||editing===i||M.item===i)return false;
    else data={cut:await apiPng(i.file,'/extract-killlog'),ref:null};
   }finally{releaseSlot();}
   if(!items.includes(i))return false;
+  data.cut=await cleanedAutoBlob(data.cut);
   const centered=await recenterAuto(data.cut,data.ref);i.shift=centered.shift;updateResult(i,centered.cut,centered.ref,false);status('추출 완료 · 다른 사진도 계속 작업할 수 있습니다.');window.logActivity?.('킬로그 추출',{kind:'normal'});return true;
  }catch(e){i.error='추출 실패 · '+e.message;status('인식 실패: 이 사진의 [수동 박스 지정]으로 직접 선택하세요.');return false;}
  finally{i.working=false;updateCard(i);}
@@ -7084,24 +7128,89 @@ async function zipFiles(arr){const enc=new TextEncoder(),local=[],central=[];let
 $('kl8-saveall').onclick=async()=>{const ready=items.filter(i=>i.blob);if(!ready.length)return;const fs=ready.map(i=>new File([i.blob],name(i),{type:'image/png'}));if(canShare(fs)){try{await navigator.share({files:fs});return;}catch(e){if(e.name==='AbortError')return;}}try{download(await zipFiles(ready),'killlog_'+ready.length+'photos.zip');status('킬로그 결과를 ZIP 파일로 저장했습니다.');}catch(e){status('저장 실패 · '+e.message);}};
 
 // Manual selection: drawn directly on the original image, independent of the server or auto-detection.
-function openManual(i){if(i.working||editing===i)return;M.item=i;M.rect=null;M.start=null;M.dragging=false;el.manual.hidden=false;updateCard(i);
- loadImage(i.file).then(im=>{if(M.item!==i)return;M.image=im;const sc=Math.min(1,1500/im.naturalWidth,1000/im.naturalHeight);el.manualCanvas.width=Math.round(im.naturalWidth*sc);el.manualCanvas.height=Math.round(im.naturalHeight*sc);drawManual();}).catch(e=>{status(e.message);closeManual();});
+function imageBox(r){return {x:r.x,y:r.y,w:r.w,h:r.h};}
+function tidyRect(r,w,h){
+ let x=clamp(r.x,0,w-1),y=clamp(r.y,0,h-1),rx=clamp(r.x+r.w,x+1,w),by=clamp(r.y+r.h,y+1,h);
+ return {x,y,w:rx-x,h:by-y};
 }
-function closeManual(){const i=M.item;M.item=null;M.image=null;M.rect=null;M.start=null;M.dragging=false;el.manual.hidden=true;if(i)updateCard(i);}
+// Approximate the source-location of the auto-extracted pixels by sparse color alignment.
+// Uses no server request; the result is a suggestion that can be moved/resized by the user.
+async function guessAutoBox(image,cutBlob,refBlob){
+ const photo=newCanvas(Math.max(1,Math.round(image.naturalWidth*Math.min(1,560/image.naturalWidth,390/image.naturalHeight))),1);
+ photo.height=Math.max(1,Math.round(image.naturalHeight*photo.width/image.naturalWidth));
+ const pc=photo.getContext('2d',{willReadFrequently:true});pc.drawImage(image,0,0,photo.width,photo.height);
+ const img=pc.getImageData(0,0,photo.width,photo.height).data;
+ const ci=await loadImage(cutBlob),ti=refBlob?await loadImage(refBlob):ci;
+ const tmp=newCanvas(ci.naturalWidth,ci.naturalHeight),tc=tmp.getContext('2d',{willReadFrequently:true});tc.drawImage(ci,0,0);const mask=tc.getImageData(0,0,tmp.width,tmp.height).data;
+ let l=tmp.width,t=tmp.height,r=0,b=0;
+ for(let y=0;y<tmp.height;y++)for(let x=0;x<tmp.width;x++)if(mask[(y*tmp.width+x)*4+3]>120){l=Math.min(l,x);t=Math.min(t,y);r=Math.max(r,x);b=Math.max(b,y);}
+ if(r-l<25||b-t<9)return null;
+ tc.clearRect(0,0,tmp.width,tmp.height);tc.drawImage(ti,0,0,tmp.width,tmp.height);const colors=tc.getImageData(0,0,tmp.width,tmp.height).data;
+ const points=[];const dx=(r-l)/15,dy=(b-t)/5;
+ for(let j=0;j<6;j++)for(let k=0;k<16;k++){
+  const px=Math.round(l+(k+.45)*dx),py=Math.round(t+(j+.45)*dy),idx=(py*tmp.width+px)*4;
+  const cr=colors[idx],cg=colors[idx+1],cb=colors[idx+2];
+  if(mask[idx+3]>180&&(Math.max(cr,cg,cb)-Math.min(cr,cg,cb)>52||Math.max(cr,cg,cb)>165))points.push([px-l,py-t,cr,cg,cb]);
+ }
+ if(points.length<9)return null;
+ const ratio=(b-t+1)/(r-l+1);
+ let best=Infinity,bestRect=null;
+ const srcW=photo.width,srcH=photo.height;
+ for(let ww=srcW*.13;ww<srcW*.91;ww*=1.2){
+  const hh=ww*ratio;if(hh>=srcH*.7||hh<8)continue;
+  const step=Math.max(4,Math.min(13,Math.round(ww*.022)));
+  for(let yy=0;yy+hh<srcH;yy+=step)for(let xx=0;xx+ww<srcW;xx+=step){
+   let error=0;const xscale=ww/(r-l+1),yscale=hh/(b-t+1);
+   for(const [sx,sy,rr,gg,bb] of points){const px=Math.min(srcW-1,Math.round(xx+sx*xscale)),py=Math.min(srcH-1,Math.round(yy+sy*yscale)),idx=(py*srcW+px)*4;
+    error+=Math.abs(img[idx]-rr)+Math.abs(img[idx+1]-gg)+Math.abs(img[idx+2]-bb);
+   }
+   const score=error/points.length;
+   if(score<best){best=score;bestRect={x:xx,y:yy,w:ww,h:hh};}
+  }
+ }
+ if(!bestRect||best>125)return null;
+ const factorX=image.naturalWidth/photo.width,factorY=image.naturalHeight/photo.height;
+ return tidyRect({x:(bestRect.x-bestRect.w*.16)*factorX,y:(bestRect.y-bestRect.h*.18)*factorY,w:bestRect.w*1.32*factorX,h:bestRect.h*1.36*factorY},image.naturalWidth,image.naturalHeight);
+}
+function openManual(i,adjust=false){
+ if(i.working||editing===i||M.item)return;
+ M.item=i;M.rect=null;M.start=null;M.dragging=false;M.operation=null;el.manual.hidden=false;updateCard(i);
+ $('kl8-manual-feedback').textContent=adjust?'감지 위치를 추정합니다. 박스를 이동하거나 모서리 점을 조절하세요.':'원하는 영역을 직접 네모박스로 지정하세요.';
+ loadImage(i.file).then(async im=>{
+  if(M.item!==i)return;M.image=im;const sc=Math.min(1,1500/im.naturalWidth,1000/im.naturalHeight);
+  el.manualCanvas.width=Math.round(im.naturalWidth*sc);el.manualCanvas.height=Math.round(im.naturalHeight*sc);
+  let r=i.cropBox||null;
+  if(adjust&&!r&&i.blob){try{r=await guessAutoBox(im,i.blob,i.refBlob);}catch(_){}}
+  if(M.item!==i)return;
+  if(adjust&&!r){r={x:im.naturalWidth*.22,y:im.naturalHeight*.35,w:im.naturalWidth*.56,h:im.naturalHeight*.22};$('kl8-manual-feedback').textContent='정확한 위치를 찾지 못했어요. 표시된 임시 박스를 원하는 위치로 이동하거나 다시 그리세요.';}
+  else if(adjust){$('kl8-manual-feedback').textContent='추정된 박스입니다. 위치가 다르면 안쪽을 끌거나 모서리 점을 조절하세요.';}
+  if(r)M.rect={x:r.x*el.manualCanvas.width/im.naturalWidth,y:r.y*el.manualCanvas.height/im.naturalHeight,w:r.w*el.manualCanvas.width/im.naturalWidth,h:r.h*el.manualCanvas.height/im.naturalHeight};
+  drawManual();
+ }).catch(e=>{status(e.message);closeManual();});
+}
+function closeManual(){const i=M.item;M.item=null;M.image=null;M.rect=null;M.start=null;M.dragging=false;M.operation=null;el.manual.hidden=true;if(i)updateCard(i);}
+function handles(r){return [[r.x,r.y,'nw'],[r.x+r.w,r.y,'ne'],[r.x,r.y+r.h,'sw'],[r.x+r.w,r.y+r.h,'se']];}
 function drawManual(){const c=el.manualCanvas;if(!M.image)return;const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(M.image,0,0,c.width,c.height);
- if(M.rect){const r=M.rect;ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,c.width,r.y);ctx.fillRect(0,r.y+r.h,c.width,c.height-r.y-r.h);ctx.fillRect(0,r.y,r.x,r.h);ctx.fillRect(r.x+r.w,r.y,c.width-r.x-r.w,r.h);ctx.strokeStyle='#78d7ff';ctx.lineWidth=Math.max(2,c.width/500);ctx.strokeRect(r.x,r.y,r.w,r.h);}
+ if(M.rect){const r=M.rect;ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,c.width,r.y);ctx.fillRect(0,r.y+r.h,c.width,c.height-r.y-r.h);ctx.fillRect(0,r.y,r.x,r.h);ctx.fillRect(r.x+r.w,r.y,c.width-r.x-r.w,r.h);ctx.strokeStyle='#78d7ff';ctx.lineWidth=Math.max(2,c.width/500);ctx.strokeRect(r.x,r.y,r.w,r.h);for(const [x,y] of handles(r)){ctx.beginPath();ctx.fillStyle='#ffffff';ctx.arc(x,y,Math.max(6,c.width/210),0,Math.PI*2);ctx.fill();ctx.strokeStyle='#2363a5';ctx.stroke();}}
 }
 function manualPoint(e){const r=el.manualCanvas.getBoundingClientRect();return {x:clamp((e.clientX-r.left)*el.manualCanvas.width/r.width,0,el.manualCanvas.width),y:clamp((e.clientY-r.top)*el.manualCanvas.height/r.height,0,el.manualCanvas.height)};}
-el.manualCanvas.onpointerdown=e=>{if(!M.image)return;e.preventDefault();M.dragging=true;M.start=manualPoint(e);M.rect=null;el.manualCanvas.setPointerCapture(e.pointerId);};
-el.manualCanvas.onpointermove=e=>{if(!M.dragging||!M.start)return;e.preventDefault();const p=manualPoint(e),s=M.start;M.rect={x:Math.min(s.x,p.x),y:Math.min(s.y,p.y),w:Math.abs(p.x-s.x),h:Math.abs(p.y-s.y)};drawManual();};
-for(const type of ['pointerup','pointercancel','lostpointercapture'])el.manualCanvas.addEventListener(type,()=>{M.dragging=false;});
+el.manualCanvas.onpointerdown=e=>{if(!M.image)return;e.preventDefault();const p=manualPoint(e),r=M.rect,threshold=Math.max(13,el.manualCanvas.width*.017);M.dragging=true;M.start=p;M.initial=r?imageBox(r):null;M.operation='draw';
+ if(r){const h=handles(r).find(([x,y])=>Math.hypot(x-p.x,y-p.y)<threshold);if(h)M.operation=h[2];else if(p.x>=r.x&&p.x<=r.x+r.w&&p.y>=r.y&&p.y<=r.y+r.h)M.operation='move';}
+ if(M.operation==='draw')M.rect=null;try{el.manualCanvas.setPointerCapture(e.pointerId);}catch(_){}
+};
+el.manualCanvas.onpointermove=e=>{if(!M.dragging||!M.start)return;e.preventDefault();const p=manualPoint(e),s=M.start,r=M.initial,c=el.manualCanvas;
+ if(M.operation==='draw')M.rect={x:Math.min(s.x,p.x),y:Math.min(s.y,p.y),w:Math.abs(p.x-s.x),h:Math.abs(p.y-s.y)};
+ else if(M.operation==='move'){M.rect={x:clamp(r.x+p.x-s.x,0,c.width-r.w),y:clamp(r.y+p.y-s.y,0,c.height-r.h),w:r.w,h:r.h};}
+ else {let x0=r.x,y0=r.y,x1=r.x+r.w,y1=r.y+r.h;if(M.operation.includes('w'))x0=clamp(p.x,0,x1-8);if(M.operation.includes('e'))x1=clamp(p.x,x0+8,c.width);if(M.operation.includes('n'))y0=clamp(p.y,0,y1-5);if(M.operation.includes('s'))y1=clamp(p.y,y0+5,c.height);M.rect={x:x0,y:y0,w:x1-x0,h:y1-y0};}
+ drawManual();};
+for(const type of ['pointerup','pointercancel','lostpointercapture'])el.manualCanvas.addEventListener(type,()=>{M.dragging=false;M.operation=null;});
 $('kl8-manual-cancel').onclick=closeManual;
 $('kl8-manual-reset').onclick=()=>{M.rect=null;drawManual();};
 $('kl8-manual-confirm').onclick=async()=>{if(!M.item||!M.image)return;const i=M.item,r=M.rect,c=el.manualCanvas;if(!r||r.w<8||r.h<5){$('kl8-manual-feedback').textContent='킬로그 전체를 드래그하여 네모박스로 선택하세요.';return;}
  const factorX=M.image.naturalWidth/c.width,factorY=M.image.naturalHeight/c.height;
- const rect={x:Math.floor(r.x*factorX),y:Math.floor(r.y*factorY),w:Math.ceil(r.w*factorX),h:Math.ceil(r.h*factorY)};
+ const rect=tidyRect({x:Math.floor(r.x*factorX),y:Math.floor(r.y*factorY),w:Math.ceil(r.w*factorX),h:Math.ceil(r.h*factorY)},M.image.naturalWidth,M.image.naturalHeight);
  $('kl8-manual-confirm').disabled=true;
- try{const data=await placeInOutput(M.image,rect);i.shift={x:0,y:0};updateResult(i,data.cut,data.ref,true);closeManual();status('수동 킬로그 추출 완료 · 배경은 보정의 지우기로 정리할 수 있습니다.');}
+ try{const data=await placeInOutput(M.image,rect);i.cropBox=rect;i.shift={x:0,y:0};updateResult(i,data.cut,data.ref,true);closeManual();status('박스 수정 추출 완료 · 잔배경 제거와 되돌리기는 보정에서 이용하세요.');}
  catch(e){$('kl8-manual-feedback').textContent='수동 추출 실패 · '+e.message;}finally{$('kl8-manual-confirm').disabled=false;}
 };
 
@@ -7145,13 +7254,13 @@ function makeProtection(){
     const idx=y*w+x,k=idx*4;if(a[k+3]<70)continue;
     const delta=(Math.abs(a[k]-bg[0])+Math.abs(a[k+1]-bg[1])+Math.abs(a[k+2]-bg[2]))/3;
     const bright=Math.max(a[k],a[k+1],a[k+2]),dark=Math.min(a[k],a[k+1],a[k+2]);
-    if(delta>35||(bright-dark)>70||bright>210||(Math.abs(y-midY)<halfH&&delta>17))p[idx]=1;
+    if(!slateLike(a[k],a[k+1],a[k+2],a[k+3])&&(delta>35||(bright-dark)>70||bright>210||(Math.abs(y-midY)<halfH&&delta>17)))p[idx]=1;
   }
   return p;
  }
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
   const k=y*w+x,j=k*4,alpha=a[j+3],lum=(a[j]*.2126+a[j+1]*.7152+a[j+2]*.0722),max=Math.max(a[j],a[j+1],a[j+2]),min=Math.min(a[j],a[j+1],a[j+2]);
-  if(alpha>=217||(alpha>=145&&(max-min>=46||lum>=112)))p[k]=1;
+  if(!slateLike(a[j],a[j+1],a[j+2],alpha)&&(alpha>=217||(alpha>=145&&(max-min>=46||lum>=112))))p[k]=1;
  }
  // A one-pixel halo prevents careless erasing of anti-aliased edges.
  const expanded=p.slice();for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++)if(p[y*w+x]){const j=y*w+x;expanded[j-1]=1;expanded[j+1]=1;expanded[j-w]=1;expanded[j+w]=1;}
@@ -7165,12 +7274,35 @@ window.addEventListener('resize',()=>{if(editing)fitEditor();});
 function pointerPosition(e){const r=el.canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*E.current.width/r.width,y:(e.clientY-r.top)*E.current.height/r.height};}
 function updateCursor(pt){if(!pt||!editing){el.cursor.hidden=true;return;}const r=el.canvas.getBoundingClientRect(),s=el.stage.getBoundingClientRect(),scale=r.width/E.current.width,d=Math.max(4,Number($('kl8-brush').value)*scale);el.cursor.hidden=false;el.cursor.style.left=r.left-s.left+pt.x*scale+'px';el.cursor.style.top=r.top-s.top+pt.y*scale+'px';el.cursor.style.width=d+'px';el.cursor.style.height=d+'px';el.cursor.style.borderColor=E.mode==='keep'?'#73ffc0':'#ff767d';}
 $('kl8-brush').oninput=()=>{$('kl8-brushval').textContent=$('kl8-brush').value;updateCursor(E.pointer);};
+const HISTORY_LIMIT=18;
+function snapshot(){return {cur:E.curData.data.slice(),keep:E.keepData.data.slice()};}
+function updateHistoryButtons(){$('kl8-undo').disabled=!E.undo.length;$('kl8-redo').disabled=!E.redo.length;}
+function pushHistory(){if(!editing)return;E.undo.push(snapshot());if(E.undo.length>HISTORY_LIMIT)E.undo.shift();E.redo.length=0;updateHistoryButtons();}
+function restoreSnapshot(s){E.curData.data.set(s.cur);E.keepData.data.set(s.keep);E.curCtx.putImageData(E.curData,0,0);E.keepCtx.putImageData(E.keepData,0,0);redraw();}
+function historyMove(from,to,label){if(!editing||!from.length)return;to.push(snapshot());if(to.length>HISTORY_LIMIT)to.shift();restoreSnapshot(from.pop());updateHistoryButtons();feedback(label);}
+$('kl8-undo').onclick=()=>historyMove(E.undo,E.redo,'이전 보정 단계로 되돌렸습니다.');
+$('kl8-redo').onclick=()=>historyMove(E.redo,E.undo,'되돌린 보정을 다시 실행했습니다.');
+function renderProtectOverlay(){const w=E.current.width,h=E.current.height,c=E.protectOverlay;c.width=w;c.height=h;const d=E.protectCtx.createImageData(w,h);
+ for(let i=0;i<w*h;i++)if(E.protected[i]){const k=i*4;d.data[k]=72;d.data[k+1]=150;d.data[k+2]=255;d.data[k+3]=110;}
+ E.protectCtx.putImageData(d,0,0);
+}
+function redrawCompare(){if(!editing||$('kl8-compare-panel').hidden)return;
+ const before=$('kl8-before-canvas'),after=$('kl8-after-canvas');before.width=E.base.width;before.height=E.base.height;after.width=E.current.width;after.height=E.current.height;
+ before.getContext('2d').drawImage(E.base,0,0);after.getContext('2d').drawImage(E.current,0,0);
+}
+$('kl8-compare').onclick=()=>{if(!editing)return;const panel=$('kl8-compare-panel');panel.hidden=!panel.hidden;$('kl8-compare').classList.toggle('kl8-primary',!panel.hidden);redrawCompare();};
+$('kl8-cleanup').onclick=()=>{if(!editing)return;const candidate=new ImageData(new Uint8ClampedArray(E.curData.data),E.current.width,E.current.height);
+ const n=stripSlateData(candidate,E.current.width,E.current.height,E.keepData.data);
+ if(!n){feedback('제거할 회청색 잔배경이 없습니다. 다른 색의 배경은 지우기로 정리해 주세요.');return;}
+ pushHistory();E.curData.data.set(candidate.data);E.curCtx.putImageData(E.curData,0,0);redraw();feedback('회청색 잔배경 '+n.toLocaleString()+'픽셀 제거 · 되돌리기로 복구 가능');};
 function redraw(){if(!editing)return;const w=E.current.width,h=E.current.height;E.viewCtx.clearRect(0,0,w,h);E.viewCtx.drawImage(E.current,0,0);
+ if($('kl8-show-protect').checked){E.viewCtx.drawImage(E.protectOverlay,0,0);}
  if($('kl8-show-keep').checked){E.overlayCtx.clearRect(0,0,w,h);E.overlayCtx.fillStyle='#3aff9b';E.overlayCtx.fillRect(0,0,w,h);E.overlayCtx.globalCompositeOperation='destination-in';E.overlayCtx.drawImage(E.keep,0,0);E.overlayCtx.globalCompositeOperation='source-over';E.viewCtx.save();E.viewCtx.globalAlpha=.35;E.viewCtx.drawImage(E.overlay,0,0);E.viewCtx.restore();}
+ redrawCompare();
  if($('kl8-barlock').checked&&barLockInfo&&E.mode==='keep'){E.viewCtx.save();E.viewCtx.strokeStyle='#96ddff';E.viewCtx.lineWidth=1;E.viewCtx.setLineDash([8,5]);E.viewCtx.beginPath();E.viewCtx.moveTo(barLockInfo.xFrom,barLockInfo.top+.5);E.viewCtx.lineTo(w,barLockInfo.top+.5);E.viewCtx.moveTo(barLockInfo.xFrom,barLockInfo.bottom+.5);E.viewCtx.lineTo(w,barLockInfo.bottom+.5);E.viewCtx.stroke();E.viewCtx.restore();}
 }
 function mode(next){E.mode=next;$('kl8-keep').classList.toggle('kl8-primary',next==='keep');$('kl8-erase').classList.toggle('kl8-primary',next==='erase');feedback(next==='erase'?'지우기: 킬로그 원본과 살리기로 표시한 부분은 자동 보호됩니다.':'살리기: 원본 색을 복원하며 이 부분은 앞으로도 지워지지 않습니다.');redraw();updateCursor(E.pointer);}
-$('kl8-keep').onclick=()=>mode('keep');$('kl8-erase').onclick=()=>mode('erase');$('kl8-barlock').onchange=redraw;$('kl8-show-keep').onchange=redraw;
+$('kl8-keep').onclick=()=>mode('keep');$('kl8-erase').onclick=()=>mode('erase');$('kl8-barlock').onchange=redraw;$('kl8-show-keep').onchange=redraw;$('kl8-show-protect').onchange=redraw;
 function stamp(x,y){const w=E.current.width,h=E.current.height,r=Number($('kl8-brush').value)/2,cur=E.curData.data,ref=E.refData.data,keep=E.keepData.data,protectedP=E.protected;
  let changed=0;const lx=clamp(Math.floor(x-r),0,w-1),rx=clamp(Math.ceil(x+r),0,w-1),ty=clamp(Math.floor(y-r),0,h-1),by=clamp(Math.ceil(y+r),0,h-1);
  for(let yy=ty;yy<=by;yy++)for(let xx=lx;xx<=rx;xx++){if((xx-x)**2+(yy-y)**2>r*r)continue;const pix=yy*w+xx,k=pix*4;
@@ -7190,7 +7322,7 @@ function brushStroke(a,b){const len=Math.hypot(b.x-a.x,b.y-a.y),step=Math.max(2,
 }
 el.canvas.addEventListener('pointerenter',e=>{if(editing){E.pointer=pointerPosition(e);updateCursor(E.pointer);}});
 el.canvas.addEventListener('pointermove',e=>{if(!editing)return;const p=pointerPosition(e);E.pointer=p;updateCursor(p);if(painting){e.preventDefault();brushStroke(lastPoint,p);lastPoint=p;}});
-el.canvas.addEventListener('pointerdown',e=>{if(!editing)return;e.preventDefault();painting=true;try{el.canvas.setPointerCapture(e.pointerId);}catch(_){}const p=pointerPosition(e);E.pointer=p;lastPoint=p;brushStroke(p,p);updateCursor(p);});
+el.canvas.addEventListener('pointerdown',e=>{if(!editing)return;e.preventDefault();pushHistory();painting=true;try{el.canvas.setPointerCapture(e.pointerId);}catch(_){}const p=pointerPosition(e);E.pointer=p;lastPoint=p;brushStroke(p,p);updateCursor(p);});
 for(const ty of ['pointerup','pointercancel','lostpointercapture'])el.canvas.addEventListener(ty,()=>{painting=false;lastPoint=null;});
 el.canvas.addEventListener('pointerleave',()=>{if(!painting){E.pointer=null;el.cursor.hidden=true;}});
 async function openEditor(i){if(!i.blob||i.working||editing||M.item)return;editing=i;updateCard(i);status(i.refBlob?'보정 창 여는 중…':'원본 색 불러오는 중…');
@@ -7200,14 +7332,14 @@ async function openEditor(i){if(!i.blob||i.working||editing||M.item)return;editi
   el.modal.hidden=false;
   for(const c of [E.current,E.base,E.reference,E.keep,E.overlay,el.canvas]){c.width=cut.width;c.height=cut.height;}
   E.curCtx.clearRect(0,0,cut.width,cut.height);E.curCtx.drawImage(cut,0,0);E.baseCtx.drawImage(base,0,0);E.refCtx.drawImage(ref,0,0);E.keepCtx.clearRect(0,0,cut.width,cut.height);if(mask)E.keepCtx.drawImage(mask,0,0);
-  E.curData=E.curCtx.getImageData(0,0,cut.width,cut.height);E.refData=E.refCtx.getImageData(0,0,cut.width,cut.height);E.baseData=E.baseCtx.getImageData(0,0,cut.width,cut.height);E.keepData=E.keepCtx.getImageData(0,0,cut.width,cut.height);E.protected=makeProtection();
-  barLockInfo=i.manual?null:autoBarEdges();zoom=1;E.pointer=null;el.cursor.hidden=true;mode('keep');fitEditor();redraw();status('보정 중 · 추출 중인 다른 사진도 계속 처리됩니다.');
+  E.curData=E.curCtx.getImageData(0,0,cut.width,cut.height);E.refData=E.refCtx.getImageData(0,0,cut.width,cut.height);E.baseData=E.baseCtx.getImageData(0,0,cut.width,cut.height);E.keepData=E.keepCtx.getImageData(0,0,cut.width,cut.height);E.protected=makeProtection();renderProtectOverlay();E.undo=[];E.redo=[];updateHistoryButtons();$('kl8-compare-panel').hidden=true;$('kl8-compare').classList.remove('kl8-primary');$('kl8-source-thumb').src=i.sourceUrl;
+  barLockInfo=autoBarEdges();$('kl8-barlock').checked=true;zoom=1;E.pointer=null;el.cursor.hidden=true;mode('keep');fitEditor();redraw();status('보정 중 · 추출 중인 다른 사진도 계속 처리됩니다.');
  }catch(e){editing=null;el.modal.hidden=true;updateCard(i);status('보정 창 오류 · '+e.message);}
 }
-function closeEditor(){const i=editing;editing=null;painting=false;lastPoint=null;E.pointer=null;el.cursor.hidden=true;el.modal.hidden=true;barLockInfo=null;if(i)updateCard(i);}
+function closeEditor(){const i=editing;E.undo=[];E.redo=[];updateHistoryButtons();editing=null;painting=false;lastPoint=null;E.pointer=null;el.cursor.hidden=true;el.modal.hidden=true;barLockInfo=null;if(i)updateCard(i);}
 $('kl8-close').onclick=closeEditor;el.modal.addEventListener('click',e=>{if(e.target===el.modal)closeEditor();});
-$('kl8-reset').onclick=()=>{if(!editing)return;E.curCtx.clearRect(0,0,E.current.width,E.current.height);E.curCtx.drawImage(E.base,0,0);E.keepCtx.clearRect(0,0,E.keep.width,E.keep.height);E.curData=E.curCtx.getImageData(0,0,E.current.width,E.current.height);E.keepData=E.keepCtx.getImageData(0,0,E.keep.width,E.keep.height);redraw();feedback('현재 보정을 초기화했습니다.');};
-$('kl8-clear-keep').onclick=()=>{if(!editing)return;E.keepCtx.clearRect(0,0,E.keep.width,E.keep.height);E.keepData=E.keepCtx.getImageData(0,0,E.keep.width,E.keep.height);redraw();feedback('살리기 표시를 해제했습니다. 원본 킬로그 보호는 유지됩니다.');};
+$('kl8-reset').onclick=()=>{if(!editing)return;pushHistory();E.curCtx.clearRect(0,0,E.current.width,E.current.height);E.curCtx.drawImage(E.base,0,0);E.keepCtx.clearRect(0,0,E.keep.width,E.keep.height);E.curData=E.curCtx.getImageData(0,0,E.current.width,E.current.height);E.keepData=E.keepCtx.getImageData(0,0,E.keep.width,E.keep.height);redraw();feedback('현재 보정을 초기화했습니다.');};
+$('kl8-clear-keep').onclick=()=>{if(!editing)return;pushHistory();E.keepCtx.clearRect(0,0,E.keep.width,E.keep.height);E.keepData=E.keepCtx.getImageData(0,0,E.keep.width,E.keep.height);redraw();feedback('살리기 표시를 해제했습니다. 원본 킬로그 보호는 유지됩니다.');};
 $('kl8-save').onclick=async()=>{if(!editing)return;const i=editing;$('kl8-save').disabled=true;
  try{
   const [blob,keepBlob]=await Promise.all([pngBlob(E.current),pngBlob(E.keep)]);
@@ -7215,8 +7347,8 @@ $('kl8-save').onclick=async()=>{if(!editing)return;const i=editing;$('kl8-save')
  }catch(e){feedback('보정 저장 실패 · '+e.message);}finally{$('kl8-save').disabled=false;}
 };
 $('kl8-resume').onclick=()=>window.SnaDraft?.resume('kill');$('kl8-draft').onclick=()=>window.SnaDraft?.save('kill',true);
-window.SnaKilllog={save:async()=>{const e={photos:[],results:[]};for(const i of items.slice(0,24)){e.photos.push(i.file);if(i.blob)e.results.push({photo:e.photos.length-1,master:i.blob,original:i.baseBlob,reference:i.refBlob,keep:i.keepBlob,manual:i.manual,shift:i.shift});}return {mode:'normal',albums:{normal:e}};},
- restore:async(data)=>{if(!data?.albums)return false;for(const i of items)revoke(i);items.length=0;const a=data.albums.normal;if(a){for(const f of a.photos||[])add(f,false);for(const r of a.results||[]){const i=items[r.photo];if(!i)continue;i.blob=r.master||r.blob;i.baseBlob=r.original||i.blob;i.refBlob=r.reference||null;i.keepBlob=r.keep||null;i.manual=!!r.manual;i.shift=r.shift||{x:0,y:0};i.url=urlFor(i.blob);}}render();return true;}};
+window.SnaKilllog={save:async()=>{const e={photos:[],results:[]};for(const i of items.slice(0,24)){e.photos.push(i.file);if(i.blob)e.results.push({photo:e.photos.length-1,master:i.blob,original:i.baseBlob,reference:i.refBlob,keep:i.keepBlob,manual:i.manual,cropBox:i.cropBox,shift:i.shift});}return {mode:'normal',albums:{normal:e}};},
+ restore:async(data)=>{if(!data?.albums)return false;for(const i of items)revoke(i);items.length=0;const a=data.albums.normal;if(a){for(const f of a.photos||[])add(f,false);for(const r of a.results||[]){const i=items[r.photo];if(!i)continue;i.blob=r.master||r.blob;i.baseBlob=r.original||i.blob;i.refBlob=r.reference||null;i.keepBlob=r.keep||null;i.manual=!!r.manual;i.cropBox=r.cropBox||null;i.shift=r.shift||{x:0,y:0};i.url=urlFor(i.blob);}}render();return true;}};
 const input=$('kl8-api-input'),settings=$('kl8-server-settings');input.value=API;if(!API)settings.open=true;
 async function health(){if(!API){status('Render 서버 주소를 위에 등록하세요. 수동 박스 지정은 서버 없이도 가능합니다.');settings.open=true;return false;}
  status('Render 연결 확인 중…');try{const c=new AbortController();const timeout=setTimeout(()=>c.abort(),12000);let r;try{r=await fetch(API+'/health',{cache:'no-store',signal:c.signal});}finally{clearTimeout(timeout);}if(!r.ok)throw Error('HTTP '+r.status);const d=await r.json();if(d.ok!==true||!(d.endpoint||'').includes('/extract-killlog'))throw Error('킬로그 전용 서버가 아닙니다.');pairSupported=String(d.pair_endpoint||'').includes('/extract-killlog-pair');status(pairSupported?'Render 연결됨 · 빠른 보정 지원':'Render 연결됨 · 기존 서버 호환 모드');$('kl8-api-note').textContent='연결된 주소: '+API+' · 이 기기에 저장됨';settings.open=false;return true;
