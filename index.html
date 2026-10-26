@@ -1021,7 +1021,7 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 </style>
 
 <style>
-/* v12.3.2 - clothes/guns undo, redo and restore: accessible tablet & mobile controls */
+/* v12.3.3 - clothes/guns undo, redo and restore: accessible tablet & mobile controls */
 .tab-pane .sna-photo-history{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0 16px;align-items:stretch}
 .tab-pane .sna-photo-history .sna-history-btn{box-sizing:border-box!important;appearance:none!important;-webkit-appearance:none!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;min-width:0!important;min-height:52px!important;padding:11px 14px!important;border:1px solid #526d9a!important;border-radius:14px!important;background:linear-gradient(150deg,#263d62,#192940)!important;color:#ecf4ff!important;font:800 14px/1.25 -apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif!important;letter-spacing:-.3px!important;box-shadow:0 5px 14px #040c19a3,inset 0 1px #8cb1e82e!important;text-align:center!important;white-space:normal!important;cursor:pointer;transition:background .15s ease,transform .15s ease,opacity .15s ease;touch-action:manipulation}
 .tab-pane .sna-photo-history .sna-history-btn .sna-history-icon{flex:none;font-size:21px;line-height:1;color:#a7c6ff}
@@ -1153,6 +1153,7 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
   <div class="member-panel" id="admin-grade-panel">
  <h3>👑 회원 등급 · 이용 권한</h3>
  <p>신규/재승인 회원은 등급 기간 하나로 이용 기간이 결정됩니다. 기간이 끝나면 동일한 계정으로 로그인한 뒤 관리자 연장을 기다립니다. 기존 이용권의 남은 기간은 변경 전까지 유지됩니다.</p>
+ <p class="member-tip">실버·골드·VIP 각각 5개 기능을 체크하거나 해제할 수 있습니다. 변경 후 아래 저장 버튼을 눌러 주세요.</p>
  <div class="member-controls"><label for="admin-grade-choice">권한을 편집할 등급</label><select id="admin-grade-choice"><option value="silver">실버</option><option value="gold">골드</option><option value="vip">VIP</option></select></div>
  <div id="admin-grade-permissions" class="member-controls"></div>
  <div class="member-controls"><button type="button" class="member-btn primary" id="admin-save-grades">등급 권한 저장</button><span id="admin-grade-message" class="member-tip"></span></div>
@@ -1647,8 +1648,9 @@ setInterval(()=>{
 // 등급 설정은 Firestore에 저장한다. 관리자 인증은 반드시 서버 측 규칙으로 별도 강화해야 한다.
 function startGradeSubscription(){return onSnapshot(doc(db,'appSettings','gradeRights'),snap=>{
  const raw=snap.exists()?snap.data().rights:null;
+ // 등급마다 5개 기능을 독립적으로 설정할 수 있으며 실버 등급도 변경 가능하다.
  if(raw){gradeRights=Object.fromEntries(Object.keys(GRADE_NAMES).map(g=>[
-  g,g==='silver'?[...BASE_RIGHTS.silver]:(Array.isArray(raw[g])?BASE_RIGHTS[g].filter(x=>raw[g].includes(x)):[...BASE_RIGHTS[g]])
+  g,Array.isArray(raw[g])?Object.keys(FEATURE_NAMES).filter(x=>raw[g].includes(x)):[...BASE_RIGHTS[g]]
  ]));}else gradeRights=structuredClone(BASE_RIGHTS);
  refreshGradeUI();
  renderGradeRights();
@@ -1660,7 +1662,6 @@ function renderGradeRights(){
  Object.keys(FEATURE_NAMES).forEach(feature=>{
   const label=make('label','member-controls');
   const cb=document.createElement('input');cb.type='checkbox';cb.checked=gradeRights[grade]?.includes(feature)||false;
-  if(grade==='silver'){cb.disabled=true;cb.title='실버는 옷 추출·총 자르기·합치기 기능으로 고정됩니다.';}
   cb.onchange=()=>{
    let set=new Set(gradeRights[grade]||[]);cb.checked?set.add(feature):set.delete(feature);
    gradeRights[grade]=[...set];
@@ -1672,9 +1673,16 @@ document.getElementById('admin-grade-choice').addEventListener('change',renderGr
 document.getElementById('admin-save-grades').onclick=async()=>{
  if(!isAdminMode){window.uiAlert?.('관리자 화면에서만 설정할 수 있어요.');return;}
  const el=document.getElementById('admin-grade-message');el.textContent='저장 중…';
- try{gradeRights.silver=[...BASE_RIGHTS.silver];
-  for(const g of ['gold','vip'])gradeRights[g]=BASE_RIGHTS[g].filter(x=>gradeRights[g]?.includes(x));
-  await setDoc(doc(db,'appSettings','gradeRights'),{rights:gradeRights,updatedAt:Date.now()},{merge:true});el.textContent='등급별 기능 권한을 저장했어요.';window.logActivity?.('관리자: 등급 권한 변경',{});}
+ try{
+  const allowedFeatures=Object.keys(FEATURE_NAMES);
+  const savedRights=Object.fromEntries(Object.keys(GRADE_NAMES).map(g=>[
+   g,allowedFeatures.filter(x=>gradeRights[g]?.includes(x))
+  ]));
+  await setDoc(doc(db,'appSettings','gradeRights'),{rights:savedRights,updatedAt:Date.now()},{merge:true});
+  gradeRights=savedRights;
+  el.textContent='실버·골드·VIP 등급별 기능 권한을 저장했어요.';
+  window.logActivity?.('관리자: 등급 권한 변경',{});
+ }
  catch(e){el.textContent='저장 실패: Firestore 보안 규칙을 확인해 주세요.';console.error(e);}
 };
 // ===== 업데이트 관리: Firestore appSettings/updateHistory (관리자만 쓰기, 사용자 실시간 읽기) =====
@@ -8108,13 +8116,13 @@ render();health();
 
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.3.2 · 후기 서버 확인·버튼 개선</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.3.3 · 후기 서버 확인·버튼 개선</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
- <strong>v12.3 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.3.2: 옷·총 사진 목록 버튼 UI를 개선하고, 후기는 Firebase 서버 전송에 성공한 경우에만 작성 완료 처리합니다. 관리자 화면에서 기능별 이용 후기와 오류 신고를 구분해 표시합니다. 최고 관리자는 후기 작성 대상에서 제외됩니다.</div>
+ <strong>v12.3 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.3.3: 옷·총 사진 목록 버튼 UI를 개선하고, 후기는 Firebase 서버 전송에 성공한 경우에만 작성 완료 처리합니다. 관리자 화면에서 기능별 이용 후기와 오류 신고를 구분해 표시합니다. 최고 관리자는 후기 작성 대상에서 제외됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script>
-(()=>{const version='12.3.2';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.3.2: 사진 기록 버튼 UI · Firebase 후기 전송 확인 · 관리자 후기 조회 개선';}}catch(_){} })();
+(()=>{const version='12.3.2';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.3.3: 사진 기록 버튼 UI · Firebase 후기 전송 확인 · 관리자 후기 조회 개선';}}catch(_){} })();
 </script>
 
 <div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
