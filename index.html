@@ -998,6 +998,26 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 @media(max-width:570px){.kl8-modal{padding:5px}.kl8-editorbox{padding:10px;max-height:97dvh}.kl8-modal .kl8-btn{font-size:12px;padding:9px 11px}.kl8-modal .kl8-toolbar{gap:5px;margin:6px 0}.kl8-scroll{max-height:50dvh}}
 
 </style>
+<style>
+/* v12.3 · 기능별 최초 이용 후기. 판매 공개 동의는 선택 사항. */
+.sna-review-inline{max-width:1280px;margin:10px auto;padding:10px 14px;border:1px solid #405d83;border-radius:13px;background:#172940;color:#dceaff;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;font:13px/1.5 system-ui,sans-serif}
+.sna-review-inline strong{font-weight:800;color:#fff}
+.sna-review-inline button,.sna-review-dialog button{color:#fff;border:1px solid #6889b4;background:#263e62;border-radius:10px;min-height:40px;padding:8px 13px;font:inherit;font-weight:750;cursor:pointer}
+.sna-review-inline button:disabled{opacity:.65;cursor:default}
+#sna-review-modal[hidden]{display:none!important}
+#sna-review-modal{position:fixed;inset:0;z-index:10000220;background:rgba(0,6,18,.85);display:flex;align-items:center;justify-content:center;padding:12px;overscroll-behavior:contain}
+.sna-review-dialog{max-width:510px;width:100%;max-height:94dvh;overflow:auto;background:#162741;color:#f2f7ff;border:1px solid #6f92c3;border-radius:19px;padding:19px;box-shadow:0 18px 55px #000b;font:14px/1.6 system-ui,sans-serif}
+.sna-review-dialog h2{font-size:20px;margin:0 0 6px}.sna-review-dialog p{color:#c6d5ee;margin:0 0 12px}
+.sna-review-dialog textarea{width:100%;min-height:120px;resize:vertical;box-sizing:border-box;background:#0b1b32;color:#fff;border:1px solid #6384b4;border-radius:10px;padding:10px;font:15px/1.55 system-ui,sans-serif}
+.sna-review-dialog .sna-review-rating{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:10px 0}
+.sna-review-dialog .sna-review-rating button{min-width:40px;min-height:39px;padding:3px;background:#263c60}
+.sna-review-dialog .sna-review-rating button[aria-pressed=true]{background:#5c80c9;border-color:#bdd3ff}
+.sna-review-dialog label{display:flex;gap:9px;align-items:flex-start;margin:12px 0}
+.sna-review-dialog label input{min-width:18px;height:18px;margin-top:3px;accent-color:#99bbff}
+.sna-review-dialog .sna-review-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:9px}
+.sna-review-dialog .sna-review-bottom button{background:#90b6ff;color:#0b1b32;font-weight:900;min-height:46px}
+#sna-review-notice{font-size:12px;color:#ffd7a4;min-height:19px;margin-top:5px}
+</style>
 </head>
 
 <body>
@@ -1127,7 +1147,7 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
  <p id="admin-release-status" class="release-status" role="status" aria-live="polite"></p>
  <div id="admin-release-list" class="release-list" aria-label="등록된 업데이트 목록"></div>
 </section>
-<div class="member-panel" id="sna-admin-reports"><h3>🛠 사용자 오류 신고·개선 요청</h3><p>최고 관리자만 열람하고 처리 상태를 변경할 수 있습니다.</p><p id="sna-admin-report-status" class="member-tip"></p><div id="sna-admin-report-list"></div></div>
+<div class="member-panel" id="sna-admin-reports"><h3>📝 이용 후기 · 사용자 오류 신고 · 개선 요청</h3><p>최고 관리자만 열람할 수 있습니다. 홍보에 사용하려면 후기의 별도 공개 동의 여부를 확인해 주세요.</p><p id="sna-admin-report-status" class="member-tip"></p><div id="sna-admin-report-list"></div></div>
 <div class="member-panel"><h3>🖼 대필 전시관 관리</h3><p>공개된 작품을 검토하고 필요한 경우 삭제할 수 있습니다.</p><div id="admin-gallery-list"></div></div>
 <div class="member-controls" style="margin-bottom:10px"><input id="admin-user-search" type="search" placeholder="회원 이름 검색" aria-label="회원 검색" style="flex:1"><select id="admin-user-grade-filter" aria-label="등급 검색"><option value="">모든 등급</option><option value="silver">실버</option><option value="gold">골드</option><option value="vip">VIP</option></select></div>
 <div id="admin-user-list"></div>
@@ -1245,10 +1265,90 @@ function snaStartPresets(uid){
   snaSetFallbackPresets();snaMsg('sna-preset-status','Firebase 권한/연결 오류. 지금은 기기 내부 프리셋만 표시합니다.');
  });
 }
+
+// v12.3: account-specific one-time feedback, existing feedbackReports admin inbox.
+// "후기 공개 동의" defaults OFF; honest positive or negative feedback is accepted.
+const REVIEW_FEATURES={clothes:'옷 추출기',guns:'총 자르기',kill:'킬로그 커팅',merge:'사진 합치기',board:'대필판'};
+const reviewModal=document.getElementById('sna-review-modal');
+const reviewBody=document.getElementById('sna-review-body');
+const reviewConsent=document.getElementById('sna-review-consent');
+const reviewSubmit=document.getElementById('sna-review-submit');
+const reviewNotice=document.getElementById('sna-review-notice');
+let reviewUid=null,reviewRecords={},reviewActive=null,reviewScore=0,reviewOpening=false;
+const reviewLocalKey=uid=>'sna-feature-reviews-v1:'+uid;
+function reviewSaveLocal(){if(!reviewUid)return;try{localStorage.setItem(reviewLocalKey(reviewUid),JSON.stringify(reviewRecords));}catch(e){console.warn('후기 기기 저장 실패',e);}}
+function reviewLoadLocal(uid){try{return JSON.parse(localStorage.getItem(reviewLocalKey(uid))||'{}')||{};}catch(e){return {};}}
+function reviewCount(){return [...reviewBody.value.replace(/\s/g,'')].length;}
+function reviewStatus(){
+ for(const [feature,title] of Object.entries(REVIEW_FEATURES)){
+  const panel=document.querySelector('[data-sna-review="'+feature+'"]');if(!panel)continue;
+  const rec=reviewRecords[feature];const msg=panel.querySelector('.sna-review-state');const btn=panel.querySelector('button');
+  msg.textContent=rec?.done?'· 작성 완료':rec?.used?'· 첫 사용 후기 작성 필요':'· 사용 후 최초 1회 작성';
+  btn.textContent=rec?.done?'작성 완료':rec?.used?'후기 작성하기':'이용 후기';btn.disabled=!!rec?.done||!reviewUid;
+ }
+}
+function reviewRefresh(){const n=reviewCount();document.getElementById('sna-review-count').textContent=n+' / 20자';reviewSubmit.disabled=n<20||n>800;}
+reviewBody.addEventListener('input',reviewRefresh);
+for(const btn of document.querySelectorAll('[data-review-star]'))btn.addEventListener('click',()=>{reviewScore=Number(btn.dataset.reviewStar);for(const b of document.querySelectorAll('[data-review-star]'))b.setAttribute('aria-pressed',String(Number(b.dataset.reviewStar)===reviewScore));});
+function reviewOpen(feature){
+ if(!reviewUid||!REVIEW_FEATURES[feature]||reviewRecords[feature]?.done||reviewActive)return;
+ reviewActive=feature;reviewScore=0;reviewBody.value='';reviewConsent.checked=false;
+ for(const b of document.querySelectorAll('[data-review-star]'))b.setAttribute('aria-pressed','false');
+ document.getElementById('sna-review-title').textContent=REVIEW_FEATURES[feature]+' 이용 후기';
+ document.getElementById('sna-review-description').textContent=REVIEW_FEATURES[feature]+'의 실제 이용 경험을 솔직하게 적어 주세요. 좋은 점과 불편한 점 모두 괜찮습니다. 첫 이용 후 한 번만 작성합니다.';
+ reviewNotice.textContent='';reviewRefresh();reviewModal.hidden=false;document.querySelector('.sna-review-dialog')?.focus();
+}
+function reviewNext(){if(reviewActive||!reviewUid)return;const f=Object.keys(REVIEW_FEATURES).find(x=>reviewRecords[x]?.used&&!reviewRecords[x]?.done);if(f)reviewOpen(f);}
+function reviewUsed(feature){
+ if(!reviewUid||!REVIEW_FEATURES[feature]||reviewRecords[feature]?.done)return;
+ reviewRecords[feature]={...(reviewRecords[feature]||{}),used:true};reviewSaveLocal();reviewStatus();
+ if(!reviewOpening){reviewOpening=true;setTimeout(()=>{reviewOpening=false;reviewNext();},2300);}
+}
+async function reviewSyncOne(feature){
+ if(!reviewUid)return;
+ const uid=reviewUid,rec=reviewRecords[feature];if(!rec?.done||rec.synced||!rec.body)return;
+ const body=rec.body;const ref=doc(db,'feedbackReports','feature_review_'+uid+'_'+feature);
+ await setDoc(ref,{uid,name:savedName||'회원',category:'이용 후기 · '+REVIEW_FEATURES[feature],type:'featureReview',feature,body,score:rec.score||null,publicConsent:!!rec.publicConsent,status:'new',createdAt:rec.createdAt,updatedAt:Date.now()});
+ if(reviewUid!==uid)return;
+ reviewRecords[feature].synced=true;reviewSaveLocal();
+}
+async function reviewSyncAll(){for(const key of Object.keys(REVIEW_FEATURES))try{await reviewSyncOne(key);}catch(e){console.warn('후기 서버 동기화 보류',key,e?.code||e?.message);}}
+reviewSubmit.addEventListener('click',async()=>{
+ const f=reviewActive,uid=reviewUid;if(!f||!uid||reviewCount()<20)return;
+ const text=reviewBody.value.trim(),date=Date.now();reviewSubmit.disabled=true;reviewNotice.textContent='후기 저장 중…';
+ reviewRecords[f]={used:true,done:true,body:text,score:reviewScore,publicConsent:reviewConsent.checked,createdAt:date,synced:false};reviewSaveLocal();
+ try{await reviewSyncOne(f);reviewNotice.textContent='후기 제출 완료!';}
+ catch(e){console.warn('후기 서버 저장 보류',e?.code||e?.message);reviewNotice.textContent='기기에는 저장됐지만 서버에 연결하지 못했습니다. 로그인 시 다시 전송합니다.';}
+ if(uid!==reviewUid)return;
+ reviewStatus();reviewActive=null;reviewModal.hidden=true;window.logActivity?.('이용 후기 작성',{feature:f});
+ setTimeout(reviewNext,400);
+});
+for(const btn of document.querySelectorAll('[data-sna-review-open]'))btn.addEventListener('click',()=>{
+ const f=btn.dataset.snaReviewOpen;if(!reviewRecords[f]?.used){window.uiAlert?.('먼저 해당 기능으로 결과물을 만든 후 작성할 수 있습니다.');return;}
+ reviewOpen(f);
+});
+window.SnaReviews={used:reviewUsed,setUser:async(uid)=>{
+ reviewUid=uid||null;reviewRecords=uid?reviewLoadLocal(uid):{};reviewActive=null;reviewModal.hidden=true;reviewStatus();if(!uid)return;
+ // Read once-per-account status when rules allow it; never hold up login on slow connections.
+ const original=uid;
+ void Promise.all(Object.keys(REVIEW_FEATURES).map(async feature=>{
+  try{
+   const snap=await getDoc(doc(db,'feedbackReports','feature_review_'+uid+'_'+feature));
+   if(reviewUid!==original)return;
+   if(snap.exists())reviewRecords[feature]={done:true,used:true,synced:true};
+  }catch(e){/* If user reads are restricted, the local record still works. */}
+ })).then(()=>{
+   if(reviewUid!==original)return;
+   reviewSaveLocal();reviewStatus();void reviewSyncAll();
+ });
+ setTimeout(()=>{if(reviewUid===original&&document.getElementById('auth-screen')?.style.display==='none')reviewNext();},3600);
+}};
+
 window.SnaCloudSession=uid=>{
  snaCloud.uid=uid||null;
  const b=document.getElementById('sna-report-open');if(b)b.style.display=uid?'block':'none';
  snaStartPresets(uid);
+ window.SnaReviews?.setUser(uid);
  window.SnaDraft?.setUser(uid);
  if(!uid&&snaCloud.reportUnsub){snaCloud.reportUnsub();snaCloud.reportUnsub=null;}
 };
@@ -1345,6 +1445,11 @@ function snaStartReportAdmin(){
    state.value=r.status||'new';state.onchange=async()=>{try{await updateDoc(doc(db,'feedbackReports',d.id),{status:state.value,updatedAt:Date.now()});}catch(e){snaMsg('sna-admin-report-status','수정 실패: 관리자 규칙을 확인해 주세요.');}};
    actions.append(state);
    item.append(name,text);
+   if(r.type==='featureReview'){
+     const meta=document.createElement('p');
+     meta.textContent='이용 후기 · 만족도 '+(r.score?`${r.score}/5`:'미선택')+' · '+(r.publicConsent?'홍보 공개 동의':'홍보 공개 미동의');
+     meta.style.color=r.publicConsent?'#aee5c5':'#ffcb9e';meta.style.fontWeight='750';item.append(meta);
+   }
    if(r.thumb&&/^data:image\/jpeg;base64,/.test(r.thumb)){const img=document.createElement('img');img.src=r.thumb;img.alt='사용자가 첨부한 오류 이미지';item.append(img);}
    item.append(actions);holder.append(item);
   }
@@ -2487,6 +2592,7 @@ window.closeAdmin=()=>{
 ===================================================== -->
 
 <div id="clothes-tab" class="tab-pane active">
+<div class="sna-review-inline" data-sna-review="clothes"><span><strong>📝 옷 추출기 이용 후기</strong> <span class="sna-review-state">처음 사용한 후 한 번만 작성해 주세요.</span></span><button type="button" data-sna-review-open="clothes">후기 작성</button></div>
 <div class="app">
 
 <header class="header">
@@ -2639,6 +2745,7 @@ window.closeAdmin=()=>{
 ===================================================== -->
 
 <div id="guns-tab" class="tab-pane">
+<div class="sna-review-inline" data-sna-review="guns"><span><strong>📝 총 자르기 이용 후기</strong> <span class="sna-review-state">처음 사용한 후 한 번만 작성해 주세요.</span></span><button type="button" data-sna-review-open="guns">후기 작성</button></div>
 <div class="app">
 
 <header class="header">
@@ -2734,6 +2841,7 @@ window.closeAdmin=()=>{
 
 <!-- 킬로그 커팅 v9: Render 추출 + 즉시 색복원/삭제. 다른 편집기 모듈과 독립. -->
 <div id="kill-tab" class="tab-pane">
+<div class="sna-review-inline" data-sna-review="kill"><span><strong>📝 킬로그 커팅 이용 후기</strong> <span class="sna-review-state">처음 사용한 후 한 번만 작성해 주세요.</span></span><button type="button" data-sna-review-open="kill">후기 작성</button></div>
  <div class="app kl8-app">
   <header class="header"><div class="title-wrap"><h1>🎯 킬로그 커팅</h1><p>킬로그 자동 추출 · 실시간 보정 · PNG 저장</p></div></header>
   <div class="photo-panel">
@@ -2803,6 +2911,7 @@ window.closeAdmin=()=>{
 
 
 <div id="merge-tab" class="tab-pane">
+<div class="sna-review-inline" data-sna-review="merge"><span><strong>📝 사진 합치기 이용 후기</strong> <span class="sna-review-state">처음 사용한 후 한 번만 작성해 주세요.</span></span><button type="button" data-sna-review-open="merge">후기 작성</button></div>
 <div class="app">
 
 <header class="header">
@@ -2889,6 +2998,7 @@ window.closeAdmin=()=>{
  </div>
 </div>
 <div id="board-tab" class="tab-pane">
+<div class="sna-review-inline" data-sna-review="board"><span><strong>📝 대필판 이용 후기</strong> <span class="sna-review-state">처음 사용한 후 한 번만 작성해 주세요.</span></span><button type="button" data-sna-review-open="board">후기 작성</button></div>
  <div class="board-app">
   <header class="header">
    <div class="logo-area">
@@ -4426,6 +4536,7 @@ window.c_extractSelected=()=>{
  resultCountTitle.textContent=croppedCards.length;
  saveAllButton.disabled=false;
  const saveTop=document.getElementById('c_saveAllTop');if(saveTop)saveTop.disabled=false;
+ if(croppedCards.length)window.SnaReviews?.used('clothes');
 
 };
 
@@ -5294,6 +5405,7 @@ window.g_extractSelected=()=>{
  resultCountText.textContent=croppedCards.length;
  resultCountTitle.textContent=croppedCards.length;
  saveAllButton.disabled=false;
+ if(croppedCards.length)window.SnaReviews?.used('guns');
 };
 
 
@@ -5653,6 +5765,7 @@ saveBtn.addEventListener("click",async()=>{
   resultCanvas.toDataURL("image/jpeg",.95),
   "merged_result.jpg"
  );
+ window.SnaReviews?.used('merge');
 
 });
 
@@ -7111,6 +7224,7 @@ saveBtn.addEventListener("click",async()=>{
    if(!shared)return;
    const blob=file;
    if(window.logActivity)window.logActivity("대필판 PNG 저장",{clothes:state.clothes.length,guns:state.guns.length,width:info.width,height:info.height});
+   window.SnaReviews?.used('board');
    // 원본 PNG 저장 성공 이후에만 전시관에 등록한다. 전시관 등록 실패는 PNG 저장을 취소하지 않는다.
    if(window.addBoardToGallery){
     const title=document.getElementById('board-work-title')?.value.trim()||'나의 대필 작품';
@@ -7334,7 +7448,7 @@ async function extract(i){if(i.working||editing===i||M.item===i)return false;
   }finally{releaseSlot();}
   if(!items.includes(i))return false;
   data.cut=await cleanedAutoBlob(data.cut);
-  const centered=await recenterAuto(data.cut,data.ref);i.shift=centered.shift;updateResult(i,centered.cut,centered.ref,false);status('추출 완료 · 다른 사진도 계속 작업할 수 있습니다.');window.logActivity?.('킬로그 추출',{kind:'normal'});return true;
+  const centered=await recenterAuto(data.cut,data.ref);i.shift=centered.shift;updateResult(i,centered.cut,centered.ref,false);status('추출 완료 · 다른 사진도 계속 작업할 수 있습니다.');window.logActivity?.('킬로그 추출',{kind:'normal'});window.SnaReviews?.used('kill');return true;
  }catch(e){i.error='추출 실패 · '+e.message;status(i.error+' · 원본을 다시 선택하거나 수동 박스를 이용해 주세요.');return false;}
  finally{i.working=false;updateCard(i);}
 }
@@ -7435,7 +7549,7 @@ $('kl8-manual-confirm').onclick=async()=>{if(!M.item||!M.image)return;const i=M.
  const factorX=M.image.naturalWidth/c.width,factorY=M.image.naturalHeight/c.height;
  const rect=tidyRect({x:Math.floor(r.x*factorX),y:Math.floor(r.y*factorY),w:Math.ceil(r.w*factorX),h:Math.ceil(r.h*factorY)},M.image.naturalWidth,M.image.naturalHeight);
  $('kl8-manual-confirm').disabled=true;
- try{const data=await placeInOutput(M.image,rect);i.cropBox=rect;i.shift={x:0,y:0};updateResult(i,data.cut,data.ref,true);closeManual();status('박스 수정 추출 완료 · 잔배경 제거와 되돌리기는 보정에서 이용하세요.');}
+ try{const data=await placeInOutput(M.image,rect);i.cropBox=rect;i.shift={x:0,y:0};updateResult(i,data.cut,data.ref,true);closeManual();status('박스 수정 추출 완료 · 잔배경 제거와 되돌리기는 보정에서 이용하세요.');window.SnaReviews?.used('kill');}
  catch(e){$('kl8-manual-feedback').textContent='수동 추출 실패 · '+e.message;}finally{$('kl8-manual-confirm').disabled=false;}
 };
 
@@ -7868,13 +7982,31 @@ render();health();
 
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.1 · 오른쪽 직각선 표시</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.3 · 이용 후기 추가</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
- <strong>v12.1 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.1에서 노란색 오른쪽 수직 가이드와 1픽셀 이동 버튼을 강조했습니다. 이전 저장 설정은 유지합니다.</div>
+ <strong>v12.3 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.3: 기능별 첫 사용 후기(각 1회, 공백 제외 20자 이상)를 추가했습니다. 후기 공개는 선택 사항이며 기존 설정은 유지합니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script>
-(()=>{const version='12.1';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.1: 오른쪽 노란 직각 가이드, 위치 슬라이더 및 1px 이동 버튼 추가';}}catch(_){} })();
+(()=>{const version='12.3';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.3: 기능별 첫 이용 후기 · 공백 제외 20자 이상 · 홍보 공개 동의 선택';}}catch(_){} })();
 </script>
+
+<div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
+  <section class="sna-review-dialog" tabindex="-1">
+    <h2 id="sna-review-title">이용 후기 작성</h2>
+    <p id="sna-review-description">해당 기능을 처음 이용하셨다면 솔직한 후기를 한 번 작성해 주세요. 불편했던 점도 자유롭게 적어 주세요.</p>
+    <div class="sna-review-rating" aria-label="별점, 선택 사항">
+      <span>만족도(선택)</span>
+      <button type="button" data-review-star="1" aria-pressed="false">★ 1</button><button type="button" data-review-star="2" aria-pressed="false">★ 2</button><button type="button" data-review-star="3" aria-pressed="false">★ 3</button><button type="button" data-review-star="4" aria-pressed="false">★ 4</button><button type="button" data-review-star="5" aria-pressed="false">★ 5</button>
+    </div>
+    <label for="sna-review-body" style="display:block">실제로 사용해 본 경험 (공백 제외 20자 이상)</label>
+    <textarea id="sna-review-body" maxlength="800" placeholder="예: 총기 이미지가 깔끔하게 잘려서 좋았지만 선택할 때 조금 헷갈렸어요."></textarea>
+    <div id="sna-review-count">0 / 20자</div>
+    <label><input id="sna-review-consent" type="checkbox"> <span><strong>판매 안내에 후기 공개 동의 (선택)</strong><br>작성한 후기와 만족도를 홍보에 사용할 수 있습니다. 동의하지 않으면 공개하지 않습니다. 이름은 별도 동의 없이 공개하지 않습니다.</span></label>
+    <p id="sna-review-notice" role="status"></p>
+    <div class="sna-review-bottom"><span>각 기능별로 한 번만 작성</span><button id="sna-review-submit" type="button" disabled>후기 제출</button></div>
+  </section>
+</div>
+
 </body>
 </html>
