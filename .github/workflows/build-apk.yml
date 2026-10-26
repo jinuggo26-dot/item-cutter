@@ -12,12 +12,25 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
+      - name: Android SDK 점검 (GitHub 기본 설치 사용)
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "SDK path: $SDK"
+          test -d "$SDK" || { echo "::error::Android SDK folder was not found: $SDK"; exit 1; }
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          SDKMGR="$SDK/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$SDKMGR" || { echo "::error::Android sdkmanager not found: $SDKMGR"; exit 1; }
+          echo "$SDK/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          # GitHub Ubuntu runner already includes Android SDK; accept needed packages.
+          printf 'y\n%.0s' {1..100} | "$SDKMGR" --sdk_root="$SDK" --licenses >/dev/null
+          "$SDKMGR" --sdk_root="$SDK" --install "platforms;android-35" "build-tools;35.0.0"
+          echo "Android SDK ready"
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
-      - name: Android SDK 준비
-        run: sdkmanager --install "platforms;android-35" "build-tools;35.0.0"
       - name: Prepare Samsung app source
         shell: bash
         run: |
