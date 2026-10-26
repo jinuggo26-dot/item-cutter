@@ -1021,7 +1021,7 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 </style>
 
 <style>
-/* v12.3.3 - clothes/guns undo, redo and restore: accessible tablet & mobile controls */
+/* v12.4.0 - clothes/guns undo, redo and restore: accessible tablet & mobile controls */
 .tab-pane .sna-photo-history{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0 16px;align-items:stretch}
 .tab-pane .sna-photo-history .sna-history-btn{box-sizing:border-box!important;appearance:none!important;-webkit-appearance:none!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;min-width:0!important;min-height:52px!important;padding:11px 14px!important;border:1px solid #526d9a!important;border-radius:14px!important;background:linear-gradient(150deg,#263d62,#192940)!important;color:#ecf4ff!important;font:800 14px/1.25 -apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif!important;letter-spacing:-.3px!important;box-shadow:0 5px 14px #040c19a3,inset 0 1px #8cb1e82e!important;text-align:center!important;white-space:normal!important;cursor:pointer;transition:background .15s ease,transform .15s ease,opacity .15s ease;touch-action:manipulation}
 .tab-pane .sna-photo-history .sna-history-btn .sna-history-icon{flex:none;font-size:21px;line-height:1;color:#a7c6ff}
@@ -1050,6 +1050,47 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 .sna-admin-feedback-list .sna-report-item select{background:#1f3656;color:#eef5ff;border:1px solid #6585b3;border-radius:8px;min-height:36px;padding:6px}
 .sna-empty-feedback{color:#b5c9e4;border:1px dashed #445e83;border-radius:12px;padding:15px;background:#15243c;font-size:13px}
 .sna-review-inline .sna-review-state.sna-review-pending{color:#ffdba9;font-weight:750}
+
+/* v12.4: extraction QA, administrator insight and consent-based review showcase */
+.sna-qa-panel{border:1px solid #425e87;background:linear-gradient(145deg,#182b47,#102035);border-radius:16px;padding:15px;margin:14px 0 18px;color:#eaf2ff;box-shadow:0 7px 22px #0611244a}
+.sna-qa-head,.sna-review-showcase-head,.sna-stats-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sna-qa-head h3,.sna-review-showcase-head h2,.sna-stats-head h3{font-size:17px;line-height:1.4;color:#f1f6ff;margin:0}
+.sna-qa-panel p,.sna-review-showcase p,.sna-stats-help{margin:8px 0;font-size:12.5px;line-height:1.65;color:#b9cae3}
+.sna-qa-panel button,.sna-review-showcase button,.sna-stats-head button{background:#294a78;color:#f4f8ff;border:1px solid #678dc4;border-radius:11px;min-height:42px;padding:9px 14px;font-weight:800;cursor:pointer}
+.sna-qa-panel button:focus-visible,.sna-review-showcase button:focus-visible{outline:3px solid #c3d8ff;outline-offset:2px}
+.sna-qa-status{font-weight:750;color:#c9ddff;min-height:20px}
+.sna-qa-list{display:grid;gap:7px;max-height:300px;overflow:auto}
+.sna-qa-row{display:flex;gap:9px;justify-content:space-between;align-items:center;border:1px solid #3e5678;border-radius:11px;background:#122139;padding:9px 10px;font-size:12px;line-height:1.5}
+.sna-qa-row span{flex:1;min-width:0;overflow-wrap:anywhere}
+.sna-qa-row button{min-height:35px;padding:6px 10px;white-space:nowrap;font-size:12px}
+.sna-qa-focus{outline:3px solid #ffd487!important;outline-offset:4px}
+.sna-review-showcase{max-width:1100px;margin:15px auto 20px;padding:17px;border-radius:19px;background:linear-gradient(145deg,#192e4c,#111f34);border:1px solid #526b95;color:#eaf2ff}
+.sna-review-showcase-head button{background:#314c7b}
+.sna-review-showcase-controls{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}
+.sna-review-showcase-controls select{min-height:43px;min-width:155px;padding:8px 12px;flex:1;background:#101d30;color:#eaf2ff;border:1px solid #4d6a92;border-radius:10px;font-size:14px}
+.sna-review-showcase-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:11px;margin-top:11px}
+.sna-review-public-card{border:1px solid #4f6991;border-radius:14px;padding:15px;background:#182a43;box-shadow:0 5px 14px #0002}
+.sna-review-public-card .meta{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;color:#afc5e8;font-size:12px;margin-bottom:10px}
+.sna-review-public-card .stars{color:#f8d48c;font-weight:850;letter-spacing:1px}
+.sna-review-public-card p{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.65;color:#f1f6ff;margin:9px 0}
+.sna-review-public-card .date{font-size:11px;color:#a4b8d6}
+.sna-showcase-empty{padding:18px;text-align:center;color:#bacce4;border:1px dashed #4b6589;border-radius:13px}
+.sna-stats-panel{border:1px solid #52739f;border-radius:17px;padding:17px;background:linear-gradient(145deg,#172e4f,#111c31);margin-bottom:17px;color:#e9f2ff}
+.sna-stats-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,155px),1fr));gap:10px;margin:15px 0}
+.sna-stats-kpi{border:1px solid #4a658c;background:#11223a;border-radius:13px;padding:13px}
+.sna-stats-kpi strong{display:block;font-size:24px;font-weight:850;color:#f5f9ff;font-variant-numeric:tabular-nums;margin-top:4px}
+.sna-stats-kpi span{font-size:12px;color:#aec5e9}
+.sna-stats-split{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px}
+.sna-stats-subtitle{font-size:14px;font-weight:800;margin:5px 0 10px;color:#e3efff}
+.sna-stats-bar-row{margin:9px 0}
+.sna-stats-bar-label{display:flex;justify-content:space-between;gap:8px;font-size:12px;margin-bottom:4px}
+.sna-stats-track{height:10px;background:#2b3f5e;border-radius:99px;overflow:hidden}
+.sna-stats-track>span{display:block;background:linear-gradient(90deg,#759be8,#abd2ff);height:100%;border-radius:99px;min-width:0}
+.sna-stats-notice{font-size:12px;color:#b6c8e5;line-height:1.7;margin-top:12px}
+.sna-publish-btn{background:#265b4e!important;border-color:#5eaa8b!important;min-height:38px!important}
+.sna-unpublish-btn{background:#674045!important;border-color:#ba8088!important;min-height:38px!important}
+@media(max-width:600px){.sna-qa-panel,.sna-review-showcase,.sna-stats-panel{padding:12px}.sna-stats-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.sna-qa-row{align-items:flex-start}.sna-qa-row button{padding:6px 8px}}
+
 </style>
 </head>
 
@@ -1180,6 +1221,14 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
  </div>
  <p id="admin-release-status" class="release-status" role="status" aria-live="polite"></p>
  <div id="admin-release-list" class="release-list" aria-label="등록된 업데이트 목록"></div>
+</section>
+<section class="sna-stats-panel" id="sna-admin-stats" aria-labelledby="sna-stats-title">
+ <div class="sna-stats-head"><h3 id="sna-stats-title">📊 관리자 통계 대시보드</h3><button id="sna-stats-refresh" type="button">↻ 통계 새로고침</button></div>
+ <p class="sna-stats-help">Firebase 이용 로그를 기반으로 집계합니다. 조회 구간을 선택할 수 있으며 화면에 표시되는 수치는 최근 기록을 기준으로 한 통계입니다.</p>
+ <div class="member-controls"><label for="sna-stats-period">조회 기간</label><select id="sna-stats-period" aria-label="통계 조회 기간"><option value="7">최근 7일</option><option value="30" selected>최근 30일</option></select><span id="sna-stats-updated" class="member-tip">데이터 동기화 대기</span></div>
+ <div id="sna-stats-kpis" class="sna-stats-kpis"><div class="sna-stats-kpi"><span>통계 준비 중</span><strong>—</strong></div></div>
+ <div class="sna-stats-split"><div><h4 class="sna-stats-subtitle">기능별 결과물 생성 / 저장 시도</h4><div id="sna-stats-feature-bars"></div></div><div><h4 class="sna-stats-subtitle">회원 등급 현황</h4><div id="sna-stats-grade-bars"></div></div></div>
+ <p id="sna-stats-note" class="sna-stats-notice">불러오는 중…</p>
 </section>
 <div class="member-panel sna-admin-feedback-panel" id="sna-admin-reports">
  <div class="sna-admin-feedback-head"><div><h3>📝 이용 후기 · 오류 신고</h3><p>회원 후기는 서버에 저장된 내용만 표시됩니다. 판매 홍보에는 공개 동의한 후기만 사용하세요.</p></div><button type="button" id="sna-admin-report-reload" class="sna-review-reload">↻ 새로고침</button></div>
@@ -1519,6 +1568,79 @@ document.getElementById('sna-report-send')?.addEventListener('click',async()=>{
  }catch(e){console.warn(e);snaMsg('sna-report-status','전송 실패: Firebase 권한과 네트워크를 확인해 주세요. 내용은 전송되지 않았습니다.');}
  finally{send.disabled=false;}
 });
+
+// Public review exhibit: only admin-selected, explicit-consent posts, stored as an
+// anonymized list under appSettings/publicReviews. Existing rules allow active members
+// to read appSettings and only admins to write. No public access to feedbackReports.
+const SNA_PUBLISHED_DOC=doc(db,'appSettings','publicReviews');
+let snaPublishedReviews=[];
+let snaReviewsRequestSerial=0;
+function snaReviewPublicKey(id,r){
+ const text=String(r.body||'');let hash=2166136261;
+ for(let i=0;i<text.length;i++)hash=Math.imul(hash^text.charCodeAt(i),16777619)>>>0;
+ return String(r.feature||'')+'_'+String(r.createdAt||0)+'_'+hash.toString(36);
+}
+function snaSafePublicReview(r){
+ return {key:String(r.key||''),feature:String(r.feature||''),body:String(r.body||'').slice(0,800),score:Number.isInteger(r.score)&&r.score>=1&&r.score<=5?r.score:null,createdAt:Number(r.createdAt)||0};
+}
+function snaRenderPublicReviews(){
+ const target=document.getElementById('sna-public-review-list'),status=document.getElementById('sna-public-review-summary');if(!target||!status)return;
+ const filter=document.getElementById('sna-public-review-filter')?.value||'all',reverse=document.getElementById('sna-public-review-sort')?.value!=='old';
+ // Synchronize administrator publish buttons with current public document.
+ for(const btn of document.querySelectorAll('[data-sna-public-key]')){
+  const live=snaPublishedReviews.some(r=>r.key===btn.dataset.snaPublicKey);
+  btn.dataset.published=String(live);btn.textContent=live?'게시 취소':'전시관 게시';
+  btn.className=live?'member-btn sna-unpublish-btn':'member-btn sna-publish-btn';
+ }
+ const data=snaPublishedReviews.filter(r=>REVIEW_FEATURES[r.feature]&&(filter==='all'||r.feature===filter)).slice().sort((a,b)=>reverse?b.createdAt-a.createdAt:a.createdAt-b.createdAt);
+ target.replaceChildren();
+ const scored=data.map(x=>x.score).filter(v=>Number.isInteger(v)&&v>0),avg=scored.length?(scored.reduce((a,b)=>a+b,0)/scored.length).toFixed(1):'—';
+ status.textContent=`공개 후기 ${data.length}개${filter==='all'?'':' · '+REVIEW_FEATURES[filter]} · 평균 별점 ${avg}${scored.length?'/5':''} (별점 선택한 후기 기준)`;
+ if(!data.length){const div=document.createElement('div');div.className='sna-showcase-empty';div.textContent='선택한 기능에 공개된 이용 후기가 아직 없습니다.';target.append(div);return;}
+ for(const r of data){
+  const card=document.createElement('article');card.className='sna-review-public-card';
+  const meta=document.createElement('div');meta.className='meta';const feature=document.createElement('strong');feature.textContent=REVIEW_FEATURES[r.feature];const score=document.createElement('span');score.className='stars';score.textContent=r.score?'★ '+r.score+'/5':'별점 미선택';meta.append(feature,score);
+  const body=document.createElement('p');body.textContent=r.body;
+  const date=document.createElement('div');date.className='date';date.textContent='익명 회원 · '+(r.createdAt?new Date(r.createdAt).toLocaleDateString('ko-KR'):'작성일 미상');
+  card.append(meta,body,date);target.append(card);
+ }
+}
+async function snaLoadPublishedReviews(){
+ const serial=++snaReviewsRequestSerial;
+ const status=document.getElementById('sna-public-review-summary');if(status)status.textContent='Firebase에서 공개 후기를 확인하고 있습니다…';
+ if(!auth.currentUser){if(status)status.textContent='로그인이 필요합니다.';return;}
+ try{
+  const snapshot=await getDoc(SNA_PUBLISHED_DOC);if(serial!==snaReviewsRequestSerial)return;
+  const v=snapshot.exists()?snapshot.data().items:[];
+  snaPublishedReviews=Array.isArray(v)?v.filter(x=>x&&x.key&&REVIEW_FEATURES[x.feature]&&typeof x.body==='string').map(snaSafePublicReview).slice(0,50):[];
+  snaRenderPublicReviews();
+ }catch(e){if(status)status.textContent='공개 후기 로딩 실패: '+(e?.code||'권한/연결 오류')+' · 회원 이용권과 Firestore 설정을 확인하세요.';}
+}
+async function snaAdminTogglePublished(sourceId,r,btn){
+ if(!isAdminMode||!auth.currentUser)return;
+ if(r.publicConsent!==true)return window.uiAlert?.('홍보 공개에 동의하지 않은 후기는 게시할 수 없습니다.');
+ btn.disabled=true;
+ const key=snaReviewPublicKey(sourceId,r);
+ try{
+  const docSnap=await getDoc(SNA_PUBLISHED_DOC),original=docSnap.exists()?docSnap.data().items:[];
+  const old=Array.isArray(original)?original.filter(x=>x&&typeof x.key==='string'):[];
+  const has=old.some(x=>x.key===key);
+  const entry={key,feature:r.feature,body:String(r.body||'').slice(0,800),score:Number.isInteger(r.score)?r.score:null,createdAt:Number(r.createdAt)||Date.now()};
+  if(!has&&!REVIEW_FEATURES[entry.feature])throw Error('후기 기능 구분 오류');
+  const next=has?old.filter(x=>x.key!==key):[entry,...old];
+  if(next.length>50)throw Error('전시관은 최대 50개까지 게시할 수 있습니다. 기존 후기를 먼저 내리세요.');
+  await setDoc(SNA_PUBLISHED_DOC,{items:next,updatedAt:Date.now()});
+  snaPublishedReviews=next.map(snaSafePublicReview);snaRenderPublicReviews();
+  btn.dataset.published=String(!has);btn.textContent=has?'전시관 게시':'전시관 게시 취소';
+  btn.className=has?'member-btn sna-publish-btn':'member-btn sna-unpublish-btn';
+  snaMsg('sna-admin-report-status',has?'선택한 후기를 전시관에서 내렸습니다.':'공개 동의 후기를 익명으로 전시관에 게시했습니다.');
+ }catch(e){console.warn('후기 공개 관리 실패',e);snaMsg('sna-admin-report-status','후기 공개 관리 실패: '+(e?.code||e?.message||'권한/연결 오류'));}
+ finally{btn.disabled=false;}
+}
+for(const id of ['sna-public-review-filter','sna-public-review-sort'])document.getElementById(id)?.addEventListener('change',snaRenderPublicReviews);
+document.getElementById('sna-public-review-refresh')?.addEventListener('click',snaLoadPublishedReviews);
+window.SnaPublicReviewsRefresh=snaLoadPublishedReviews;
+
 function snaStartReportAdmin(){
  if(!isAdminMode||!authUser)return;
  if(snaCloud.reportUnsub){snaCloud.reportUnsub();snaCloud.reportUnsub=null;}
@@ -1526,10 +1648,12 @@ function snaStartReportAdmin(){
  const issueHolder=document.getElementById('sna-admin-report-list');
  if(!reviewHolder||!issueHolder)return;
  snaMsg('sna-admin-report-status','Firebase 서버 후기 · 오류 신고 불러오는 중…');
+ void snaLoadPublishedReviews();
  const req=query(collection(db,'feedbackReports'),orderBy('createdAt','desc'),limit(150));
  snaCloud.reportUnsub=onSnapshot(req,snap=>{
   reviewHolder.replaceChildren();issueHolder.replaceChildren();
   let reviews=0,issues=0;
+  feedbackStatCache=snap.docs.map(d=>d.data());snaRenderStats();
   for(const d of snap.docs){
    const r=d.data();const isReview=r.type==='featureReview'||d.id.startsWith('feature_review_');
    isReview?reviews++:issues++;
@@ -1551,7 +1675,12 @@ function snaStartReportAdmin(){
    state.value=['new','reviewing','resolved'].includes(r.status)?r.status:'new';
    state.onchange=async()=>{try{await updateDoc(doc(db,'feedbackReports',d.id),{status:state.value,updatedAt:Date.now()});}
     catch(e){console.warn('관리자 상태 수정 실패',e);snaMsg('sna-admin-report-status','상태 변경 실패: '+(e?.code||'Firebase 권한/통신 오류'));}};
-   actions.append(state);item.append(name,badges,body);
+   actions.append(state);
+   if(isReview&&r.publicConsent===true){
+    const p=document.createElement('button');p.type='button';p.className='member-btn sna-publish-btn';p.textContent='전시관 게시';p.dataset.snaPublicKey=snaReviewPublicKey(d.id,r);p.title='공개 동의 후기만 익명으로 게시하거나 내립니다';
+    p.onclick=()=>snaAdminTogglePublished(d.id,r,p);actions.append(p);
+   }
+   item.append(name,badges,body);
    if(!isReview&&r.thumb&&/^data:image\/jpeg;base64,/.test(r.thumb)){
     const img=document.createElement('img');img.src=r.thumb;img.alt='신고 이미지';item.append(img);
    }
@@ -1593,7 +1722,7 @@ const effectiveGrade=data=>{
  return Number.isFinite(Number(until))&&Number(until)>0&&Date.now()>=Number(until)?'silver':grade;
 };
 window.canUseFeature=feature=>{
- if(feature==='gallery')return !!authUser && (isAdminMode||(currentMember?.status==='approved'&&!expired(currentMember)));
+ if(feature==='gallery'||feature==='reviews')return !!authUser && (isAdminMode||(currentMember?.status==='approved'&&!expired(currentMember)));
  if(!FEATURE_NAMES[feature])return true;
  if(isAdminMode)return true;
  if(!currentMember||currentMember.status!=='approved'||expired(currentMember))return false;
@@ -1615,7 +1744,7 @@ function refreshGradeUI(){
  if(!authUser||(!isAdminMode&&(!currentMember||currentMember.status!=='approved'||expired(currentMember))))return;
  const active=document.querySelector('.global-tabs button.active');
  if(active&&!window.canUseFeature(active.id.replace('btn-',''))){
-  const next=[...Object.keys(FEATURE_NAMES),'gallery'].find(x=>window.canUseFeature(x));
+  const next=[...Object.keys(FEATURE_NAMES),'gallery','reviews'].find(x=>window.canUseFeature(x));
   if(next)window.switchTab?.(next,true); // 시스템이 자동 이동할 때는 경고 팝업 없음
  }
 }
@@ -2046,6 +2175,7 @@ const displayLogin=(message='')=>{
 };
 async function resetCurrentSession(){
  window.SnaCloudSession?.(null);
+ snaPublishedReviews=[];snaRenderPublicReviews();
  if(userUnsubscribe){userUnsubscribe();userUnsubscribe=null;}
  if(memberContentUnsubscribes.length)stopMemberContentSubscriptions();
  for(const unsub of liveUnsubscribes)try{unsub();}catch(e){};
@@ -2210,6 +2340,44 @@ onAuthStateChanged(auth,async user=>{
  catch(e){console.error('계정 연결 오류',e);showWaiting('Firebase 로그인은 됐지만 회원 정보 확인에 실패했습니다. Firestore 권한과 회원 UID를 확인해 주세요.','error');}
 });
 let activityCache=[];
+
+let feedbackStatCache=[];
+const SNA_STATS_FEATURES={clothes:'옷 추출',guns:'총 자르기',kill:'킬로그',merge:'합치기',board:'대필판'};
+function snaStatsClassification(log){
+ const a=String(log.action||'');
+ if(a==='킬로그 추출'||a.startsWith('킬로그 보정 저장'))return 'kill';
+ if(a==='옷 추출 / 자르기 시작')return 'clothes';
+ if(a==='총기 카드 자르기 시작')return 'guns';
+ if(a==='이미지 합치기 저장 요청')return 'merge';
+ if(a==='대필판 PNG 저장')return 'board';
+ return null;
+}
+function snaKpi(label,value){const node=document.createElement('div');node.className='sna-stats-kpi';const a=document.createElement('span');a.textContent=label;const b=document.createElement('strong');b.textContent=String(value);node.append(a,b);return node;}
+function snaStatsBars(id,data){const out=document.getElementById(id);if(!out)return;out.replaceChildren();const max=Math.max(1,...Object.values(data));for(const [name,count] of Object.entries(data)){
+ const row=document.createElement('div');row.className='sna-stats-bar-row';const heading=document.createElement('div');heading.className='sna-stats-bar-label';
+ const title=document.createElement('span');title.textContent=name;const number=document.createElement('b');number.textContent=String(count);heading.append(title,number);
+ const track=document.createElement('div');track.className='sna-stats-track';const bar=document.createElement('span');bar.style.width=(100*count/max)+'%';track.append(bar);row.append(heading,track);out.append(row);
+}}
+function snaRenderStats(){
+ const section=document.getElementById('sna-admin-stats');if(!section||!isAdminMode)return;
+ const days=Number(document.getElementById('sna-stats-period').value)||30;const from=Date.now()-days*86400000;
+ const events=activityCache.filter(a=>Number(a.timestamp)>=from);const users=adminUserSnapshot?.docs.map(d=>d.data()).filter(u=>u.authUid&&!u.migratedTo)||[];
+ const reviews=feedbackStatCache.filter(r=>r.type==='featureReview'&&Number(r.createdAt)>=from);
+ const scores=reviews.map(r=>Number(r.score)).filter(n=>n>=1&&n<=5);
+ const visits=new Set(events.filter(r=>r.action==='로그인 / 접속'&&r.uid).map(r=>r.uid));
+ const activeUsers=new Set(events.filter(r=>r.uid).map(r=>r.uid));
+ const counts={clothes:0,guns:0,kill:0,merge:0,board:0};events.forEach(a=>{const kind=snaStatsClassification(a);if(kind)counts[kind]++;});
+ const byGrade={실버:0,골드:0,VIP:0,'승인 대기·기타':0};
+ users.forEach(u=>{if(u.status!=='approved'){byGrade['승인 대기·기타']++;return;}const key=u.grade==='vip'?'VIP':u.grade==='gold'?'골드':'실버';byGrade[key]++;});
+ const kpi=document.getElementById('sna-stats-kpis');kpi.replaceChildren(snaKpi('현재 등록 회원',users.length),snaKpi(`${days}일 내 기록된 활동 회원`,activeUsers.size),snaKpi('기능 결과 작업 기록',Object.values(counts).reduce((a,b)=>a+b,0)),snaKpi(`${days}일 내 접수된 후기`,reviews.length),snaKpi('후기 평균 별점',scores.length?(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1)+'/5':'—'),snaKpi('후기 홍보 공개 동의',reviews.filter(r=>r.publicConsent===true).length));
+ snaStatsBars('sna-stats-feature-bars',Object.fromEntries(Object.entries(counts).map(([k,v])=>[SNA_STATS_FEATURES[k],v])));
+ snaStatsBars('sna-stats-grade-bars',byGrade);
+ document.getElementById('sna-stats-updated').textContent='갱신: '+new Date().toLocaleTimeString('ko-KR');
+ document.getElementById('sna-stats-note').textContent=`표시 범위: 최근 활동 로그 ${activityCache.length}개 · 후기/신고 ${feedbackStatCache.length}개만 불러와 집계합니다. 실제 전체 건수가 아니라 최대 조회 개수 안에서의 수치입니다. 회원 수는 조회 기간과 관계없는 현재 상태이며, 이용 기록이 없는 작업은 계산되지 않습니다. 기능 작업은 저장·추출 시작 요청 기록을 포함합니다.`;
+}
+document.getElementById('sna-stats-period')?.addEventListener('change',snaRenderStats);
+document.getElementById('sna-stats-refresh')?.addEventListener('click',()=>{if(isAdminMode){snaRenderStats();window.SnaAdminReportsStart?.();}});
+
 function makeLogRow(log){
  const row=make("div","log-card admin-log-row");
  const body=make("div","admin-log-body");
@@ -2401,7 +2569,7 @@ function loadAdminData(){
  };
  document.getElementById('admin-user-search').oninput=()=>{if(adminUserSnapshot)renderUserSnapshot(adminUserSnapshot);};
  document.getElementById('admin-user-grade-filter').onchange=()=>{if(adminUserSnapshot)renderUserSnapshot(adminUserSnapshot);};
- liveUnsubscribes.push(onSnapshot(collection(db,"users"),snapshot=>{adminUserSnapshot=snapshot;renderUserSnapshot(snapshot);},err=>console.warn("사용자 목록 오류",err)));
+ liveUnsubscribes.push(onSnapshot(collection(db,"users"),snapshot=>{adminUserSnapshot=snapshot;renderUserSnapshot(snapshot);snaRenderStats();},err=>console.warn("사용자 목록 오류",err)));
  const latest=query(collection(db,"logs"),orderBy("timestamp","desc"),limit(20));
  liveUnsubscribes.push(onSnapshot(latest,snapshot=>{
   const list=document.getElementById("admin-log-list");list.replaceChildren();
@@ -2413,7 +2581,7 @@ function loadAdminData(){
   if(!list.childNodes.length)list.append(make("div","admin-empty","접속 기록이 없습니다."));
  },err=>console.warn("접속 로그 오류",err)));
  const q=query(collection(db,"activityLogs"),orderBy("timestamp","desc"),limit(150));
- liveUnsubscribes.push(onSnapshot(q,snapshot=>{activityCache=snapshot.docs.map(s=>s.data());renderActivityLogs();},err=>console.warn("작업 로그 오류",err)));
+ liveUnsubscribes.push(onSnapshot(q,snapshot=>{activityCache=snapshot.docs.map(s=>s.data());renderActivityLogs();snaRenderStats();},err=>console.warn("작업 로그 오류",err)));
 }
 window.saveMemberSettings=async(id,grade='silver',duration='30')=>{
  if(!isAdminMode||!auth.currentUser){window.uiAlert?.('최고 관리자만 변경할 수 있습니다.');return false;}
@@ -2705,6 +2873,7 @@ window.closeAdmin=()=>{
  </button>
 
  <button id="btn-gallery" onclick="switchTab('gallery')">🏛️ 전시관</button>
+ <button id="btn-reviews" onclick="switchTab('reviews')" type="button">⭐ 이용 후기</button>
  <button id="btn-guide" type="button" data-open-guide title="옷·총·킬로그·합치기·대필판·전시관 전체 사용방법" aria-haspopup="dialog">📖 사용방법</button>
  <button id="btn-creator-about" type="button" data-open-creator title="제작자 스나 · 프로그램 정보" aria-haspopup="dialog">ℹ 제작자</button>
  <button id="btn-logout" onclick="window.confirmSignOutMember()" title="로그아웃" style="flex:0 0 auto;min-width:80px;font-size:12px;padding:10px 12px">로그아웃</button>
@@ -2856,6 +3025,12 @@ window.closeAdmin=()=>{
  </div>
 </div>
 
+<section class="sna-qa-panel" id="sna-qa-clothes" aria-label="옷 자동 검사">
+ <div class="sna-qa-head"><h3>🔍 옷 · 추출 오류 자동 검사</h3><button type="button" data-qa-run="clothes">↻ 결과 다시 검사</button></div>
+ <p>추출된 이미지의 빈 영역·중복·비정상적인 크기·투명 영역 경계 잘림 등을 점검합니다. 의심 항목만 표시하며 이미지를 자동으로 삭제하거나 변경하지 않습니다.</p>
+ <div class="sna-qa-status" id="sna-qa-status-clothes" role="status" aria-live="polite">추출한 결과가 있으면 자동으로 검사합니다.</div>
+ <div class="sna-qa-list" id="sna-qa-list-clothes"></div>
+</section>
 <div id="c_results" class="results">
  <div class="empty">
   <div>◇</div>
@@ -2953,6 +3128,12 @@ window.closeAdmin=()=>{
  <button id="g_saveAllTop" type="button" class="photo-button" onclick="window.g_saveAllCards()" disabled style="min-height:44px;background:#869fea;color:#0a1632;font-weight:800;white-space:nowrap">📥 모두 저장</button>
 </div>
 
+<section class="sna-qa-panel" id="sna-qa-guns" aria-label="총기 자동 검사">
+ <div class="sna-qa-head"><h3>🔍 총기 · 추출 오류 자동 검사</h3><button type="button" data-qa-run="guns">↻ 결과 다시 검사</button></div>
+ <p>추출된 이미지의 빈 영역·중복·비정상적인 크기·투명 영역 경계 잘림 등을 점검합니다. 의심 항목만 표시하며 이미지를 자동으로 삭제하거나 변경하지 않습니다.</p>
+ <div class="sna-qa-status" id="sna-qa-status-guns" role="status" aria-live="polite">추출한 결과가 있으면 자동으로 검사합니다.</div>
+ <div class="sna-qa-list" id="sna-qa-list-guns"></div>
+</section>
 <div id="g_results" class="results">
  <div class="empty">
   <div>◇</div>
@@ -2997,7 +3178,13 @@ window.closeAdmin=()=>{
    <div id="kl8-status" class="kl8-status" role="status">사진을 추가해 주세요.</div>
    <div id="kl8-list" class="kl8-list"></div>
   </div>
-  <div class="photo-panel"><div class="panel-head"><strong>추출 결과</strong><span id="kl8-count">0개</span></div><div id="kl8-results" class="kl8-results"><div class="empty">아직 추출 결과가 없습니다.</div></div><button type="button" id="kl8-saveall" class="all-save" disabled>추출한 킬로그 모두 저장 / 공유</button><p class="sna-samsung-save-hint" style="display:none;margin:8px 0 0;color:#e9bc85;font-size:12px;line-height:1.5;text-align:center">삼성 기기에서 한 번에 공유할 수 있는 파일 수는 기기와 앱에 따라 제한될 수 있습니다.</p></div>
+  <div class="photo-panel"><div class="panel-head"><strong>추출 결과</strong><span id="kl8-count">0개</span></div><section class="sna-qa-panel" id="sna-qa-kill" aria-label="킬로그 자동 검사">
+ <div class="sna-qa-head"><h3>🔍 킬로그 · 추출 오류 자동 검사</h3><button type="button" data-qa-run="kill">↻ 결과 다시 검사</button></div>
+ <p>추출된 이미지의 빈 영역·중복·비정상적인 크기·투명 영역 경계 잘림 등을 점검합니다. 의심 항목만 표시하며 이미지를 자동으로 삭제하거나 변경하지 않습니다.</p>
+ <div class="sna-qa-status" id="sna-qa-status-kill" role="status" aria-live="polite">추출한 결과가 있으면 자동으로 검사합니다.</div>
+ <div class="sna-qa-list" id="sna-qa-list-kill"></div>
+</section>
+<div id="kl8-results" class="kl8-results"><div class="empty">아직 추출 결과가 없습니다.</div></div><button type="button" id="kl8-saveall" class="all-save" disabled>추출한 킬로그 모두 저장 / 공유</button><p class="sna-samsung-save-hint" style="display:none;margin:8px 0 0;color:#e9bc85;font-size:12px;line-height:1.5;text-align:center">삼성 기기에서 한 번에 공유할 수 있는 파일 수는 기기와 앱에 따라 제한될 수 있습니다.</p></div>
  </div>
 </div>
 <div class="kl8-modal" id="kl8-manual-modal" role="dialog" aria-label="킬로그 수동 영역 지정" hidden>
@@ -3130,6 +3317,15 @@ window.closeAdmin=()=>{
  <div class="member-controls"><button class="member-btn primary" id="gallery-refresh" type="button">전시관 새로고침</button><button class="member-btn" id="gallery-my" type="button">내 작품</button><button class="member-btn" id="gallery-public" type="button">전체 공개 작품</button></div>
  <p id="gallery-status" role="status">작품을 불러오는 중…</p><div class="member-grid" id="gallery-items"></div>
  </div>
+</div>
+<div id="reviews-tab" class="tab-pane">
+ <section class="sna-review-showcase" id="sna-public-review-showcase" aria-labelledby="sna-review-showcase-title">
+  <div class="sna-review-showcase-head"><h2 id="sna-review-showcase-title">⭐ 실제 회원 이용 후기 전시관</h2><button type="button" id="sna-public-review-refresh">↻ 후기 새로고침</button></div>
+  <p>직접 이용한 회원이 작성하고 홍보 공개에 동의한 후기 중 관리자가 확인하여 등록한 내용입니다. 별점이나 평가가 낮은 후기도 숨기지 않고 등록할 수 있습니다. 작성자 식별정보는 공개하지 않습니다. 후기 공개 동의 철회는 관리자에게 요청할 수 있습니다.</p>
+  <div class="sna-review-showcase-controls"><select id="sna-public-review-filter" aria-label="이용 후기 기능 선택"><option value="all">모든 기능</option><option value="clothes">옷 추출기</option><option value="guns">총 자르기</option><option value="kill">킬로그 커팅</option><option value="merge">사진 합치기</option><option value="board">대필판</option></select><select id="sna-public-review-sort" aria-label="이용 후기 정렬"><option value="new">최신 후기순</option><option value="old">오래된 후기순</option></select></div>
+  <p id="sna-public-review-summary" role="status">공개된 이용 후기를 불러오는 중입니다.</p>
+  <div id="sna-public-review-list" class="sna-review-showcase-cards"></div>
+ </section>
 </div>
 <div id="board-tab" class="tab-pane">
 <div class="sna-review-inline" data-sna-review="board"><span><strong>📝 대필판 이용 후기</strong> <span class="sna-review-state">처음 사용한 후 한 번만 작성해 주세요.</span></span><button type="button" data-sna-review-open="board">후기 작성</button></div>
@@ -3358,13 +3554,14 @@ function switchTab(tabId, silent=false){
    return;
  }
  if(!silent && window.logActivity)window.logActivity("기능 열기",{feature:({clothes:"옷 추출",guns:"총기 카드 자르기",merge:"이미지 합치기",kill:"킬로그 커팅",board:"대필판 만들기"})[tabId]||tabId});
- ["clothes","guns","kill","merge","board","gallery"].forEach(id=>{
+ ["clothes","guns","kill","merge","board","gallery","reviews"].forEach(id=>{
   document.getElementById("btn-"+id).classList.remove("active");
   document.getElementById(id+"-tab").classList.remove("active");
  });
 
  document.getElementById("btn-"+tabId).classList.add("active");
  document.getElementById(tabId+"-tab").classList.add("active");
+ if(tabId==='reviews'&&!silent)window.SnaPublicReviewsRefresh?.();
 }
 
 
@@ -3468,21 +3665,87 @@ const snaSamsungSaveLimit = (() => {
 
 // v12: advisory image QA. Never deletes images without an explicit click.
 window.SnaQuality=(()=>{
- const seen={cloth:new Map(),gun:new Map()};
- function inspect(url,kind,onRemove){
-  const img=new Image();img.onload=()=>{
-   const c=document.createElement('canvas');c.width=24;c.height=24;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(img,0,0,24,24);
-   const d=g.getImageData(0,0,24,24).data;let min=255,max=0,bright=0,edges=0,ink=0,h=2166136261;
-   for(let i=0;i<576;i++){const j=i*4,v=Math.round(d[j]*.299+d[j+1]*.587+d[j+2]*.114);min=Math.min(min,v);max=Math.max(max,v);if(v>215)bright++;if(v<30)ink++;const bit=v>125?1:0;h=Math.imul(h^bit,16777619)>>>0;if(i<24||i>=552||i%24===0||i%24===23){if(v>210||v<15)edges++;}}
-   const hash=h.toString(16)+'-'+Math.round((bright/576)*20);const warn=[];
-   if(max-min<18||bright>555||ink>550)warn.push('빈칸/단색 의심');
-   if(edges>85)warn.push('테두리/잘림 확인');
-   if(bright>465)warn.push('과도한 여백 의심');
-   if(seen[kind].has(hash))warn.push('중복 이미지 의심');else seen[kind].set(hash,true);
-   if(onRemove && warn.length){const host=document.createElement('div');host.className='sna-quality-warning';host.textContent='검토: '+warn.join(' · ');onRemove(host);}
-  };img.src=url;
+ const warnedHashes={cloth:new Set(),gun:new Set()},timers={};
+ function getPicture(image){return new Promise((resolve,reject)=>{
+  if(image.complete&&image.naturalWidth)return resolve(image);
+  if(image.decode)image.decode().then(()=>resolve(image)).catch(reject);
+  else{image.addEventListener('load',()=>resolve(image),{once:true});image.addEventListener('error',reject,{once:true});}
+ });}
+ async function characteristics(img){
+  await getPicture(img);
+  const w=img.naturalWidth,h=img.naturalHeight;
+  if(!w||!h)throw Error('미리보기 이미지가 비어 있음');
+  const cv=document.createElement('canvas');cv.width=48;cv.height=48;
+  const ctx=cv.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,48,48);
+  const d=ctx.getImageData(0,0,48,48).data;
+  let min=255,max=0,sum=0,bright=0,ink=0,visible=0,minX=48,maxX=-1,minY=48,maxY=-1,borderAlpha=0,alphaVariants=0;
+  const tiles=[];
+  for(let y=0;y<48;y++)for(let x=0;x<48;x++){
+   const i=(y*48+x)*4,a=d[i+3];if(a<240)alphaVariants++;
+   if(a<32)continue;
+   visible++;minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);
+   if(x===0||y===0||x===47||y===47)borderAlpha++;
+   const v=Math.round(d[i]*.299+d[i+1]*.587+d[i+2]*.114);
+   min=Math.min(min,v);max=Math.max(max,v);sum+=v;if(v>235)bright++;if(v<22)ink++;
+   if(x%6===3&&y%6===3)tiles.push(Math.round(v/16));
+  }
+  return {w,h,visible,range:max-min,bright,ink,borderAlpha,alphaVariants,minX,maxX,minY,maxY,signature:tiles.join('.')};
  }
- return {inspect};
+ function problems(info,kind){
+  const warns=[];
+  if(!info.visible||info.range<14)warns.push('내용이 거의 없거나 단색');
+  else if(kind!=='kill'&&info.bright/Math.max(1,info.visible)>.9)warns.push('밝은 여백이 지나치게 많을 수 있음');
+  if(kind==='kill'){
+   if(info.visible<48)warns.push('표시되는 킬로그가 매우 적음');
+   if(info.alphaVariants>250&&info.visible>70&&info.borderAlpha>48)warns.push('투명 영역 경계에 장식이 닿음 — 잘림 확인');
+   if(info.visible>70&&Math.abs((info.minX+info.maxX)/2-23.5)>7)warns.push('추출 이미지가 중앙에서 벗어나 보임');
+  }
+  return warns;
+ }
+ // Keep the old per-card warning contract; automatic inspection never deletes the result.
+ function inspect(url,kind,showWarning){
+  const img=new Image();img.onload=async()=>{
+   try{const c=await characteristics(img),warns=problems(c,kind);
+    const seen=warnedHashes[kind];if(seen){if(seen.has(c.signature))warns.push('동일한 이미지가 있을 가능성');else seen.add(c.signature);}
+    if(warns.length&&showWarning){const n=document.createElement('div');n.className='sna-quality-warning';n.textContent='검토 권장: '+warns.join(' · ');showWarning(n);}
+   }catch(e){console.warn('이미지 품질 검사 건너뜀',e);}
+  };img.onerror=()=>{};img.src=url;
+ }
+ const SELECTORS={clothes:'#c_results .card',guns:'#g_results .card',kill:'#kl8-results .kl8-item'};
+ async function batch(feature){
+  const panel=document.getElementById('sna-qa-'+feature);if(!panel)return;
+  const text=panel.querySelector('.sna-qa-status'),list=panel.querySelector('.sna-qa-list');
+  const cards=[...document.querySelectorAll(SELECTORS[feature])];
+  const usable=cards.map((card,index)=>({card,index,img:card.querySelector(feature==='kill'?'.kl8-result img':'img')})).filter(x=>x.img);
+  text.textContent='검사 중…';list.replaceChildren();
+  if(!usable.length){text.textContent='추출된 결과가 없습니다. 사진을 추출하면 검사할 수 있어요.';return;}
+  const outcomes=await Promise.all(usable.map(async item=>{
+   try{return {...item,meta:await characteristics(item.img),warnings:[]};}
+   catch(e){return {...item,warnings:['이미지 불러오기 실패 · 수동 확인'],meta:null};}
+  }));
+  const areas=outcomes.filter(x=>x.meta).map(x=>x.meta.w*x.meta.h).sort((a,b)=>a-b);
+  const ratios=outcomes.filter(x=>x.meta).map(x=>x.meta.w/x.meta.h).sort((a,b)=>a-b);
+  const median=a=>a.length?a[Math.floor(a.length/2)]:0,medianArea=median(areas),medianRatio=median(ratios),seen=new Map();
+  for(const x of outcomes){if(!x.meta)continue;
+   const c=x.meta;x.warnings.push(...problems(c,feature));
+   if(feature!=='kill'&&outcomes.length>=3){
+    const ratio=c.w/c.h;
+    if(medianRatio>0&&(ratio<medianRatio*.55||ratio>medianRatio*1.8))x.warnings.push('다른 결과와 가로세로 비율이 크게 다름');
+    if(medianArea>0&&c.w*c.h<medianArea*.23)x.warnings.push('다른 결과보다 해상도가 매우 작음');
+   }
+   const key=c.signature+'@'+Math.round(c.w/c.h*10);
+   if(seen.has(key))x.warnings.push('다른 결과와 거의 중복될 수 있음');else seen.set(key,true);
+  }
+  if(!panel.isConnected)return;
+  const suspicious=outcomes.filter(x=>x.warnings.length);
+  text.textContent=`${outcomes.length}개 검사 완료 · ${suspicious.length}개 확인 권장 · ${outcomes.length-suspicious.length}개 특이점 없음`;
+  if(!suspicious.length){const empty=document.createElement('p');empty.className='sna-showcase-empty';empty.textContent='현재 검사 기준에서 의심 항목이 발견되지 않았어요. 실제 잘림이나 장식 누락은 저장 전 직접 확인해 주세요.';list.append(empty);return;}
+  for(const x of suspicious){const row=document.createElement('div');row.className='sna-qa-row';const span=document.createElement('span');span.textContent=`사진 ${x.index+1}: ${[...new Set(x.warnings)].join(' · ')}`;
+   const btn=document.createElement('button');btn.type='button';btn.textContent='결과 위치로 이동';btn.onclick=()=>{x.card.scrollIntoView({behavior:'smooth',block:'center'});x.card.classList.add('sna-qa-focus');setTimeout(()=>x.card.classList.remove('sna-qa-focus'),2200);};row.append(span,btn);list.append(row);}
+ }
+ function scheduleCheck(feature){if(!SELECTORS[feature])return;clearTimeout(timers[feature]);timers[feature]=setTimeout(()=>batch(feature).catch(e=>console.warn('검사 실패',e)),400);}
+ document.querySelectorAll('[data-qa-run]').forEach(btn=>btn.addEventListener('click',()=>batch(btn.dataset.qaRun)));
+ return {inspect,check:batch,scheduleCheck};
 })();
 
 /* =====================================================
@@ -4670,7 +4933,7 @@ window.c_extractSelected=()=>{
  resultCountTitle.textContent=croppedCards.length;
  saveAllButton.disabled=false;
  const saveTop=document.getElementById('c_saveAllTop');if(saveTop)saveTop.disabled=false;
- if(croppedCards.length)window.SnaReviews?.used('clothes');
+ if(croppedCards.length)window.SnaReviews?.used('clothes');window.SnaQuality?.scheduleCheck('clothes');
 
 };
 
@@ -5539,7 +5802,7 @@ window.g_extractSelected=()=>{
  resultCountText.textContent=croppedCards.length;
  resultCountTitle.textContent=croppedCards.length;
  saveAllButton.disabled=false;
- if(croppedCards.length)window.SnaReviews?.used('guns');
+ if(croppedCards.length)window.SnaReviews?.used('guns');window.SnaQuality?.scheduleCheck('guns');
 };
 
 
@@ -7507,7 +7770,7 @@ async function recenterAuto(cut,ref){
 function updateResult(i,cut,ref=null,manual=false){
  if(i.url)URL.revokeObjectURL(i.url);
  i.blob=cut;i.baseBlob=cut;i.url=urlFor(cut);i.refBlob=ref;i.refPromise=null;i.error='';i.manual=manual;i.keepBlob=null;i.barLock=null;i.barLockEnabled=true;if(!manual)i.cropBox=null;
- updateCard(i);saveQueue();
+ updateCard(i);saveQueue();window.SnaQuality?.scheduleCheck('kill');
 }
 function add(file,refresh=true){const i={file:validBlob(file)?file:new File([],'원본_복구필요.png',{type:'image/png'}),sourceUrl:validBlob(file)?urlFor(file):null,url:null,blob:null,baseBlob:null,refBlob:null,refPromise:null,keepBlob:null,shift:{x:0,y:0},barLock:null,barLockEnabled:true,error:'',working:false,manual:false,cropBox:null,card:null};items.push(i);if(refresh)render();return i;}
 $('kl8-files').onchange=e=>{for(const f of [...(e.target.files||[])].filter(f=>f.type.startsWith('image/')))add(f,false);e.target.value='';render();saveQueue();};
@@ -8116,13 +8379,13 @@ render();health();
 
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.3.3 · 후기 서버 확인·버튼 개선</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.4.0 · 추출 검사 · 통계 · 후기 전시관</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
- <strong>v12.3 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.3.3: 옷·총 사진 목록 버튼 UI를 개선하고, 후기는 Firebase 서버 전송에 성공한 경우에만 작성 완료 처리합니다. 관리자 화면에서 기능별 이용 후기와 오류 신고를 구분해 표시합니다. 최고 관리자는 후기 작성 대상에서 제외됩니다.</div>
+ <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.4.0: 옷·총·킬로그 추출 오류 자동 검사, 관리자 통계 대시보드, 상단 「⭐ 이용 후기」 탭에 공개 동의 후기를 관리자가 승인해 게시하는 익명 전시관이 추가되었습니다. 기존 기능과 관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script>
-(()=>{const version='12.3.2';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.3.3: 사진 기록 버튼 UI · Firebase 후기 전송 확인 · 관리자 후기 조회 개선';}}catch(_){} })();
+(()=>{const version='12.4.0';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.4.0: 추출 품질 검사 · 관리자 통계 · 후기 전시관';}}catch(_){} })();
 </script>
 
 <div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
