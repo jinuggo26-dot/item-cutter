@@ -941,6 +941,30 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 .sna-quality-warning{font-size:12px;color:#ffce86;background:#3e301e;padding:7px;border:1px solid #986b3b;border-radius:7px;margin-top:5px}
 .board-item-preview,.board-drag-hint{touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .sna-version-bar{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 6px);left:8px;z-index:987;background:#17263d;color:#c2d7ff;border:1px solid #425977;border-radius:14px;font:11px system-ui;padding:5px 9px;opacity:.82}
+
+/* v12.4.1 · 원본 사진 목록 삭제 도구 */
+.sna-photo-delete-tools{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:10px 0 14px}
+.sna-photo-delete-tools .sna-photo-danger,.sna-photo-delete-tools .sna-photo-outline{appearance:none!important;min-height:42px!important;border-radius:11px!important;padding:9px 13px!important;font-weight:800!important;font-size:13px!important;line-height:1.25!important;cursor:pointer;white-space:normal;color:#fff!important}
+.sna-photo-delete-tools .sna-photo-danger{background:linear-gradient(145deg,#983944,#652933)!important;border:1px solid #d47b84!important}
+.sna-photo-delete-tools .sna-photo-outline{background:#293a55!important;border:1px solid #637aa3!important}
+.sna-photo-delete-tools button:disabled{opacity:.42!important;cursor:not-allowed}
+.sna-photo-delete-count{color:#a8bbdc;font-size:12px;font-weight:700}
+.photo-list .sna-photo-entry{flex:0 0 auto;display:flex;flex-direction:column;gap:5px;min-width:124px;max-width:196px;padding:5px;border-radius:12px;border:1px solid #385071;background:#132039;box-sizing:border-box}
+.photo-list .sna-photo-entry>.photo-button{width:100%;max-width:100%;text-align:center;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.photo-list .sna-photo-entry-actions{display:flex;gap:5px;align-items:center}
+.photo-list .sna-photo-check{display:flex;align-items:center;gap:5px;padding:5px;flex:1;min-height:34px;color:#c9daf4;font-size:12px;font-weight:750;cursor:pointer}
+.photo-list .sna-photo-check input{accent-color:#93b6ff;width:19px;height:19px;flex:none}
+.photo-list .sna-photo-delete-one{appearance:none;min-width:38px;min-height:34px;border-radius:9px;padding:4px 8px;border:1px solid #be7881;background:#75313d;color:#fff;font-size:15px;font-weight:900;cursor:pointer}
+.photo-list .sna-photo-delete-one:active,.sna-photo-delete-tools button:not(:disabled):active{transform:scale(.97)}
+.kl8-list .sna-kill-photo-entry{flex:none;display:flex;align-items:stretch;gap:4px;min-width:125px}
+.kl8-list .sna-kill-photo-entry .kl8-photo{flex:1;min-width:0}
+.kl8-list .sna-kill-photo-delete{min-width:35px;max-width:40px;border:1px solid #ba6575;border-radius:9px;background:#6d2d39;color:#fff;font-size:17px;font-weight:800}
+.kl8-list .sna-kill-photo-delete:disabled{opacity:.45}
+.sna-merge-photo-list{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 13px}
+.sna-merge-photo-item{display:flex;align-items:center;gap:8px;background:#1a2a44;border:1px solid #3f577e;border-radius:11px;padding:8px;max-width:100%;color:#e0eaff;font-size:13px}
+.sna-merge-photo-item .sna-merge-photo-name{max-width:240px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.sna-merge-photo-item button{border:1px solid #ba6676;background:#6c2c38;color:#fff;font-weight:800;border-radius:8px;padding:8px 10px;min-height:35px}
+@media(max-width:520px){.sna-photo-delete-tools{gap:7px}.sna-photo-delete-tools .sna-photo-danger,.sna-photo-delete-tools .sna-photo-outline{font-size:12px!important;min-height:43px!important;padding:9px 10px!important}}
 </style>
 <style>
 #sna-report-open{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:100001;min-height:42px;padding:9px 14px;border:1px solid #7892bc;background:#263c5e;color:#f4f7ff;border-radius:25px;font-weight:750;box-shadow:0 4px 16px #0008;display:none}
@@ -1021,7 +1045,7 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 </style>
 
 <style>
-/* v12.4.0 - clothes/guns undo, redo and restore: accessible tablet & mobile controls */
+/* v12.4.1 - clothes/guns undo, redo and restore: accessible tablet & mobile controls */
 .tab-pane .sna-photo-history{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0 16px;align-items:stretch}
 .tab-pane .sna-photo-history .sna-history-btn{box-sizing:border-box!important;appearance:none!important;-webkit-appearance:none!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;min-width:0!important;min-height:52px!important;padding:11px 14px!important;border:1px solid #526d9a!important;border-radius:14px!important;background:linear-gradient(150deg,#263d62,#192940)!important;color:#ecf4ff!important;font:800 14px/1.25 -apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif!important;letter-spacing:-.3px!important;box-shadow:0 5px 14px #040c19a3,inset 0 1px #8cb1e82e!important;text-align:center!important;white-space:normal!important;cursor:pointer;transition:background .15s ease,transform .15s ease,opacity .15s ease;touch-action:manipulation}
 .tab-pane .sna-photo-history .sna-history-btn .sna-history-icon{flex:none;font-size:21px;line-height:1;color:#a7c6ff}
@@ -2920,7 +2944,14 @@ window.closeAdmin=()=>{
   <button id="c_v12undo" class="sna-history-btn" type="button" disabled><span aria-hidden="true" class="sna-history-icon">↶</span><span>실행 취소</span></button>
   <button id="c_v12redo" class="sna-history-btn" type="button" disabled><span aria-hidden="true" class="sna-history-icon">↷</span><span>다시 실행</span></button>
   <button id="c_v12restore" class="sna-history-btn sna-history-restore" type="button"><span aria-hidden="true" class="sna-history-icon">⟳</span><span>작업 자동 복구</span></button>
- </div><div id="c_photoList" class="photo-list"></div>
+ </div>
+ <div class="sna-photo-delete-tools" role="group" aria-label="옷 사진 삭제">
+  <button type="button" id="c_deleteCurrent" class="sna-photo-outline">🗑 현재 사진 삭제</button>
+  <button type="button" id="c_deleteSelected" class="sna-photo-danger" disabled>✓ 체크한 사진 삭제</button>
+  <button type="button" id="c_deleteAll" class="sna-photo-danger" disabled>전체 사진 삭제</button>
+  <span id="c_deleteCount" class="sna-photo-delete-count">삭제할 사진 0장</span>
+ </div>
+ <div id="c_photoList" class="photo-list" aria-label="사진을 선택하거나 삭제"></div>
 </section>
 
 <div style="display:flex;justify-content:space-between;margin:16px 2px 9px;font-size:13px">
@@ -3083,7 +3114,14 @@ window.closeAdmin=()=>{
   <button id="g_v12undo" class="sna-history-btn" type="button" disabled><span aria-hidden="true" class="sna-history-icon">↶</span><span>실행 취소</span></button>
   <button id="g_v12redo" class="sna-history-btn" type="button" disabled><span aria-hidden="true" class="sna-history-icon">↷</span><span>다시 실행</span></button>
   <button id="g_v12restore" class="sna-history-btn sna-history-restore" type="button"><span aria-hidden="true" class="sna-history-icon">⟳</span><span>작업 자동 복구</span></button>
- </div><div id="g_photoList" class="photo-list"></div>
+ </div>
+ <div class="sna-photo-delete-tools" role="group" aria-label="총 사진 삭제">
+  <button type="button" id="g_deleteCurrent" class="sna-photo-outline">🗑 현재 사진 삭제</button>
+  <button type="button" id="g_deleteSelected" class="sna-photo-danger" disabled>✓ 체크한 사진 삭제</button>
+  <button type="button" id="g_deleteAll" class="sna-photo-danger" disabled>전체 사진 삭제</button>
+  <span id="g_deleteCount" class="sna-photo-delete-count">삭제할 사진 0장</span>
+ </div>
+ <div id="g_photoList" class="photo-list" aria-label="사진을 선택하거나 삭제"></div>
 </section>
 
 <div style="display:flex;justify-content:space-between;margin:16px 2px 9px;font-size:13px">
@@ -3266,6 +3304,8 @@ window.closeAdmin=()=>{
  </div>
 
  <div class="kl8-toolbar"><button type="button" id="m_undo" class="kl8-btn" disabled>↶ 되돌리기</button><button type="button" id="m_redo" class="kl8-btn" disabled>↷ 다시 실행</button><button type="button" id="m_restore" class="kl8-btn">이전 합치기 작업 복원</button></div>
+ <div style="margin:13px 0 5px;font-weight:800;color:#dae6fd;font-size:14px">🗑 사진 목록 · 개별 삭제</div>
+ <div id="m_photoList" class="sna-merge-photo-list" aria-label="합치기 원본 사진 목록"></div>
  <button id="m_positionBtn" class="action" style="width:100%;min-height:44px;background:#242832">
   📍 위치 변경 모드 켜기
  </button>
@@ -3777,6 +3817,7 @@ let originalImageData=null;
 let cards=[];
 let selectedCards=[];
 let croppedCards=[];
+const cDeleteMarks=new Set(); // 삭제 대상으로 체크한 원본 사진 (카드 선택과 별개)
 
 // 자르기 설정은 사진 전체에 동일하게 적용한다. 원본 감지 좌표는 유지한다.
 const clothTrimIds=['Top','Bottom','Left','Right'];
@@ -4030,6 +4071,7 @@ fileInput.addEventListener("change",event=>{
  if(!files.length)return;
 
  photos=[];
+ cDeleteMarks.clear();
  currentIndex=0;
  selectedCards=[];
  croppedCards=[];
@@ -4096,14 +4138,69 @@ function makePhotoButtons(){
   button.addEventListener('drop',e=>{e.preventDefault();const from=Number(photoList.dataset.dragFrom),to=index;
    if(from>=0&&from<photos.length&&to>=0&&to<photos.length&&from!==to){cHist();const photo=photos.splice(from,1)[0];photos.splice(to,0,photo);makePhotoButtons();showPhoto(to);window.SnaDraft?.queue('clothes');}
   });
-  photoList.appendChild(button);
+  const entry=document.createElement('div');
+  entry.className='sna-photo-entry';
+  const actions=document.createElement('div');actions.className='sna-photo-entry-actions';
+  const mark=document.createElement('label');mark.className='sna-photo-check';
+  const check=document.createElement('input');check.type='checkbox';check.checked=cDeleteMarks.has(photo);
+  check.setAttribute('aria-label',`사진 ${index+1} 삭제 대상으로 선택`);
+  check.onchange=()=>{if(check.checked)cDeleteMarks.add(photo);else cDeleteMarks.delete(photo);updateCDeleteButtons();};
+  mark.append(check,document.createTextNode('삭제 선택'));
+  const del=document.createElement('button');del.type='button';del.className='sna-photo-delete-one';
+  del.textContent='🗑';del.title=`사진 ${index+1} 삭제`;del.setAttribute('aria-label',`사진 ${index+1} 삭제`);
+  del.onclick=()=>deleteCPhotos([photo]);
+  actions.append(mark,del);entry.append(button,actions);photoList.appendChild(entry);
  });
 
  updatePhotoButtons();
 
  photoCountLabel.textContent=
   `${photos.filter(Boolean).length}장`;
+ updateCDeleteButtons();
 }
+
+
+// 사용자가 체크한 원본 사진만 삭제. 선택된 카드/추출 결과와는 별개로 관리합니다.
+function updateCDeleteButtons(){
+ for(const item of [...cDeleteMarks])if(!photos.includes(item))cDeleteMarks.delete(item);
+ const count=cDeleteMarks.size;
+ document.getElementById('c_deleteCount').textContent=`삭제할 사진 ${count}장`;
+ document.getElementById('c_deleteCurrent').disabled=!photos[currentIndex];
+ document.getElementById('c_deleteSelected').disabled=!count;
+ document.getElementById('c_deleteAll').disabled=!photos.length;
+}
+function resetCEmptyViewer(){
+ image=new Image();originalImageData=null;cards=[];selectedCards=[];currentIndex=0;
+ imageCanvas.width=1;imageCanvas.height=1;selectionCanvas.width=1;selectionCanvas.height=1;
+ imageCtx.clearRect(0,0,1,1);selectionCtx.clearRect(0,0,1,1);
+ currentPhoto.textContent='사진을 선택해주세요';countText.textContent='0';
+ drawClothTrimPreview();
+ const warning=document.getElementById('c_partialWarning');if(warning)warning.style.display='none';
+}
+async function deleteCPhotos(targets){
+ const deleting=new Set(targets.filter(photo=>photos.includes(photo)));
+ if(!deleting.size)return;
+ const message=deleting.size===photos.length?`사진 ${deleting.size}장을 모두 삭제할까요? 추출 결과도 함께 초기화됩니다. 실행 취소로 되돌릴 수 있어요.`:`사진 ${deleting.size}장을 삭제할까요? 혼동을 막기 위해 현재 추출 결과도 초기화됩니다. 실행 취소로 되돌릴 수 있어요.`;
+ const approved=window.uiConfirm?await window.uiConfirm(message):window.confirm(message);
+ if(!approved)return;
+ if(![...deleting].some(photo=>photos.includes(photo)))return;
+ cHist();
+ const active=photos[currentIndex],beforeIndex=currentIndex;
+ photos=photos.filter(photo=>!deleting.has(photo));
+ cDeleteMarks.clear();
+ croppedCards=[];results.innerHTML='<div class="empty"><div>◇</div>사진을 선택한 뒤 자르기를 눌러주세요.</div>';
+ resultCountText.textContent='0';resultCountTitle.textContent='0';saveAllButton.disabled=true;
+ const topSave=document.getElementById('c_saveAllTop');if(topSave)topSave.disabled=true;
+ const activeIndex=photos.indexOf(active);
+ makePhotoButtons();
+ if(photos.length)showPhoto(activeIndex>=0?activeIndex:Math.min(beforeIndex,photos.length-1));
+ else resetCEmptyViewer();
+ for(const photo of deleting){if(photo.url)try{URL.revokeObjectURL(photo.url);}catch(_){}}
+ window.SnaQuality?.scheduleCheck('clothes');window.SnaDraft?.queue('clothes');
+}
+document.getElementById('c_deleteCurrent').onclick=()=>{const photo=photos[currentIndex];if(photo)deleteCPhotos([photo]);};
+document.getElementById('c_deleteSelected').onclick=()=>deleteCPhotos([...cDeleteMarks]);
+document.getElementById('c_deleteAll').onclick=()=>deleteCPhotos([...photos]);
 
 function updatePhotoButtons(){
 
@@ -4118,6 +4215,7 @@ function updatePhotoButtons(){
    "active",
    index===currentIndex
   );
+  // 개별 삭제/전체 삭제 버튼은 사진 목록 상태에 맞춰 동기화됩니다.
  });
 }
 
@@ -4957,7 +5055,7 @@ async function cRestore(data){if(!data)return;restoringCloth=true;
   await Promise.all((data.photos||[]).map(async (p,index)=>{if(!(p.file instanceof Blob))return;
    const url=URL.createObjectURL(p.file),img=new Image();await new Promise(ok=>{img.onload=ok;img.onerror=ok;img.src=url;});
    photos[index]={image:img,url,name:p.file.name,file:p.file,selected:p.selected||[]};}));
-  makePhotoButtons();if(photos.length)showPhoto(Math.min(photos.length-1,data.current||0));
+  cDeleteMarks.clear();makePhotoButtons();if(photos.length)showPhoto(Math.min(photos.length-1,data.current||0));else resetCEmptyViewer();
   results.replaceChildren();for(const [idx,url] of croppedCards.entries()){const card=document.createElement('div');card.className='card';const img=document.createElement('img');img.src=url;const btn=document.createElement('button');btn.className='save';btn.textContent='↗ JPG 공유 / 저장';btn.onclick=()=>shareFile(url,`clothes_${idx+1}.jpg`);card.append(img,btn);results.append(card);}
   resultCountTitle.textContent=String(croppedCards.length);resultCountText.textContent=String(croppedCards.length);saveAllButton.disabled=!croppedCards.length;
   document.getElementById('c_saveAllTop').disabled=!croppedCards.length;
@@ -4965,9 +5063,9 @@ async function cRestore(data){if(!data)return;restoringCloth=true;
 window.SnaClothes={snapshot:cSnap,restore:cRestore};
 for(const [id,from,to] of [['c_v12undo',cHistory,cRedo],['c_v12redo',cRedo,cHistory]])document.getElementById(id).onclick=async()=>{if(!from.length)return;to.push(cSnap());await cRestore(from.pop());cButtons();window.SnaDraft?.queue('clothes');};
 const cRestoreBtn=document.getElementById('c_v12restore');cRestoreBtn.onclick=()=>window.SnaDraft?.resume('clothes');
-photoList.addEventListener('pointerdown',e=>{if(e.target.closest('.photo-button')){window._snaClothHold={start:e.target.closest('.photo-button'),x:e.clientX,y:e.clientY,t:Date.now()};}});
+photoList.addEventListener('pointerdown',e=>{if(e.target.closest('.photo-button')){window._snaClothHold={start:e.target.closest('.sna-photo-entry'),x:e.clientX,y:e.clientY,t:Date.now()};}});
 document.addEventListener('pointerup',e=>{const p=window._snaClothHold;window._snaClothHold=null;if(!p||Date.now()-p.t<360)return;
- const dst=document.elementFromPoint(e.clientX,e.clientY)?.closest('.photo-button'),arr=[...photoList.children],from=arr.indexOf(p.start),to=arr.indexOf(dst);
+ const dst=document.elementFromPoint(e.clientX,e.clientY)?.closest('.sna-photo-entry'),arr=[...photoList.children],from=arr.indexOf(p.start),to=arr.indexOf(dst);
  if(from>=0&&to>=0&&from!==to){cHist();const item=photos.splice(from,1)[0];photos.splice(to,0,item);makePhotoButtons();showPhoto(to);window.SnaDraft?.queue('clothes');}
 });
 imageCanvas.addEventListener('pointerdown',()=>cHist(),{capture:true});
@@ -5022,6 +5120,7 @@ let originalImageData=null;
 let cards=[];
 let selectedCards=[];
 let croppedCards=[];
+const gDeleteMarks=new Set(); // 삭제 대상으로 체크한 원본 사진 (카드 선택과 별개)
 
 
 /* =====================================================
@@ -5050,6 +5149,7 @@ fileInput.addEventListener("change",event=>{
  if(!files.length)return;
 
  photos=[];
+ gDeleteMarks.clear();
  currentIndex=0;
  selectedCards=[];
  croppedCards=[];
@@ -5114,15 +5214,70 @@ function makePhotoButtons(){
   button.addEventListener('drop',e=>{e.preventDefault();const from=Number(photoList.dataset.dragFrom),to=index;
    if(from>=0&&from<photos.length&&to>=0&&to<photos.length&&from!==to){gHist();const photo=photos.splice(from,1)[0];photos.splice(to,0,photo);makePhotoButtons();showPhoto(to);window.SnaDraft?.queue('guns');}
   });
-  photoList.appendChild(button);
+  const entry=document.createElement('div');
+  entry.className='sna-photo-entry';
+  const actions=document.createElement('div');actions.className='sna-photo-entry-actions';
+  const mark=document.createElement('label');mark.className='sna-photo-check';
+  const check=document.createElement('input');check.type='checkbox';check.checked=gDeleteMarks.has(photo);
+  check.setAttribute('aria-label',`사진 ${index+1} 삭제 대상으로 선택`);
+  check.onchange=()=>{if(check.checked)gDeleteMarks.add(photo);else gDeleteMarks.delete(photo);updateGDeleteButtons();};
+  mark.append(check,document.createTextNode('삭제 선택'));
+  const del=document.createElement('button');del.type='button';del.className='sna-photo-delete-one';
+  del.textContent='🗑';del.title=`사진 ${index+1} 삭제`;del.setAttribute('aria-label',`사진 ${index+1} 삭제`);
+  del.onclick=()=>deleteGPhotos([photo]);
+  actions.append(mark,del);entry.append(button,actions);photoList.appendChild(entry);
  });
 
  updatePhotoButtons();
 
  photoCountLabel.textContent=
   `${photos.filter(Boolean).length}장`;
+ updateGDeleteButtons();
 }
 
+
+
+// 사용자가 체크한 원본 사진만 삭제. 선택된 카드/추출 결과와는 별개로 관리합니다.
+function updateGDeleteButtons(){
+ for(const item of [...gDeleteMarks])if(!photos.includes(item))gDeleteMarks.delete(item);
+ const count=gDeleteMarks.size;
+ document.getElementById('g_deleteCount').textContent=`삭제할 사진 ${count}장`;
+ document.getElementById('g_deleteCurrent').disabled=!photos[currentIndex];
+ document.getElementById('g_deleteSelected').disabled=!count;
+ document.getElementById('g_deleteAll').disabled=!photos.length;
+}
+function resetGEmptyViewer(){
+ image=new Image();originalImageData=null;cards=[];selectedCards=[];currentIndex=0;
+ imageCanvas.width=1;imageCanvas.height=1;selectionCanvas.width=1;selectionCanvas.height=1;
+ imageCtx.clearRect(0,0,1,1);selectionCtx.clearRect(0,0,1,1);
+ currentPhoto.textContent='사진을 선택해주세요';countText.textContent='0';
+ 
+ 
+}
+async function deleteGPhotos(targets){
+ const deleting=new Set(targets.filter(photo=>photos.includes(photo)));
+ if(!deleting.size)return;
+ const message=deleting.size===photos.length?`사진 ${deleting.size}장을 모두 삭제할까요? 추출 결과도 함께 초기화됩니다. 실행 취소로 되돌릴 수 있어요.`:`사진 ${deleting.size}장을 삭제할까요? 혼동을 막기 위해 현재 추출 결과도 초기화됩니다. 실행 취소로 되돌릴 수 있어요.`;
+ const approved=window.uiConfirm?await window.uiConfirm(message):window.confirm(message);
+ if(!approved)return;
+ if(![...deleting].some(photo=>photos.includes(photo)))return;
+ gHist();
+ const active=photos[currentIndex],beforeIndex=currentIndex;
+ photos=photos.filter(photo=>!deleting.has(photo));
+ gDeleteMarks.clear();
+ croppedCards=[];results.innerHTML='<div class="empty"><div>◇</div>사진을 선택한 뒤 자르기를 눌러주세요.</div>';
+ resultCountText.textContent='0';resultCountTitle.textContent='0';saveAllButton.disabled=true;
+ const topSave=document.getElementById('g_saveAllTop');if(topSave)topSave.disabled=true;
+ const activeIndex=photos.indexOf(active);
+ makePhotoButtons();
+ if(photos.length)showPhoto(activeIndex>=0?activeIndex:Math.min(beforeIndex,photos.length-1));
+ else resetGEmptyViewer();
+ for(const photo of deleting){if(photo.url)try{URL.revokeObjectURL(photo.url);}catch(_){}}
+ window.SnaQuality?.scheduleCheck('guns');window.SnaDraft?.queue('guns');
+}
+document.getElementById('g_deleteCurrent').onclick=()=>{const photo=photos[currentIndex];if(photo)deleteGPhotos([photo]);};
+document.getElementById('g_deleteSelected').onclick=()=>deleteGPhotos([...gDeleteMarks]);
+document.getElementById('g_deleteAll').onclick=()=>deleteGPhotos([...photos]);
 
 function updatePhotoButtons(){
 
@@ -5137,6 +5292,7 @@ function updatePhotoButtons(){
    "active",
    index===currentIndex
   );
+  // 개별 삭제/전체 삭제 버튼은 사진 목록 상태에 맞춰 동기화됩니다.
  });
 
 
@@ -5827,7 +5983,7 @@ async function gRestore(data){if(!data)return;restoringGun=true;
   await Promise.all((data.photos||[]).map(async (p,index)=>{if(!(p.file instanceof Blob))return;
    const url=URL.createObjectURL(p.file),img=new Image();await new Promise(ok=>{img.onload=ok;img.onerror=ok;img.src=url;});
    photos[index]={image:img,url,name:p.file.name,file:p.file,selected:p.selected||[]};}));
-  makePhotoButtons();if(photos.length)showPhoto(Math.min(photos.length-1,data.current||0));
+  gDeleteMarks.clear();makePhotoButtons();if(photos.length)showPhoto(Math.min(photos.length-1,data.current||0));else resetGEmptyViewer();
   results.replaceChildren();for(const [idx,url] of croppedCards.entries()){const card=document.createElement('div');card.className='card';const img=document.createElement('img');img.src=url;const btn=document.createElement('button');btn.className='save';btn.textContent='↗ JPG 공유 / 저장';btn.onclick=()=>shareFile(url,`guns_${idx+1}.jpg`);card.append(img,btn);results.append(card);}
   resultCountTitle.textContent=String(croppedCards.length);resultCountText.textContent=String(croppedCards.length);saveAllButton.disabled=!croppedCards.length;
   document.getElementById('g_saveAllTop').disabled=!croppedCards.length;
@@ -5835,9 +5991,9 @@ async function gRestore(data){if(!data)return;restoringGun=true;
 window.SnaGuns={snapshot:gSnap,restore:gRestore};
 for(const [id,from,to] of [['g_v12undo',gHistory,gRedo],['g_v12redo',gRedo,gHistory]])document.getElementById(id).onclick=async()=>{if(!from.length)return;to.push(gSnap());await gRestore(from.pop());gButtons();window.SnaDraft?.queue('guns');};
 const gRestoreBtn=document.getElementById('g_v12restore');gRestoreBtn.onclick=()=>window.SnaDraft?.resume('guns');
-photoList.addEventListener('pointerdown',e=>{if(e.target.closest('.photo-button')){window._snaGunHold={start:e.target.closest('.photo-button'),x:e.clientX,y:e.clientY,t:Date.now()};}});
+photoList.addEventListener('pointerdown',e=>{if(e.target.closest('.photo-button')){window._snaGunHold={start:e.target.closest('.sna-photo-entry'),x:e.clientX,y:e.clientY,t:Date.now()};}});
 document.addEventListener('pointerup',e=>{const p=window._snaGunHold;window._snaGunHold=null;if(!p||Date.now()-p.t<360)return;
- const dst=document.elementFromPoint(e.clientX,e.clientY)?.closest('.photo-button'),arr=[...photoList.children],from=arr.indexOf(p.start),to=arr.indexOf(dst);
+ const dst=document.elementFromPoint(e.clientX,e.clientY)?.closest('.sna-photo-entry'),arr=[...photoList.children],from=arr.indexOf(p.start),to=arr.indexOf(dst);
  if(from>=0&&to>=0&&from!==to){gHist();const item=photos.splice(from,1)[0];photos.splice(to,0,item);makePhotoButtons();showPhoto(to);window.SnaDraft?.queue('guns');}
 });
 imageCanvas.addEventListener('pointerdown',()=>gHist(),{capture:true});
@@ -5912,7 +6068,7 @@ function saveMergeHistory(){if(mergeRestoring)return;mergeUndo.push(mergeSnapsho
 async function restoreMerge(data){if(!data)return;mergeRestoring=true;
  try{files=[...(data.files||[])];colsInput.value=data.cols||'6';rowsInput.value=data.rows||'7';order=(data.order||files.map((_,i)=>i)).filter(i=>i>=0&&i<files.length);status.textContent=files.length+'장';resultCount.textContent=files.length+'장 배치 완료';
   images=await Promise.all(files.map(f=>new Promise(ok=>{const img=new Image(),u=URL.createObjectURL(f);img.onload=()=>{URL.revokeObjectURL(u);ok(img)};img.onerror=()=>{URL.revokeObjectURL(u);ok(null)};img.src=u;})));
-  if(files.length)makeComposite();else{mergeWrap.style.display='none';empty.style.display='flex';}
+  if(files.length)makeComposite();else{mergeWrap.style.display='none';empty.style.display='flex';renderMergeList();}
  }finally{mergeRestoring=false;mergeButtons();}
 }
 window.SnaMerge={snapshot:mergeSnapshot,restore:restoreMerge};
@@ -5975,9 +6131,33 @@ imageInput.addEventListener(
 );
 
 
+function renderMergeList(){
+ const list=document.getElementById('m_photoList');if(!list)return;
+ list.replaceChildren();
+ if(!files.length){const tip=document.createElement('span');tip.className='sna-photo-delete-count';tip.textContent='사진을 추가하면 여기에서 개별 삭제할 수 있습니다.';list.append(tip);return;}
+ files.forEach((file,index)=>{
+  const item=document.createElement('div');item.className='sna-merge-photo-item';
+  const name=document.createElement('span');name.className='sna-merge-photo-name';name.textContent=`사진 ${index+1} · ${file.name||'이미지'}`;
+  const del=document.createElement('button');del.type='button';del.textContent='🗑 삭제';del.setAttribute('aria-label',`사진 ${index+1} 삭제`);
+  del.onclick=async()=>{
+   const ok=window.uiConfirm?await window.uiConfirm(`합치기 사진 ${index+1}을 삭제할까요? 실행 취소로 복원할 수 있어요.`):window.confirm('이 사진을 삭제할까요?');
+   if(!ok)return;
+   const at=files.indexOf(file);if(at<0)return;
+   saveMergeHistory();files.splice(at,1);images.splice(at,1);
+   order=order.filter(i=>i!==at).map(i=>i>at?i-1:i);
+   firstPos=null;status.textContent=files.length+'장';resultCount.textContent=files.length?files.length+'장 배치 완료':'준비 중';
+   fileName.textContent=files.length?`${files.length}장의 이미지가 선택됨`:'PNG · JPG / 여러 장 선택 가능';
+   if(files.length)makeComposite();else{resultCtx.clearRect(0,0,resultCanvas.width,resultCanvas.height);mergeWrap.style.display='none';empty.style.display='flex';renderMergeList();}
+   window.SnaDraft?.queue('merge');
+  };
+  item.append(name,del);list.append(item);
+ });
+}
+renderMergeList();
 function makeComposite(){
 
- if(!files.length)return;
+ if(!files.length){renderMergeList();return;}
+ renderMergeList();
 
  const cols=parseInt(colsInput.value)||6;
  const rows=parseInt(rowsInput.value)||7;
@@ -6145,6 +6325,7 @@ clearBtn.addEventListener("click",()=>{
 
  fileName.textContent=
   "PNG · JPG / 여러 장 선택 가능";
+ renderMergeList();
 });
 
 
@@ -7802,10 +7983,18 @@ function render(){
     render();status('원본 교체 완료 · 이 사진만 다시 추출하면 됩니다.');saveQueue();
    }catch(e){status('원본 교체 실패: '+e.message);}
   };
-  const del=createBtn('삭제','',()=>{if(i.working||editing===i||M.item===i)return;const at=items.indexOf(i);if(at>=0){items.splice(at,1);revoke(i);}render();saveQueue();});
+  const removeItem=async()=>{if(i.working||editing===i||M.item===i)return;
+   const ok=window.uiConfirm?await window.uiConfirm('이 킬로그 원본 사진을 삭제할까요?'):window.confirm('이 킬로그 원본 사진을 삭제할까요?');
+   if(!ok||i.working||editing===i||M.item===i)return;
+   const at=items.indexOf(i);if(at>=0){items.splice(at,1);revoke(i);}render();saveQueue();};
+  const del=createBtn('삭제','kl8-danger',removeItem);
+  const photoEntry=document.createElement('div');photoEntry.className='sna-kill-photo-entry';
+  const tabDelete=createBtn('🗑','sna-kill-photo-delete',removeItem);
+  tabDelete.title=`사진 ${n+1} 삭제`;tabDelete.setAttribute('aria-label',`킬로그 원본 사진 ${n+1} 삭제`);
+  photoEntry.append(tab,tabDelete);
   toolbar.append(run,manual,adjust,edit,save,recover,del,replacement);card.append(title,orig,result,toolbar);results.append(card);
   orig.onerror=()=>{orig.alt='원본을 표시할 수 없습니다. 다시 선택해 주세요.';card.dataset.sourceError='true';};
-  i.card=card;i.widgets={tab,result,run,manual,adjust,edit,save,recover,del};list.append(tab);updateCard(i,n);
+  i.card=card;i.widgets={tab,result,run,manual,adjust,edit,save,recover,del,tabDelete};list.append(photoEntry);updateCard(i,n);
  }
  if(!items.length){const e=document.createElement('div');e.className='empty';e.textContent='원본 사진을 추가해 주세요.';results.append(e);}
  updateCounters();
@@ -7824,6 +8013,7 @@ function updateCard(i,number){
  save.disabled=!validBlob(i.blob)&&!validBlob(i.baseBlob);
  if(i.widgets.recover)i.widgets.recover.disabled=i.working||editing===i||M.item===i;
  del.disabled=i.working||editing===i||M.item===i;
+ if(i.widgets.tabDelete)i.widgets.tabDelete.disabled=del.disabled;
  updateCounters();
 }
 function uploadForm(file,extra={}){const form=new FormData();form.append('file',file,file.name);for(const [k,v] of Object.entries(extra))form.append(k,String(v));return form;}
@@ -8379,13 +8569,13 @@ render();health();
 
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.4.0 · 추출 검사 · 통계 · 후기 전시관</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.4.1 · 추출 검사 · 통계 · 후기 전시관</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
- <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.4.0: 옷·총·킬로그 추출 오류 자동 검사, 관리자 통계 대시보드, 상단 「⭐ 이용 후기」 탭에 공개 동의 후기를 관리자가 승인해 게시하는 익명 전시관이 추가되었습니다. 기존 기능과 관리자 후기 면제는 유지됩니다.</div>
+ <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.4.1: 옷·총·킬로그 추출 오류 자동 검사, 관리자 통계 대시보드, 상단 「⭐ 이용 후기」 탭에 공개 동의 후기를 관리자가 승인해 게시하는 익명 전시관이 추가되었습니다. 기존 기능과 관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script>
-(()=>{const version='12.4.0';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.4.0: 추출 품질 검사 · 관리자 통계 · 후기 전시관';}}catch(_){} })();
+(()=>{const version='12.4.1';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.4.1: 추출 오류 검사 · 통계 · 후기 · 원본 사진 삭제';}}catch(_){} })();
 </script>
 
 <div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
