@@ -1167,7 +1167,7 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 @media(max-width:350px){#merge-tab .sna-merge-history-btn{font-size:12px!important;gap:6px!important}.sna-merge-history-icon{font-size:20px!important}}
 </style>
 <style id="sna-v1254-simple-ui">
-/* v12.5.4 - compact responsive board configuration */
+/* v12.5.5 - compact responsive board configuration */
 #board-tab .sna-compat-hidden{display:none!important}
 #board-tab .sna-board-simple{padding:clamp(14px,2vw,20px);margin:14px 0 12px}
 #board-tab .sna-board-simple-head{align-items:center}
@@ -2022,7 +2022,6 @@ async function snaTrialFinish(){
 window.SnaTrial={get active(){return snaTrialActive;},open:snaTrialOpen,reload:snaTrialReload,finish:snaTrialFinish,end:snaTrialEnd,reset:()=>snaTrialEnd(false)};
 document.getElementById('sna-market-open-login')?.addEventListener('click',snaTrialOpen);
 document.getElementById('sna-market-open-waiting')?.addEventListener('click',snaTrialOpen);
-document.getElementById('sna-market-open-nav')?.addEventListener('click',snaTrialOpen);
 document.getElementById('sna-realtrial-close')?.addEventListener('click',()=>{snaTrialModal.hidden=true;});
 document.getElementById('sna-realtrial-done')?.addEventListener('click',()=>{snaTrialModal.hidden=true;});
 document.getElementById('sna-realtrial-refresh')?.addEventListener('click',snaTrialReload);
@@ -3218,7 +3217,6 @@ window.closeAdmin=()=>{
 
  <button id="btn-gallery" onclick="switchTab('gallery')">🏛️ 전시관</button>
  <button id="btn-reviews" onclick="switchTab('reviews')" type="button">⭐ 이용 후기</button>
- <button id="sna-market-open-nav" type="button" title="실제 기능을 각 1회 체험">✨ 무료 체험</button>
  <button id="btn-guide" type="button" data-open-guide title="옷·총·킬로그·합치기·대필판·전시관 전체 사용방법" aria-haspopup="dialog">📖 사용방법</button>
  <button id="btn-creator-about" type="button" data-open-creator title="제작자 스나 · 프로그램 정보" aria-haspopup="dialog">ℹ 제작자</button>
  <button id="btn-logout" onclick="window.confirmSignOutMember()" title="로그아웃" style="flex:0 0 auto;min-width:80px;font-size:12px;padding:10px 12px">로그아웃</button>
@@ -3891,7 +3889,7 @@ window.closeAdmin=()=>{
     <p id="board-gallery-status" role="status"></p>
    </div>
 
-  <!-- v12.5.4: 한 화면에서 저장하기, 세부 항목은 펼쳐보기 -->
+  <!-- v12.5.5: 한 화면에서 저장하기, 세부 항목은 펼쳐보기 -->
   <section class="sna-enhance-panel sna-board-simple" id="sna-board-magic">
     <div class="sna-enhance-head sna-board-simple-head">
       <div><h3>✨ 대필판 간편 제작</h3><p>사진을 추가하고 설정을 선택한 뒤, 아래 <b>저장 / 공유</b> 버튼만 누르세요.</p></div>
@@ -9030,13 +9028,13 @@ render();health();
 
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.4 · 간편 제작 UI · 실제 기능별 무료 체험</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.6 · 구매자 메뉴 무료 체험 제거</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
  <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 사용자 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script>
-(()=>{const version='12.5.4';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.4: 무료 체험 안내 및 대필판 간편 제작 UI';}}catch(_){} })();
+(()=>{const version='12.5.6';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.6: 구매자 메뉴 무료 체험 버튼 자동 제거';}}catch(_){} })();
 </script>
 
 <div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
@@ -9171,6 +9169,32 @@ render();health();
       alt.click();
     }
   },true);
+})();
+</script>
+
+<!-- v12.5.6: Hide/remove free-trial shortcuts ONLY from the paid-user navigation.
+     Keep the anonymous trial entry point on the login screen. -->
+<script id="sna-v1256-purchased-nav-guard">
+(()=>{
+  'use strict';
+  const nav=document.querySelector('.global-tabs');
+  if(!nav)return;
+  const isTrialShortcut=(el)=>{
+    if(!el.matches || !el.matches('button,a,[role="button"]'))return false;
+    const label=(el.textContent||'').replace(/\s+/g,'').toLowerCase();
+    const id=(el.id||'').toLowerCase();
+    return label.includes('무료체험') ||
+      ['btn-trial','btn-free-trial','btn-freeTrial','sna-trial-nav'].some(x=>id===x.toLowerCase()) ||
+      el.hasAttribute('data-sna-trial-nav');
+  };
+  function removeTrialLinks(){
+    for(const el of nav.querySelectorAll('button,a,[role="button"]')){
+      if(isTrialShortcut(el))el.remove();
+    }
+  }
+  removeTrialLinks();
+  const watcher=new MutationObserver(removeTrialLinks);
+  watcher.observe(nav,{childList:true,subtree:true,characterData:true});
 })();
 </script>
 </body>
