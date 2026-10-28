@@ -1166,6 +1166,62 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 }
 @media(max-width:350px){#merge-tab .sna-merge-history-btn{font-size:12px!important;gap:6px!important}.sna-merge-history-icon{font-size:20px!important}}
 </style>
+<style id="sna-v1254-simple-ui">
+/* v12.5.4 - compact responsive board configuration */
+#board-tab .sna-compat-hidden{display:none!important}
+#board-tab .sna-board-simple{padding:clamp(14px,2vw,20px);margin:14px 0 12px}
+#board-tab .sna-board-simple-head{align-items:center}
+#board-tab .sna-board-simple-head .sna-wizard-link{flex:0 0 auto;min-height:43px;white-space:nowrap}
+#board-tab .sna-board-simple .sna-board-basics{margin:15px 0 9px}
+#board-tab .sna-board-advanced{border:1px solid #344c70;border-radius:12px;background:#132440;margin:10px 0 15px;color:#d9e7ff}
+#board-tab .sna-board-advanced summary{cursor:pointer;list-style:none;font-size:13px;font-weight:800;padding:12px 14px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+#board-tab .sna-board-advanced summary::-webkit-details-marker{display:none}
+#board-tab .sna-board-advanced summary::after{content:'⌄';font-size:18px;color:#b9d3ff}
+#board-tab .sna-board-advanced[open] summary::after{content:'⌃'}
+#board-tab .sna-board-advanced summary span{color:#9eb5d7;font-weight:500;font-size:11px;margin-left:auto}
+#board-tab .sna-board-advanced .sna-enhance-grid{padding:0 12px 12px;margin:0}
+#board-tab .sna-action-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(128px,160px);gap:12px;align-items:end;margin:15px 0 2px}
+#board-tab .sna-action-row>label{display:flex;flex-direction:column;gap:5px;min-width:0;font-size:13px;font-weight:800;color:#eef4ff}
+#board-tab .sna-action-row>label small{font-size:11px;font-weight:500;color:#aec4e5;line-height:1.5;min-height:16px}
+#board-tab .sna-action-row select,#board-tab .sna-action-row button{display:block;width:100%;height:48px;min-height:48px;box-sizing:border-box;line-height:1.25;margin:0;align-self:end;padding:0 13px;border-radius:12px}
+#board-tab .sna-action-row select{background:#0f1b31;border:1px solid #52709e}
+#board-tab .sna-action-row button{background:#2b466c;border:1px solid #7599c8}
+#board-tab .sna-board-save-panel{display:flex;flex-direction:column;gap:10px;position:relative;bottom:auto;background:#15233b!important;border:1px solid #425f8a;border-radius:15px;padding:13px!important;transform:none;margin:14px 0 0}
+#board-tab .sna-board-save-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(100px,.55fr) minmax(180px,1.05fr);align-items:end;gap:10px;width:100%;min-width:0}
+#board-tab .sna-save-field{display:flex;min-width:0;flex-direction:column;gap:6px;font-size:12px;color:#d9e7ff;font-weight:800}
+#board-tab .sna-save-field select{width:100%;height:50px;min-height:50px;box-sizing:border-box;border:1px solid #5374a3;background:#0f1c32;color:#f0f6ff;border-radius:12px;padding:0 10px;font-size:13px;min-width:0}
+#board-tab .sna-board-save-row .sna-board-main-save{height:50px;min-height:50px;box-sizing:border-box;align-self:end;padding:0 14px;margin:0;border-radius:12px;white-space:nowrap;font-weight:850;font-size:14px}
+#board-tab .sna-board-undo-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+#board-tab .sna-board-undo-row .board-btn{min-height:45px;font-size:13px;background:#243b5c;color:#e9f1ff;border:1px solid #5278aa;border-radius:11px}
+#board-tab .sna-board-undo-row .board-btn:disabled{opacity:.43}
+#board-tab .sna-board-manage{border:1px solid #385276;background:#132138;border-radius:15px;margin:12px 0 22px;color:#f0f6ff;overflow:hidden}
+#board-tab .sna-board-manage>summary{padding:16px;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;list-style:none;font-size:14px;font-weight:800}
+#board-tab .sna-board-manage>summary::-webkit-details-marker{display:none}
+#board-tab .sna-board-manage>summary>span{font-size:12px;font-weight:600;color:#aac3e8}
+#board-tab .sna-board-manage[open]>summary{border-bottom:1px solid #385276}
+#board-tab .sna-board-manage-content{padding:14px}
+#board-tab .sna-board-manage-content h3{font-size:14px;font-weight:800;margin:4px 0 12px}
+#board-tab .sna-board-preset-save-row,#board-tab .sna-board-preset-load-row{display:grid;grid-template-columns:minmax(0,1fr) 140px;align-items:stretch;gap:9px;margin-bottom:10px}
+#board-tab .sna-board-preset-load-row{grid-template-columns:minmax(0,1fr) 100px 86px}
+#board-tab .sna-board-preset-save-row input,#board-tab .sna-board-preset-load-row select{min-width:0;width:100%;min-height:46px;height:46px;box-sizing:border-box;padding:0 10px;border:1px solid #536f9e;border-radius:11px;background:#0f1c32;color:#eaf3ff;font-size:13px}
+#board-tab .sna-board-preset-save-row button,#board-tab .sna-board-preset-load-row button{height:46px;min-height:46px;border-radius:11px;padding:0 8px;margin:0;box-sizing:border-box;font-size:13px}
+#board-tab .sna-board-recovery-row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+#board-tab .sna-board-recovery-row .board-btn{flex:1 1 150px;min-height:45px;border-radius:11px;font-size:13px}
+#board-tab .sna-board-manage .board-small{margin:5px 0 16px;line-height:1.55}
+#board-tab .sna-board-legacy{border-top:1px solid #2d4261;padding-top:8px;margin-top:8px}
+#board-tab .sna-board-legacy>summary{font-size:12px;color:#b6c9e7;cursor:pointer;padding:8px}
+@media(max-width:680px){
+ #board-tab .sna-board-simple-head{align-items:flex-start}
+ #board-tab .sna-board-simple-head .sna-wizard-link{font-size:12px;padding:8px 10px}
+ #board-tab .sna-action-row{grid-template-columns:minmax(0,1fr) 110px;gap:8px}
+ #board-tab .sna-action-row select,#board-tab .sna-action-row button{height:46px;min-height:46px;font-size:12px}
+ #board-tab .sna-board-save-row{grid-template-columns:minmax(0,1fr) minmax(0,.65fr);gap:10px}
+ #board-tab .sna-board-save-row .sna-board-main-save{grid-column:1/-1;width:100%;height:50px}
+ #board-tab .sna-board-preset-load-row{grid-template-columns:minmax(0,1fr) 90px}
+ #board-tab .sna-board-preset-load-row #sna-preset-delete{grid-column:1/-1}
+ #board-tab .sna-board-preset-save-row{grid-template-columns:minmax(0,1fr) 110px}
+}
+</style>
 </head>
 
 <body>
@@ -1239,7 +1295,7 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
   <button class="auth-btn" id="auth-signup" type="button" onclick="window.registerMember()" style="margin-top:8px;background:#233954">새 계정 회원가입</button>
   <button class="auth-btn" id="auth-reset-password" type="button" onclick="window.resetLoginPassword()" style="margin-top:8px;background:#263242">비밀번호 재설정 이메일 받기</button>
 
-  <div class="sna-market-login"><div class="sna-market-login-head">구매 전에 직접 확인해 보세요</div><p>실제 옷·총·킬로그·합치기·대필판을 각 1회씩 이용할 수 있습니다. 회원가입 후 승인 대기 상태에서 체험 가능합니다.</p><button type="button" id="sna-market-open-login" class="sna-market-primary">✨ 회원가입 없이 실제 기능 무료 체험</button></div>
+  <div class="sna-market-login"><div class="sna-market-login-head">구매 전에 직접 확인해 보세요</div><p>회원가입 없이 실제 5개 기능을 각각 1회 체험할 수 있습니다. 이미 가입했다면 승인 대기 중에도 남은 체험을 이용할 수 있어요. 결과물을 저장·공유하면 해당 기능의 체험권이 차감됩니다.</p><button type="button" id="sna-market-open-login" class="sna-market-primary">✨ 회원가입 없이 실제 기능 무료 체험</button></div>
   <button type="button" class="creator-login-link" data-open-creator>ℹ 제작자 소개 · 스나</button>
   <button type="button" class="creator-login-link" data-open-guide>📖 통합 사용방법 보기</button>
   <p class="member-tip" id="auth-error" role="status">기존 회원은 가입 후 관리자에게 기존 이용권 연결을 요청하세요. 닉네임만으로 이전 권한이 연결되지 않습니다.</p>
@@ -1250,7 +1306,7 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
   <p id="waiting-account-status" class="member-tip" style="margin:10px 0 8px;color:#c9dcff"></p>
   <button class="auth-btn" id="waiting-recheck" type="button" onclick="window.recheckMemberStatus()" style="margin-bottom:8px">이용 상태 다시 확인</button>
   <button class="auth-btn" id="request-again" type="button" onclick="window.requestAgain()">로그아웃 / 다른 계정</button>
-  <button class="auth-btn" id="sna-market-open-waiting" type="button" style="margin-top:8px;background:#3b5792">✨ 회원가입 없이 무료 체험 시작</button>
+  <button class="auth-btn" id="sna-market-open-waiting" type="button" style="margin-top:8px;background:#3b5792">✨ 남은 무료 체험 확인하기</button>
  </div>
 </div>
 <section id="sna-report-dialog" class="member-shade" style="display:none;z-index:10000150;position:fixed;inset:0" role="dialog" aria-modal="true" aria-label="오류 신고 및 개선 요청"><div class="member-modal" style="width:min(95vw,600px);max-height:90dvh;overflow:auto">
@@ -3835,44 +3891,86 @@ window.closeAdmin=()=>{
     <p id="board-gallery-status" role="status"></p>
    </div>
 
-  <section class="sna-enhance-panel" id="sna-board-magic">
-   <div class="sna-enhance-head"><div><h3>✨ 스마트 대필판 제작 도우미</h3><p>사진을 추가한 뒤 자동 배치와 검사, 저장 형식을 설정하세요.</p></div><button id="sna-board-wizard" class="sna-enhance-primary" type="button">🧭 단계별 제작</button></div>
-   <div class="sna-enhance-grid">
-     <label class="sna-enhance-toggle"><input id="sna-board-smart" type="checkbox" checked> <span>사진 장수별 자동 배치 <small>열·행 구성을 자동 추천</small></span></label>
-     <label class="sna-enhance-toggle"><input id="sna-board-uniform" type="checkbox"> <span>칸 높이 통일 <small>원본 비율 유지·가운데 크롭</small></span></label>
-     <label class="sna-enhance-toggle"><input id="sna-eco-mode" type="checkbox"> <span>메모리 절약 모드 <small>이미지 로딩을 한 장씩 처리</small></span></label>
-     <label class="sna-enhance-toggle"><input id="sna-board-tour-hide" type="checkbox"> <span>순서 변경 힌트 숨기기 <small>사진 정렬 도움말만 숨김</small></span></label>
-   </div>
-   <div class="sna-enhance-actions"><button type="button" id="sna-board-layout-apply">↔ 장수에 맞게 자동 정렬</button><button type="button" id="sna-board-quality-check">🔎 저장 전 검사</button><button type="button" id="sna-board-oneclick" class="sna-enhance-primary">⚡ 원클릭 제작·저장</button></div>
-   <div class="sna-enhance-sub"><label>VIP 전용 스타일 <select id="sna-board-vip-style"><option value="">스타일 선택</option><option value="royal">👑 로열 블루</option><option value="onyx">◆ 오닉스 골드</option><option value="ruby">✦ 루비 레드</option></select></label><button type="button" id="sna-board-vip-apply">스타일 적용</button></div>
-   <div class="sna-enhance-sub"><label>추가 저장 형식 <select id="sna-board-export-format"><option value="image/png">PNG (무손실)</option><option value="image/jpeg">JPG (사진 공유용)</option><option value="image/webp">WebP (지원 기기)</option></select></label><button type="button" id="sna-board-export-alt">선택한 형식으로 저장</button></div>
-   <p id="sna-board-enhance-status" class="sna-enhance-status" aria-live="polite">자동 배치는 기존 사진 비율과 저장 설정을 최대한 유지합니다. 자르기 결과는 직접 확인하세요.</p>
+  <!-- v12.5.4: 한 화면에서 저장하기, 세부 항목은 펼쳐보기 -->
+  <section class="sna-enhance-panel sna-board-simple" id="sna-board-magic">
+    <div class="sna-enhance-head sna-board-simple-head">
+      <div><h3>✨ 대필판 간편 제작</h3><p>사진을 추가하고 설정을 선택한 뒤, 아래 <b>저장 / 공유</b> 버튼만 누르세요.</p></div>
+      <button id="sna-board-wizard" class="sna-wizard-link" type="button">🧭 사용 안내</button>
+    </div>
+    <div class="sna-enhance-grid sna-board-basics">
+      <label class="sna-enhance-toggle"><input id="sna-board-smart" type="checkbox" checked> <span>사진 수에 맞춰 자동 배치 <small>옷·총 장수에 맞는 배열 추천</small></span></label>
+      <label class="sna-enhance-toggle"><input id="sna-board-uniform" type="checkbox"> <span>이미지 칸 높이 통일 <small>원본 비율을 유지해 배치</small></span></label>
+    </div>
+    <details class="sna-board-advanced">
+      <summary>고급 옵션 <span>메모리·사진 정렬 안내</span></summary>
+      <div class="sna-enhance-grid">
+        <label class="sna-enhance-toggle"><input id="sna-eco-mode" type="checkbox"> <span>메모리 절약 <small>사진을 순차적으로 불러오기</small></span></label>
+        <label class="sna-enhance-toggle"><input id="sna-board-tour-hide" type="checkbox"> <span>순서 변경 안내 숨기기 <small>미리보기 도움말만 숨김</small></span></label>
+      </div>
+    </details>
+    <div class="sna-action-row sna-board-theme-row">
+      <label for="sna-board-vip-style"><span>VIP 전용 대필판 테마</span><small>문의·이름·레벨 문구의 색상과 테두리 분위기를 변경합니다.</small>
+        <select id="sna-board-vip-style"><option value="">디자인 테마 선택</option><option value="royal">👑 로열 블루</option><option value="onyx">◆ 오닉스 골드</option><option value="ruby">✦ 루비 레드</option></select>
+      </label>
+      <button type="button" id="sna-board-vip-apply">테마 적용</button>
+    </div>
+    <!-- 기존 사용 중인 자바스크립트 핸들러는 유지; 중복된 버튼은 화면에서 제외 -->
+    <div class="sna-compat-hidden" aria-hidden="true">
+      <button type="button" id="sna-board-layout-apply" tabindex="-1">자동 정렬</button>
+      <button type="button" id="sna-board-quality-check" tabindex="-1">저장 전 검사</button>
+      <button type="button" id="sna-board-oneclick" tabindex="-1">원클릭 제작·저장</button>
+      <button type="button" id="sna-board-export-alt" tabindex="-1">형식별 저장</button>
+    </div>
+    <p id="sna-board-enhance-status" class="sna-enhance-status" aria-live="polite">사진과 문구를 확인한 뒤 저장하세요. 저장 전에 기본 상태를 확인합니다.</p>
   </section>
-   <div class="board-sticky-actions">
-    <label class="sna-export-label">PNG 화질 <select id="b_exportScale" aria-label="대필판 저장 화질"><option value="1">표준</option><option value="2">2배</option><option value="4">4배</option></select></label>
-     <button id="b_savePng" type="button" class="board-btn primary">↗ PNG 공유 / 저장</button>
-    <button id="b_saveSettings" type="button" class="board-btn">💾 설정 저장</button>
-     <button id="b_undo" type="button" class="board-btn" disabled>↶ 되돌리기</button>
-     <button id="b_redo" type="button" class="board-btn" disabled>↷ 다시 실행</button>
-   </div>
-   <div class="board-row" style="margin-top:8px;align-items:center">
-    <input type="text" id="sna-preset-title" maxlength="40" placeholder="내 설정 이름 (예: 스나 기본)" aria-label="프리셋 이름" style="width:100%;min-height:44px;background:#182844;color:white;border:1px solid #53678c;border-radius:9px;padding:10px">
-    <button id="sna-preset-save" class="board-btn" type="button">☁ 내 설정 추가</button>
-    <select id="sna-preset-list" aria-label="저장된 프리셋" style="min-height:44px;background:#182844;color:white;border:1px solid #53678c;border-radius:9px;padding:8px"><option value="">저장된 설정 선택</option></select>
-    <button id="sna-preset-load" class="board-btn" type="button">불러오기</button>
-    <button id="sna-preset-delete" class="board-btn danger" type="button">삭제</button>
-   </div>
-   <p id="sna-preset-status" role="status" class="board-small">설정 프리셋은 로그인한 계정의 Firebase에 저장됩니다. 저장 실패 시 기기 내부에만 임시 보관됩니다.</p>
-   <div class="board-row" style="margin-top:8px">
-    <button id="sna-session-save" class="board-btn" type="button">💾 현재 작업 임시 저장</button>
-    <button id="sna-session-load" class="board-btn" type="button">↩ 이전 작업 이어하기</button>
-    <button id="sna-session-clear" class="board-btn danger" type="button">임시 작업 삭제</button>
-   </div>
-   <p id="sna-session-status" class="board-small" role="status">자동 저장: 기기 내부 IndexedDB · 브라우저 데이터를 삭제하면 사라질 수 있습니다.</p>
-   <div class="board-row">
-    <button id="b_loadSettings" type="button" class="board-btn">설정 불러오기</button>
-    <button id="b_resetSettings" type="button" class="board-btn danger">기본 설정으로 초기화</button>
-   </div>
+  <div class="board-sticky-actions sna-board-save-panel">
+    <div class="sna-board-save-row">
+      <label for="sna-board-export-format" class="sna-save-field"><span>저장 형식</span>
+        <select id="sna-board-export-format"><option value="image/png">PNG · 무손실</option><option value="image/jpeg">JPG · 사진 공유</option><option value="image/webp">WebP · 지원 기기</option></select>
+      </label>
+      <label for="b_exportScale" class="sna-save-field"><span>화질 배율</span>
+        <select id="b_exportScale" aria-label="대필판 저장 화질"><option value="1">표준</option><option value="2">2배</option><option value="4">4배</option></select>
+      </label>
+      <button id="b_savePng" type="button" class="board-btn primary sna-board-main-save">↗ 저장 / 공유</button>
+    </div>
+    <div class="sna-board-undo-row">
+      <button id="b_undo" type="button" class="board-btn" disabled>↶ 되돌리기</button>
+      <button id="b_redo" type="button" class="board-btn" disabled>↷ 다시 실행</button>
+    </div>
+  </div>
+  <details class="sna-board-manage">
+    <summary>⚙️ 저장된 설정 · 이전 작업 복원 <span>펼치기</span></summary>
+    <div class="sna-board-manage-content">
+      <h3>내 설정 프리셋</h3>
+      <div class="sna-board-preset-save-row">
+        <input type="text" id="sna-preset-title" maxlength="40" placeholder="설정 이름 (예: 스나 기본)" aria-label="프리셋 이름">
+        <button id="sna-preset-save" class="board-btn" type="button">설정 저장</button>
+      </div>
+      <div class="sna-board-preset-load-row">
+        <select id="sna-preset-list" aria-label="저장된 프리셋"><option value="">저장된 설정 선택</option></select>
+        <button id="sna-preset-load" class="board-btn" type="button">불러오기</button>
+        <button id="sna-preset-delete" class="board-btn danger" type="button">삭제</button>
+      </div>
+      <p id="sna-preset-status" role="status" class="board-small">프리셋은 계정의 Firebase에 저장합니다. 실패 시 이 기기에만 보관될 수 있습니다.</p>
+      <h3>이전 작업 이어하기</h3>
+      <div class="sna-board-recovery-row">
+        <button id="sna-session-load" class="board-btn" type="button">↩ 이전 작업 복원</button>
+        <button id="sna-session-save" class="board-btn" type="button">💾 현재 작업 백업</button>
+        <button id="sna-session-clear" class="board-btn danger" type="button">임시 작업 삭제</button>
+      </div>
+      <p id="sna-session-status" class="board-small" role="status">자동 저장: 기기 내부 IndexedDB · 브라우저 데이터 삭제 시 사라질 수 있습니다.</p>
+      <details class="sna-board-legacy"><summary>기본 설정 관리</summary>
+        <div class="sna-board-recovery-row">
+          <button id="b_resetSettings" type="button" class="board-btn danger">기본 설정으로 초기화</button>
+        </div>
+      </details>
+      <!-- 이전 버전의 이 기기 전용 설정 저장/불러오기 구현은 호환용으로만 유지 -->
+      <div class="sna-compat-hidden" aria-hidden="true">
+        <button id="b_saveSettings" type="button" tabindex="-1">설정 로컬 저장</button>
+        <button id="b_loadSettings" type="button" tabindex="-1">설정 로컬 불러오기</button>
+      </div>
+    </div>
+  </details>
   </section>
  </div>
 </div>
@@ -8932,13 +9030,13 @@ render();health();
 
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.3 · 회원가입 없는 실제 기능 1회 체험</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.4 · 간편 제작 UI · 실제 기능별 무료 체험</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
  <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 사용자 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script>
-(()=>{const version='12.4.3';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.0: 합치기 작업 설정 버튼 UI 개선 · 기존 작업 복원 유지';}}catch(_){} })();
+(()=>{const version='12.5.4';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.4: 무료 체험 안내 및 대필판 간편 제작 UI';}}catch(_){} })();
 </script>
 
 <div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
@@ -8961,7 +9059,7 @@ render();health();
 
 <section id="sna-realtrial" hidden class="sna-realtrial-overlay" role="dialog" aria-modal="true" aria-labelledby="sna-realtrial-title">
  <div class="sna-realtrial-panel">
-  <header class="sna-realtrial-header"><div><h2 id="sna-realtrial-title">✨ 실제 기능 무료 체험</h2><p>회원가입 없이 각 기능을 1회씩 사용할 수 있습니다.</p></div><button id="sna-realtrial-close" type="button" aria-label="닫기">✕</button></header>
+  <header class="sna-realtrial-header"><div><h2 id="sna-realtrial-title">✨ 실제 기능 무료 체험</h2><p>회원가입 전에도, 승인 대기 중에도 각 기능을 1회씩 체험할 수 있습니다.</p></div><button id="sna-realtrial-close" type="button" aria-label="닫기">✕</button></header>
   <div class="sna-realtrial-info">회원가입이나 결제 없이 자신의 사진으로 실제 편집 기능을 체험할 수 있습니다.<br><strong>결과물 저장·공유를 완료하면 해당 기능의 1회가 차감됩니다.</strong> 편집 화면만 열거나 저장 전에 취소했다면 횟수는 그대로입니다. 체험을 모두 사용하면 회원가입 후 이용권 구매·관리자 승인을 받아야 계속 사용할 수 있습니다.</div>
   <div id="sna-realtrial-grid" class="sna-realtrial-grid" aria-live="polite"></div>
   <p id="sna-realtrial-status" class="sna-realtrial-status" role="status"></p>
@@ -9035,7 +9133,7 @@ render();health();
   {title:'1 / 4 · 사진 추가',body:'옷과 총 사진을 대필판의 사진 추가 버튼으로 넣어 주세요. 파일은 이 기기의 브라우저에서 처리합니다.',action:'사진 추가 위치 보기',go:()=>{$('b_clothesFiles')?.closest('label')?.scrollIntoView({behavior:'smooth',block:'center'});}},
   {title:'2 / 4 · 자동 배치',body:'이미 넣은 사진 수를 기준으로 판 크기와 열 수를 추천하고 정렬합니다. 사진 순서는 수동으로 바꿀 수 있습니다.',action:'자동 배치 실행',go:autoLayout},
   {title:'3 / 4 · 이미지 검사',body:'업로드 상태와 미리보기 크기를 확인합니다. 장식·이름·레벨 잘림은 원본과 최종 확인하세요.',action:'검사 실행',go:quality},
-  {title:'4 / 4 · 파일 저장',body:'완성본을 확인한 다음 PNG로 저장합니다. 상단에서 JPG·WebP 형식도 선택할 수 있습니다.',action:'PNG 저장 화면으로',go:()=>{$('b_savePng')?.scrollIntoView({behavior:'smooth',block:'center'});}}
+  {title:'4 / 4 · 파일 저장',body:'완성본을 확인한 다음 저장 형식(PNG·JPG·WebP)과 화질을 선택하고 저장 / 공유를 누르세요.',action:'저장 버튼 위치 보기',go:()=>{$('b_savePng')?.scrollIntoView({behavior:'smooth',block:'center'});}}
  ];let wizardAt=0;
  const shade=document.createElement('div');shade.id='sna-wizard';shade.className='sna-wizard-overlay';shade.hidden=true;
  shade.innerHTML='<section class="sna-wizard-card" role="dialog" aria-modal="true" aria-label="대필판 제작 안내"><h3 id="sna-wizard-title"></h3><p id="sna-wizard-body"></p><div class="sna-wizard-actions"><button id="sna-wizard-exit" type="button">닫기</button><button id="sna-wizard-act" type="button">실행</button><button id="sna-wizard-next" type="button">다음 단계 →</button></div></section>';document.body.append(shade);
@@ -9045,5 +9143,35 @@ render();health();
 })();
 </script>
 
+<script id="sna-v1254-ui-adapter">
+(()=>{
+  'use strict';
+  const main=document.getElementById('b_savePng');
+  const format=document.getElementById('sna-board-export-format');
+  const alt=document.getElementById('sna-board-export-alt');
+  const smart=document.getElementById('sna-board-smart');
+  const layout=document.getElementById('sna-board-layout-apply');
+  const check=document.getElementById('sna-board-quality-check');
+  if(!main||!format||!alt)return;
+  const names={'image/png':'PNG','image/jpeg':'JPG','image/webp':'WebP'};
+  function update(){const type=names[format.value]||'이미지';main.textContent='↗ '+type+' 저장 / 공유';main.title='현재 선택한 이미지 형식으로 저장하거나 공유합니다.';}
+  format.addEventListener('change',update);update();
+  main.addEventListener('click',e=>{
+    if(main.disabled)return;
+    // Preserve legacy settings and workflows; invoke their existing actions.
+    const stats=window.SnaBoardExtra?.count?.();
+    if(stats&&(stats.clothes||stats.guns)&&smart?.checked){
+      // The smart-layout checkbox denotes permission to auto-adjust sizes before exporting.
+      try{layout?.click();}catch(err){console.warn('대필판 자동 배치 오류',err);}
+    }
+    try{check?.click();}catch(err){console.warn('대필판 저장 전 검사 오류',err);}
+    if(format.value!=='image/png'){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      alt.click();
+    }
+  },true);
+})();
+</script>
 </body>
 </html>
