@@ -7083,7 +7083,17 @@ saveBtn.addEventListener("click",async()=>{
   const baseBannerH=GRID_Y*baseBannerRows;
   // At the original small-board proportions the white grid begins at x≈90, y≈219
    // in the supplied 1536×1482 image.  Keep the original trees/date/title intact.
-   const headerH=mode==="small"?Math.round(bgW*(219/1536)):Math.round(bgH*(mode==="medium"?(156/1536):.078));
+   // v12.5.8: The medium stationery's actual pink header ends BEFORE its
+   // preprinted white writing grid (~source y=153).  Cropping through y=156
+   // copied a few pixels of that grid and then drew a new grid beneath it,
+   // producing the overlapping/ghost edge reported above the first row.
+   // Stop at source y=150: one canvas grid, one clean top boundary.
+   // Large/small template geometry is intentionally unchanged.
+   const headerH=mode==="small"
+      ?Math.round(bgW*(219/1536))
+      :mode==="medium"
+        ?Math.round(bgW*(150/1086))
+        :Math.round(bgH*.078);
   // 자동 콜라주: 알려진 장수는 지정된 배열을 그대로 사용합니다.
   const CLOTH_GRID={9:3,12:3,15:3,18:3,21:3,24:3,30:5,40:5,45:5,48:6,54:6,96:8};
   const GUN_GRID={3:1,4:1,5:1,6:1,7:1,8:1,12:2,14:2,24:3,30:3,96:6,100:5};
@@ -9037,13 +9047,13 @@ render();health();
 
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.7 · 구매자 메뉴 무료 체험 제거</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.8 · 구매자 메뉴 무료 체험 제거</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
  <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 사용자 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script>
-(()=>{const version='12.5.7';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.7: 구매자 메뉴 무료 체험 버튼 자동 제거';}}catch(_){} })();
+(()=>{const version='12.5.8';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.8: 중스펙 흰색 격자 중첩 제거';}}catch(_){} })();
 </script>
 
 <div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
@@ -9181,7 +9191,7 @@ render();health();
 })();
 </script>
 
-<!-- v12.5.7: Hide/remove free-trial shortcuts ONLY from the paid-user navigation.
+<!-- v12.5.8: Hide/remove free-trial shortcuts ONLY from the paid-user navigation.
      Keep the anonymous trial entry point on the login screen. -->
 <script id="sna-v1257-purchased-nav-guard">
 (()=>{
