@@ -966,6 +966,18 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
 .sna-merge-photo-item button{border:1px solid #ba6676;background:#6c2c38;color:#fff;font-weight:800;border-radius:8px;padding:8px 10px;min-height:35px}
 @media(max-width:520px){.sna-photo-delete-tools{gap:7px}.sna-photo-delete-tools .sna-photo-danger,.sna-photo-delete-tools .sna-photo-outline{font-size:12px!important;min-height:43px!important;padding:9px 10px!important}}
 
+
+/* v12.5.2 actual one-time per-feature trial - no sample video or fake editor */
+.sna-realtrial-overlay{position:fixed;inset:0;z-index:10002000;overflow:auto;background:#030913ea;padding:clamp(12px,3vw,34px);display:flex;justify-content:center;align-items:flex-start}
+.sna-realtrial-overlay[hidden],#sna-trial-session[hidden]{display:none!important}
+.sna-realtrial-panel{width:min(100%,780px);margin:auto;border-radius:22px;border:1px solid #52709b;background:linear-gradient(155deg,#1a2943,#101b2e);color:#eff6ff;padding:clamp(15px,3vw,28px);box-shadow:0 24px 90px #0009;max-height:92dvh;overflow:auto}
+.sna-realtrial-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.sna-realtrial-header h2{font-size:23px;margin:0 0 7px}.sna-realtrial-header p{font-size:13px;color:#afc4e8;line-height:1.5}.sna-realtrial-header button{background:#273952;color:white;border:1px solid #5e7da9;border-radius:10px;min-width:42px;height:42px;font-size:20px}
+.sna-realtrial-info{margin:14px 0;padding:14px;border-radius:13px;background:#243a58;border:1px solid #4f6f9e;font-size:13px;line-height:1.75;color:#d5e7ff}.sna-realtrial-info strong{color:#ffe4a8}
+.sna-realtrial-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.sna-realtrial-card{padding:14px;background:#0d192c;border:1px solid #364f74;border-radius:14px;display:flex;flex-direction:column;gap:9px}.sna-realtrial-card h3{font-size:17px;margin:0;color:#f4f7ff}.sna-realtrial-card p{font-size:12px;color:#a9bedb;margin:0;line-height:1.5}.sna-realtrial-card .sna-realtrial-count{font-size:12px;font-weight:800;color:#a7d2fc}.sna-realtrial-card button{min-height:46px;padding:10px 12px;font-size:14px;font-weight:800;color:#0d1c32;border:0;border-radius:11px;background:#9dbaff}.sna-realtrial-card button:disabled{background:#3a485e;color:#aeb8c7;opacity:.8}
+.sna-realtrial-status{font-size:13px;line-height:1.6;color:#c7dcff;min-height:20px}.sna-realtrial-footer{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}.sna-realtrial-footer button{min-height:42px;padding:10px 16px;border-radius:12px;border:1px solid #6a87b2;background:#263d5d;color:#fff;font-weight:750}
+#sna-trial-session{position:fixed;right:12px;bottom:calc(65px + env(safe-area-inset-bottom,0px));z-index:10000100;max-width:calc(100vw - 24px);background:#142c4c;border:1px solid #84acfb;box-shadow:0 5px 30px #0008;border-radius:15px;padding:10px 12px;display:flex;gap:10px;align-items:center;color:#eff6ff;font-size:12px;font-weight:800}#sna-trial-session button{border:0;background:#80505d;color:white;border-radius:9px;padding:8px 12px;font-weight:800}
+@media(max-width:540px){.sna-realtrial-grid{grid-template-columns:1fr}.sna-realtrial-panel{max-height:calc(100dvh - 24px)}}
+
 /* v12.5.0: 독립 무료 체험관 / 제작 도우미 */
 .sna-market-login{border:1px solid #597ab0;background:#162944;border-radius:16px;padding:13px;margin:14px 0;color:#dae8ff;text-align:left}.sna-market-login-head{font-weight:900;font-size:15px}.sna-market-login p{font-size:12px;line-height:1.6;margin:5px 0 10px;color:#bacce7}.sna-market-primary{background:linear-gradient(135deg,#86aaff,#abb4ff)!important;color:#101c31!important;font-weight:850!important;border:0!important;border-radius:12px!important;min-height:44px;padding:10px 14px;cursor:pointer}.sna-market-login button{width:100%}
 .sna-market-overlay{position:fixed;inset:0;background:rgba(2,7,18,.88);z-index:10002000;padding:10px;overflow:auto;overscroll-behavior:contain}.sna-market-overlay[hidden]{display:none!important}.sna-market-shell{width:min(100%,1040px);margin:12px auto;background:#101a2c;border:1px solid #4b638c;color:#eff5ff;border-radius:20px;padding:17px;box-shadow:0 24px 60px #0009}.sna-market-head,.sna-market-tabs,.sna-market-footer{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}.sna-market-head h2{font-size:23px}.sna-market-head p,.sna-market-footer p,.sna-market-card p{font-size:13px;color:#b5c8e7;line-height:1.65}.sna-market-head button,.sna-market-tabs button,.sna-market-card button,.sna-market-footer button{border:1px solid #536e9b;color:#f0f7ff;background:#203454;border-radius:11px;padding:10px 12px;min-height:42px;cursor:pointer;font-weight:750}.sna-market-tabs{justify-content:flex-start;margin:15px 0;gap:7px}.sna-market-tabs button.active{background:#779cf4;color:#111b2e}.sna-market-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:13px}.sna-market-card{border:1px solid #3e5276;background:#182640;border-radius:15px;padding:16px;margin-bottom:14px}.sna-market-card h3{font-size:17px;margin:0 0 10px}.sna-market-card label{display:block;font-size:13px;font-weight:750;margin:15px 0 5px}.sna-market-card input[type=range]{width:100%;accent-color:#90b3ff}.sna-market-card input:not([type=range]),.sna-market-card select{width:100%;min-height:42px;border-radius:10px;background:#0d192a;border:1px solid #50658c;color:#edf3ff;padding:9px;user-select:text}.sna-market-preview canvas{width:min(100%,425px);height:auto;display:block;margin:auto;border-radius:8px;background:#0c1727}.sna-market-preview p{text-align:center}.sna-market-tip{font-size:12px;color:#adc2e1}.sna-before-after{position:relative;aspect-ratio:650/340;width:100%;max-width:650px;overflow:hidden;border-radius:11px;border:1px solid #536b95;margin:10px auto}.sna-before-after canvas{position:absolute;width:100%;height:100%;inset:0}.sna-before-after canvas#sna-after{clip-path:inset(0 50% 0 0)}.sna-compare-legend{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#c2d1ed}.sna-price-table{overflow-x:auto}.sna-price-table table{width:100%;min-width:410px;border-collapse:collapse;font-size:13px}.sna-price-table td,.sna-price-table th{text-align:center;border-bottom:1px solid #364969;padding:11px 6px}.sna-price-table td:first-child{text-align:left}.sna-market-steps{padding-left:22px;line-height:2;color:#dbe7ff}.sna-market-footer{border-top:1px solid #354668;padding-top:12px}.sna-enhance-panel{margin:15px 0;background:linear-gradient(150deg,#172a48,#132038);border:1px solid #5b78aa;border-radius:17px;padding:15px}.sna-enhance-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.sna-enhance-head h3{font-size:17px}.sna-enhance-head p,.sna-enhance-status{font-size:12px;color:#b8cee9;line-height:1.6;margin-top:5px}.sna-enhance-panel button,.sna-enhance-panel select{background:#263c60;border:1px solid #7296c9;border-radius:11px;color:#eef5ff;min-height:43px;padding:9px 12px;font-size:13px;font-weight:750}.sna-enhance-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:13px 0}.sna-enhance-toggle{display:flex;align-items:center;gap:9px;background:#1d3151;padding:12px;border-radius:10px;font-size:13px}.sna-enhance-toggle input{width:22px;height:22px;accent-color:#8fb5ff;flex:0 0 auto}.sna-enhance-toggle small{display:block;font-size:11px;color:#abc2e0;margin-top:3px}.sna-enhance-actions,.sna-enhance-sub{display:flex;flex-wrap:wrap;gap:9px;margin-top:10px;align-items:center}.sna-enhance-actions button{flex:1 1 130px}.sna-enhance-sub label{display:flex;align-items:center;gap:9px;flex:1;flex-wrap:wrap;font-size:13px}.sna-merge-format{display:flex;align-items:center;gap:10px;margin:12px 0;color:#c6d8f2;font-size:13px}.sna-merge-format select{height:40px;border-radius:8px;background:#1d3150;color:white;border:1px solid #5774a2;padding:0 12px}.board-item-controls .sna-tap-sort{width:100%;background:#284971;color:#eef6ff;border:1px solid #658dc7;border-radius:9px;min-height:42px;font-weight:750;margin:5px 0;cursor:pointer}.sna-wizard-overlay{position:fixed;inset:0;background:#020714d9;z-index:10005000;display:grid;place-items:center;padding:14px}.sna-wizard-overlay[hidden]{display:none}.sna-wizard-card{width:min(100%,560px);background:#152641;border:1px solid #7194c7;padding:20px;border-radius:18px;box-shadow:0 12px 50px #0009}.sna-wizard-card h3{font-size:20px}.sna-wizard-card p{color:#ccdcf3;line-height:1.7;margin:14px 0}.sna-wizard-card .sna-wizard-actions{display:flex;flex-wrap:wrap;gap:8px}.sna-wizard-actions button{flex:1;min-width:100px;min-height:45px;background:#28446e;border:1px solid #6991c9;color:#eef6ff;border-radius:10px}.sna-market-shell input,.sna-enhance-panel input{touch-action:manipulation}
@@ -1227,7 +1239,7 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
   <button class="auth-btn" id="auth-signup" type="button" onclick="window.registerMember()" style="margin-top:8px;background:#233954">새 계정 회원가입</button>
   <button class="auth-btn" id="auth-reset-password" type="button" onclick="window.resetLoginPassword()" style="margin-top:8px;background:#263242">비밀번호 재설정 이메일 받기</button>
 
-  <div class="sna-market-login"><div class="sna-market-login-head">구매 전에 직접 확인해 보세요</div><p>예시 사진으로 대필판 배치·색상·스타일을 자유롭게 체험할 수 있습니다. 실제 회원 데이터는 사용하지 않습니다.</p><button type="button" id="sna-market-open-login" class="sna-market-primary">✨ 무료 체험 · 기능 비교 보기</button></div>
+  <div class="sna-market-login"><div class="sna-market-login-head">구매 전에 직접 확인해 보세요</div><p>실제 옷·총·킬로그·합치기·대필판을 각 1회씩 이용할 수 있습니다. 회원가입 후 승인 대기 상태에서 체험 가능합니다.</p><button type="button" id="sna-market-open-login" class="sna-market-primary">✨ 회원가입 없이 실제 기능 무료 체험</button></div>
   <button type="button" class="creator-login-link" data-open-creator>ℹ 제작자 소개 · 스나</button>
   <button type="button" class="creator-login-link" data-open-guide>📖 통합 사용방법 보기</button>
   <p class="member-tip" id="auth-error" role="status">기존 회원은 가입 후 관리자에게 기존 이용권 연결을 요청하세요. 닉네임만으로 이전 권한이 연결되지 않습니다.</p>
@@ -1238,7 +1250,7 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
   <p id="waiting-account-status" class="member-tip" style="margin:10px 0 8px;color:#c9dcff"></p>
   <button class="auth-btn" id="waiting-recheck" type="button" onclick="window.recheckMemberStatus()" style="margin-bottom:8px">이용 상태 다시 확인</button>
   <button class="auth-btn" id="request-again" type="button" onclick="window.requestAgain()">로그아웃 / 다른 계정</button>
-  <button class="auth-btn" id="sna-market-open-waiting" type="button" style="margin-top:8px;background:#3b5792">✨ 승인 전 무료 체험 보기</button>
+  <button class="auth-btn" id="sna-market-open-waiting" type="button" style="margin-top:8px;background:#3b5792">✨ 회원가입 없이 무료 체험 시작</button>
  </div>
 </div>
 <section id="sna-report-dialog" class="member-shade" style="display:none;z-index:10000150;position:fixed;inset:0" role="dialog" aria-modal="true" aria-label="오류 신고 및 개선 요청"><div class="member-modal" style="width:min(95vw,600px);max-height:90dvh;overflow:auto">
@@ -1369,7 +1381,8 @@ const firebaseConfig={
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
- createUserWithEmailAndPassword, signOut, getIdTokenResult, sendPasswordResetEmail } from
+ createUserWithEmailAndPassword, signOut, getIdTokenResult, sendPasswordResetEmail,
+ signInAnonymously, EmailAuthProvider, linkWithCredential } from
  "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 const auth=getAuth(app);
 let authUser=null;let savedName=null;
@@ -1823,6 +1836,148 @@ document.getElementById('sna-admin-report-reload')?.addEventListener('click',()=
 // Administrator authorization comes from verified Firebase Custom Claim.
 window.SnaAdminReportsStart=snaStartReportAdmin;
 
+// ===== v12.5.3: 회원가입 없는 실제 기능별 1회 체험 (저장 완료 시 차감) =====
+// Anonymous Auth provides a guest UID. Trial usage is written on successful output,
+// and stays with the same UID when the guest upgrades via linkWithCredential.
+// Note: anonymous identities can be regenerated after device/browser data reset.
+const snaTrialFeatures={clothes:'옷 추출기',guns:'총 자르기',kill:'킬로그 커팅',merge:'이미지 합치기',board:'대필판 제작'};
+const snaTrialClaims={};
+let snaTrialActive=null;
+let snaTrialBusy=false;
+let snaTrialFinishing=false;
+const snaTrialModal=document.getElementById('sna-realtrial');
+const snaTrialBanner=document.getElementById('sna-trial-session');
+const snaTrialStatus=t=>{const el=document.getElementById('sna-realtrial-status');if(el)el.textContent=t;};
+const snaTrialLocalKey=feature=>'sna_v1253_trial_used_'+feature;
+function snaTrialIsLocalUsed(feature){try{return localStorage.getItem(snaTrialLocalKey(feature))==='1';}catch(_){return false;}}
+function snaTrialMarkLocal(feature){try{localStorage.setItem(snaTrialLocalKey(feature),'1');}catch(_){}}
+const snaTrialAllowed=()=>!!authUser&&!isAdminMode&&(authUser.isAnonymous||currentMember?.status==='pending');
+const snaTrialHasPaidAccess=()=>isAdminMode||currentMember?.status==='approved'&&!expired(currentMember);
+function snaTrialUI(){
+ const grid=document.getElementById('sna-realtrial-grid');if(!grid)return;
+ grid.replaceChildren();
+ let spent=0;
+ for(const [key,label] of Object.entries(snaTrialFeatures)){
+  const used=!!snaTrialClaims[key]||snaTrialIsLocalUsed(key);if(used)spent++;
+  const card=document.createElement('article');card.className='sna-realtrial-card';
+  const title=document.createElement('h3');title.textContent=label;
+  const desc=document.createElement('p');desc.textContent='원래 편집기에서 직접 사진을 올리고 결과를 완성해 보세요.';
+  const counter=document.createElement('span');counter.className='sna-realtrial-count';counter.textContent=used?'체험 완료 · 0/1':'남은 체험 1/1';
+  const btn=document.createElement('button');btn.type='button';btn.textContent=used?'1회 체험 사용 완료':snaTrialActive===key?'현재 체험 중':'실제 기능 체험하기';
+  btn.disabled=used||snaTrialBusy||!!snaTrialActive;
+  btn.onclick=()=>snaTrialStart(key);
+  card.append(title,desc,counter,btn);grid.append(card);
+ }
+ const signin=document.getElementById('sna-realtrial-register');
+ if(signin){signin.hidden=spent<5;signin.textContent='체험 5회 완료 · 회원가입 / 이용권 신청';}
+ if(spent===5)snaTrialStatus('무료 체험을 모두 사용했습니다. 계속 이용하려면 회원가입 후 관리자에게 이용권 구매·승인을 요청해 주세요.');
+}
+async function snaTrialReload(){
+ if(!snaTrialAllowed()){snaTrialStatus('회원가입 없이 체험할 수 있습니다. 체험 시작을 눌러 주세요.');snaTrialUI();return;}
+ snaTrialStatus('남은 무료 체험 횟수를 확인 중…');
+ try{
+  await Promise.all(Object.keys(snaTrialFeatures).map(async feature=>{
+   const ref=doc(db,'users',authUser.uid,'trialUses',feature);
+   const result=await getDoc(ref);
+   if(!result.exists()&&snaTrialIsLocalUsed(feature)){
+    // The export succeeded offline earlier. Retry syncing its used marker.
+    await runTransaction(db,async tx=>{
+     const existing=await tx.get(ref);
+     if(!existing.exists())tx.set(ref,{uid:authUser.uid,feature,createdAt:Date.now()});
+    });
+   }
+   snaTrialClaims[feature]=result.exists()||snaTrialIsLocalUsed(feature);
+  }));
+  snaTrialStatus('각 기능의 체험은 실제 결과물 저장·공유가 끝났을 때만 1회 차감됩니다.');
+ }catch(err){console.warn('체험 기록 조회 오류',err);snaTrialStatus('서버 체험 기록 조회 실패. 연결 상태 또는 Firebase 규칙을 확인해 주세요.');}
+ snaTrialUI();
+}
+async function snaTrialEnsureGuest(){
+ if(auth.currentUser)return auth.currentUser;
+ try{
+  const result=await signInAnonymously(auth);
+  authUser=result.user;
+  return result.user;
+ }catch(err){
+  const detail=err?.code==='auth/operation-not-allowed'?'Firebase Authentication의 익명(Anonymous) 로그인 제공업체를 활성화해야 합니다.':(err?.message||'알 수 없는 오류');
+  throw Error(detail);
+ }
+}
+async function snaTrialOpen(){
+ if(snaTrialHasPaidAccess()){window.uiAlert?.('활성 이용권이 있습니다. 일반 편집 메뉴에서 기능을 사용해 주세요.');return;}
+ try{
+  snaTrialStatus('체험 계정 준비 중…');
+  await snaTrialEnsureGuest();
+  if(!snaTrialAllowed()){window.uiAlert?.('이 계정은 체험 대상이 아닙니다. 계정 상태를 확인해 주세요.');return;}
+  snaTrialModal.hidden=false;
+  await snaTrialReload();
+ }catch(err){window.uiAlert?.('체험 시작 실패: '+(err?.message||err));}
+}
+async function snaTrialStart(feature){
+ if(!snaTrialAllowed()||!snaTrialFeatures[feature]||snaTrialBusy||snaTrialActive)return;
+ if(snaTrialClaims[feature]||snaTrialIsLocalUsed(feature)){snaTrialStatus('이 기능의 체험을 이미 완료했습니다.');return;}
+ const ok=await window.uiConfirm?.(`${snaTrialFeatures[feature]} 실제 기능을 무료로 체험할까요? 사진을 추가하고 작업한 뒤, 결과물을 저장·공유하면 그때 1회가 차감됩니다.`);
+ if(!ok)return;
+ snaTrialBusy=true;snaTrialUI();
+ try{
+  // Before opening the editor, verify no prior server-side completed usage.
+  const ref=doc(db,'users',authUser.uid,'trialUses',feature);
+  const snap=await getDoc(ref);
+  if(snap.exists()){snaTrialClaims[feature]=true;snaTrialStatus('이미 사용한 체험입니다.');return;}
+  snaTrialActive=feature;snaTrialFinishing=false;
+  snaTrialModal.hidden=true;document.getElementById('auth-screen').style.display='none';
+  snaTrialBanner.hidden=false;
+  document.getElementById('sna-trial-session-text').textContent=`${snaTrialFeatures[feature]} · 체험 중 (결과 저장 시 1회 차감)`;
+  refreshGradeUI();window.switchTab?.(feature,true);
+ }catch(err){snaTrialStatus('체험 시작 실패: '+(err?.code||err?.message||err));}
+ finally{snaTrialBusy=false;snaTrialUI();}
+}
+function snaTrialEnd(showWaitingScreen=true){
+ const feature=snaTrialActive;snaTrialActive=null;snaTrialFinishing=false;
+ snaTrialBanner.hidden=true;refreshGradeUI();
+ if(feature&&showWaitingScreen&&!snaTrialHasPaidAccess()){
+  if(authUser?.isAnonymous)displayLogin('체험을 종료했어요. 남은 기능은 「실제 기능 무료 체험」에서 사용하거나 회원가입해 주세요.');
+  else showWaiting('남은 무료 체험 기능을 선택하거나 관리자 승인을 기다려 주세요.','pending');
+ }
+}
+async function snaTrialFinish(){
+ if(!snaTrialActive||snaTrialFinishing)return false;
+ const feature=snaTrialActive,uid=authUser?.uid;
+ if(!uid)return false;
+ snaTrialFinishing=true;
+ // Keep the same browser from receiving a second trial if network fails.
+ snaTrialMarkLocal(feature);snaTrialClaims[feature]=true;
+ try{
+  const ref=doc(db,'users',uid,'trialUses',feature);
+  await runTransaction(db,async tx=>{
+   const snap=await tx.get(ref);
+   if(!snap.exists())tx.set(ref,{uid,feature,createdAt:Date.now()});
+  });
+  snaTrialEnd(true);
+  window.uiAlert?.(`${snaTrialFeatures[feature]} 무료 체험 1회를 사용했습니다. 다른 기능은 각각 1회씩 체험할 수 있습니다.`);
+  return true;
+ }catch(err){
+  console.error('체험 완료 기록 저장 실패',err);
+  snaTrialEnd(true);
+  window.uiAlert?.('체험은 이 기기에서 사용 완료로 기록됐지만 Firebase 서버 기록 전송에 실패했어요. 네트워크와 보안 규칙을 확인해 주세요.');
+  return false;
+ }
+}
+window.SnaTrial={get active(){return snaTrialActive;},open:snaTrialOpen,reload:snaTrialReload,finish:snaTrialFinish,end:snaTrialEnd,reset:()=>snaTrialEnd(false)};
+document.getElementById('sna-market-open-login')?.addEventListener('click',snaTrialOpen);
+document.getElementById('sna-market-open-waiting')?.addEventListener('click',snaTrialOpen);
+document.getElementById('sna-market-open-nav')?.addEventListener('click',snaTrialOpen);
+document.getElementById('sna-realtrial-close')?.addEventListener('click',()=>{snaTrialModal.hidden=true;});
+document.getElementById('sna-realtrial-done')?.addEventListener('click',()=>{snaTrialModal.hidden=true;});
+document.getElementById('sna-realtrial-refresh')?.addEventListener('click',snaTrialReload);
+document.getElementById('sna-realtrial-register')?.addEventListener('click',()=>{
+ snaTrialModal.hidden=true;displayLogin('무료 체험이 끝났습니다. 회원가입한 뒤 이용권 구매·승인을 요청해 주세요.');
+ document.getElementById('auth-email')?.focus();
+});
+document.getElementById('sna-trial-session-exit')?.addEventListener('click',async()=>{
+ if(await window.uiConfirm?.('체험을 종료할까요? 결과물을 아직 저장하지 않았다면 체험 횟수는 차감되지 않습니다.'))snaTrialEnd(true);
+});
+
 // ===== 수동 회원 등급제 =====
 const GRADE_NAMES={silver:'실버',gold:'골드',vip:'VIP'};
 const FEATURE_NAMES={clothes:'옷 추출',guns:'총 자르기',merge:'옷·총 합치기',kill:'킬로그 커팅',board:'대필판 제작'};
@@ -1845,10 +2000,11 @@ window.canUseFeature=feature=>{
  if(feature==='gallery'||feature==='reviews')return !!authUser && (isAdminMode||(currentMember?.status==='approved'&&!expired(currentMember)));
  if(!FEATURE_NAMES[feature])return true;
  if(isAdminMode)return true;
+ if(window.SnaTrial?.active===feature&&(authUser?.isAnonymous||currentMember?.status==='pending'))return true;
  if(!currentMember||currentMember.status!=='approved'||expired(currentMember))return false;
  return (gradeRights[effectiveGrade(currentMember)]||[]).includes(feature);
 };
-window.SnaMemberTier=()=>!authUser?null:isAdminMode?'admin':currentMember&&!expired(currentMember)&&currentMember.status==='approved'?effectiveGrade(currentMember):null;
+window.SnaMemberTier=()=>!authUser?null:isAdminMode?'admin':window.SnaTrial?.active==='board'?'vip':currentMember&&!expired(currentMember)&&currentMember.status==='approved'?effectiveGrade(currentMember):null;
 function refreshGradeUI(){
  const effective=effectiveGrade(currentMember);
  for(const feature of Object.keys(FEATURE_NAMES)){
@@ -2212,6 +2368,8 @@ const make=(tag,cls,content)=>{
  return element;
 };
 function showWaiting(message="승인을 기다리는 중입니다.",kind="pending"){
+ if(window.SnaTrial?.active&&kind==="pending")return;
+ if(window.SnaTrial?.active)window.SnaTrial.end(false);
  authScreen.style.display="flex";
  viewUserForm.style.display="none";
  viewWaiting.style.display="block";
@@ -2302,6 +2460,7 @@ async function resetCurrentSession(){
  if(memberContentUnsubscribes.length)stopMemberContentSubscriptions();
  for(const unsub of liveUnsubscribes)try{unsub();}catch(e){};
  liveUnsubscribes=[];
+ window.SnaTrial?.reset?.();
  authUser=null;savedName=null;currentMember=null;isAdminMode=false;
  accessExpiry=null;expiredHandled=false;adminDataStarted=false;adminGradeDrafts.clear();
  document.getElementById('admin-dashboard').style.display='none';
@@ -2404,7 +2563,9 @@ window.registerMember=async()=>{
  if(nickname.length>30)return authMsg('닉네임은 30자 이내로 입력해 주세요.');
  authMsg('계정을 만드는 중…');
  try{
-  const credential=await createUserWithEmailAndPassword(auth,email,password);
+  const credential=auth.currentUser?.isAnonymous
+    ? await linkWithCredential(auth.currentUser,EmailAuthProvider.credential(email,password))
+    : await createUserWithEmailAndPassword(auth,email,password);
   await setDoc(doc(db,'users',credential.user.uid),{
    authUid:credential.user.uid,name:nickname,status:'pending',
    grade:'silver',gradeDuration:null,gradeExpiresAt:null,membershipMode:'gradeOnly',createdAt:Date.now()
@@ -2415,6 +2576,11 @@ window.registerMember=async()=>{
 };
 async function afterAuthLogin(user){
  authUser=user;
+ if(user.isAnonymous){
+  savedName='무료 체험 방문자';currentMember=null;isAdminMode=false;
+  displayLogin('회원가입 없이 각 편집 기능을 실제로 1회씩 체험할 수 있습니다. 「실제 기능 무료 체험」을 눌러 주세요.');
+  return;
+ }
  window.SnaCloudSession?.(user.uid);
  const token=await getIdTokenResult(user,true);
  if(token.claims.admin===true){
@@ -2996,7 +3162,7 @@ window.closeAdmin=()=>{
 
  <button id="btn-gallery" onclick="switchTab('gallery')">🏛️ 전시관</button>
  <button id="btn-reviews" onclick="switchTab('reviews')" type="button">⭐ 이용 후기</button>
- <button id="sna-market-open-nav" type="button" title="무료 체험 · 회원 등급 비교">✨ 무료 체험</button>
+ <button id="sna-market-open-nav" type="button" title="실제 기능을 각 1회 체험">✨ 무료 체험</button>
  <button id="btn-guide" type="button" data-open-guide title="옷·총·킬로그·합치기·대필판·전시관 전체 사용방법" aria-haspopup="dialog">📖 사용방법</button>
  <button id="btn-creator-about" type="button" data-open-creator title="제작자 스나 · 프로그램 정보" aria-haspopup="dialog">ℹ 제작자</button>
  <button id="btn-logout" onclick="window.confirmSignOutMember()" title="로그아웃" style="flex:0 0 auto;min-width:80px;font-size:12px;padding:10px 12px">로그아웃</button>
@@ -3745,10 +3911,10 @@ window.SnaShareFiles=async function(files){
  if(window.snaSamsungSaveLimit&&list.length>10&&window.snaSamsungSaveLimit.shouldBlock(list.length))return false;
  const payload={files:list};
  try{if(navigator.share && navigator.canShare?.(payload)){
-   await navigator.share(payload);return true;
+   await navigator.share(payload);window.SnaTrial?.finish?.();return true;
  }}catch(err){if(err?.name==='AbortError')return false;console.warn('공유창 열기 실패',err);}
  for(const file of list){const u=URL.createObjectURL(file),a=document.createElement('a');a.href=u;a.download=file.name||'image';a.style.display='none';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),30000);}
- return true;
+ window.SnaTrial?.finish?.();return true;
 };
 window.SnaDataFile=function(dataURL,filename){
  const [head,encoded]=String(dataURL).split(',');const mime=(head.match(/^data:([^;]+)/)||[])[1]||'image/jpeg';
@@ -3785,6 +3951,7 @@ function saveJpgForKakao(dataURL, filename){
   a.style.display='none';
   document.body.appendChild(a);
   a.click();
+  window.SnaTrial?.finish?.();
   setTimeout(()=>{a.remove();URL.revokeObjectURL(url);},12000);
 }
 
@@ -7960,7 +8127,7 @@ saveBtn.addEventListener("click",async()=>{
    if(window.logActivity)window.logActivity("대필판 PNG 저장",{clothes:state.clothes.length,guns:state.guns.length,width:info.width,height:info.height});
    window.SnaReviews?.used('board');
    // 원본 PNG 저장 성공 이후에만 전시관에 등록한다. 전시관 등록 실패는 PNG 저장을 취소하지 않는다.
-   if(window.addBoardToGallery){
+   if(window.addBoardToGallery&&!window.SnaTrial?.active){
     const title=document.getElementById('board-work-title')?.value.trim()||'나의 대필 작품';
     window.addBoardToGallery(blob,{title}).catch(err=>{
      console.warn('전시관 등록 실패',err);
@@ -8027,7 +8194,7 @@ const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const name=i=>(i.file?.name||'manual').replace(/\.[^.]+$/,'').slice(0,70)+'_killlog.png';
 function revoke(i){if(i.sourceUrl)URL.revokeObjectURL(i.sourceUrl);if(i.url)URL.revokeObjectURL(i.url);}
 function urlFor(blob){return URL.createObjectURL(blob);}
-function download(blob,filename){const u=urlFor(blob),a=document.createElement('a');a.href=u;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);}
+function download(blob,filename){const u=urlFor(blob),a=document.createElement('a');a.href=u;a.download=filename;document.body.append(a);a.click();a.remove();window.SnaTrial?.finish?.();setTimeout(()=>URL.revokeObjectURL(u),60000);}
 function canShare(f){try{return !!(navigator.canShare&&navigator.share&&navigator.canShare({files:f}));}catch(_){return false;}}
 async function shareOne(i){
  const result=validBlob(i.blob)?i.blob:validBlob(i.baseBlob)?i.baseBlob:null;
@@ -8765,7 +8932,7 @@ render();health();
 
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.0 · 합치기 작업 버튼 UI 개선 · 후기 전시관</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.3 · 회원가입 없는 실제 기능 1회 체험</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
  <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 사용자 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
@@ -8792,26 +8959,16 @@ render();health();
 </div>
 
 
-<section id="sna-market" class="sna-market-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="sna-market-title">
-  <div class="sna-market-shell">
-   <header class="sna-market-head"><div><h2 id="sna-market-title">✨ 구매 전 무료 체험</h2><p>예시 소재만 사용하는 체험관 · 로그인 없이 이용 가능</p></div><button id="sna-market-close" type="button" aria-label="체험관 닫기">✕ 닫기</button></header>
-   <nav class="sna-market-tabs" role="group" aria-label="체험관 메뉴"><button type="button" data-market-tab="trial" class="active">무료 체험</button><button type="button" data-market-tab="compare">등급 비교</button><button type="button" data-market-tab="guide">처음 이용 안내</button><button type="button" data-market-tab="video">기능 소개 영상</button></nav>
-   <div id="sna-market-trial" class="sna-market-page"><div class="sna-market-grid"><div class="sna-market-card"><h3>🎨 예시 대필판 만들기</h3><p>예시 아이템·배치·색상을 바꾸면 결과가 바로 변해요. 회원 전용 기능을 열거나 실제 사진을 전송하지 않습니다.</p>
-    <label>예시 아이템 수 <input id="sna-trial-count" type="range" min="3" max="18" value="9" step="3"><output id="sna-trial-count-label">9개</output></label>
-    <label>배치 <select id="sna-trial-layout"><option value="3">3열</option><option value="4">4열</option><option value="5">5열</option></select></label>
-    <label>색상 <select id="sna-trial-theme"><option value="blue">딥 블루</option><option value="rose">로즈 퍼플</option><option value="gold">오닉스 골드</option></select></label>
-    <label>체험용 문의 문구 <input id="sna-trial-text" maxlength="18" value="대필 문의 · 샘플" autocomplete="off"></label>
-    <button id="sna-trial-reset" type="button">↺ 처음부터 체험하기</button>
-    <p class="sna-market-tip">실제 게임 아이템 이미지가 아닌 예시 그래픽입니다. 체험 화면에는 SAMPLE 표시가 들어갑니다.</p>
-   </div><div class="sna-market-card sna-market-preview"><canvas id="sna-trial-canvas" width="700" height="930" aria-label="무료 체험용 대필판 이미지"></canvas><p>실제 편집기와 다른 체험용 미리보기입니다.</p></div></div>
-   <div class="sna-market-card"><h3>🔍 원본 → 결과 비교 예시</h3><p>사용 편의성을 보여주기 위한 가상 예시입니다. 실제 추출 정확도는 원본 상태에 따라 달라집니다.</p><div id="sna-compare-visual" class="sna-before-after"><canvas id="sna-before" width="650" height="340"></canvas><canvas id="sna-after" width="650" height="340"></canvas></div><label>비교하기 <input id="sna-compare-slider" type="range" min="0" max="100" value="50" aria-label="원본과 편집 예시 비교"></label><div class="sna-compare-legend"><span>← 원본 화면 예시</span><span>편집 결과 예시 →</span></div></div>
-   </div>
-   <div id="sna-market-compare" class="sna-market-page" hidden><div class="sna-market-card"><h3>💎 실버 · 골드 · VIP 기능 비교</h3><p>아래는 기본 제공 구성을 설명한 것이며, 실제 사용할 수 있는 기능은 관리자가 계정에 설정한 권한과 이용 기간에 따라 달라질 수 있습니다.</p><div class="sna-price-table"><table><thead><tr><th>기능</th><th>실버</th><th>골드</th><th>VIP</th></tr></thead><tbody><tr><td>옷 추출 · 총 자르기</td><td>✓</td><td>✓</td><td>✓</td></tr><tr><td>이미지 합치기</td><td>✓</td><td>✓</td><td>✓</td></tr><tr><td>킬로그 커팅</td><td>관리자 설정</td><td>✓</td><td>✓</td></tr><tr><td>대필판 제작</td><td>관리자 설정</td><td>관리자 설정</td><td>✓</td></tr><tr><td>VIP 전용 스타일</td><td>—</td><td>—</td><td>✓*</td></tr></tbody></table></div><p class="sna-market-tip">* VIP 스타일은 로그인한 VIP·최고관리자에게만 편집 화면에서 표시됩니다. 구매/가격과 이용 기간은 판매자에게 확인하세요.</p></div></div>
-   <div id="sna-market-guide" class="sna-market-page" hidden><div class="sna-market-card"><h3>📖 처음 사용자를 위한 안내</h3><ol class="sna-market-steps"><li><strong>예시 체험</strong>을 통해 배치·문구를 직접 바꿔 보세요.</li><li><strong>기능 비교</strong>에서 필요한 등급을 확인하세요.</li><li>구매·관리자 승인 뒤 <strong>옷 / 총 / 킬로그</strong> 탭에 사진을 추가하세요.</li><li>자동 추출 후 결과를 확인하고 필요하면 직접 수정하세요.</li><li><strong>합치기 / 대필판</strong>에 편집한 사진을 불러오세요.</li><li>자동 배치와 저장 전 검사 후 형식을 선택해 내보내세요.</li></ol><button type="button" class="sna-market-primary" id="sna-guide-to-trial">예시로 연습하기</button></div></div>
-   <div id="sna-market-video" class="sna-market-page" hidden><div class="sna-market-card"><h3>▶ 12초 기능 소개 영상</h3><p>별도로 제작한 안내 영상으로, 실제 앱 동작을 녹화한 것이 아니라 <strong>예시 그래픽을 사용한 시연 영상</strong>입니다.</p><video id="sna-market-video-player" controls playsinline preload="none" style="display:block;width:100%;max-width:640px;border-radius:12px" src="data:video/mp4;base64,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"></video></div></div>
-   <footer class="sna-market-footer"><p>체험으로 로그인·회원 승인·유료 기능의 사용 권한이 생기지 않습니다.</p><button id="sna-market-done" type="button">체험관 닫기</button></footer>
-  </div>
+<section id="sna-realtrial" hidden class="sna-realtrial-overlay" role="dialog" aria-modal="true" aria-labelledby="sna-realtrial-title">
+ <div class="sna-realtrial-panel">
+  <header class="sna-realtrial-header"><div><h2 id="sna-realtrial-title">✨ 실제 기능 무료 체험</h2><p>회원가입 없이 각 기능을 1회씩 사용할 수 있습니다.</p></div><button id="sna-realtrial-close" type="button" aria-label="닫기">✕</button></header>
+  <div class="sna-realtrial-info">회원가입이나 결제 없이 자신의 사진으로 실제 편집 기능을 체험할 수 있습니다.<br><strong>결과물 저장·공유를 완료하면 해당 기능의 1회가 차감됩니다.</strong> 편집 화면만 열거나 저장 전에 취소했다면 횟수는 그대로입니다. 체험을 모두 사용하면 회원가입 후 이용권 구매·관리자 승인을 받아야 계속 사용할 수 있습니다.</div>
+  <div id="sna-realtrial-grid" class="sna-realtrial-grid" aria-live="polite"></div>
+  <p id="sna-realtrial-status" class="sna-realtrial-status" role="status"></p>
+  <div class="sna-realtrial-footer"><button id="sna-realtrial-refresh" type="button">↻ 이용 횟수 확인</button><button id="sna-realtrial-register" hidden type="button">회원가입 / 이용권 신청</button><button id="sna-realtrial-done" type="button">닫기</button></div>
+ </div>
 </section>
+<div id="sna-trial-session" hidden role="status"><span id="sna-trial-session-text">무료 체험 진행 중</span><button type="button" id="sna-trial-session-exit">체험 종료</button></div>
 
 <script>
 /* v12.5.0 independent sample demo + paid-app extension hooks */
@@ -8819,57 +8976,6 @@ render();health();
  'use strict';
  const $=id=>document.getElementById(id);
  const setStatus=t=>{const p=$('sna-board-enhance-status');if(p)p.textContent=t;};
- const market=$('sna-market');
- function marketPage(name){
-  ['trial','compare','guide','video'].forEach(id=>{const p=$('sna-market-'+id);if(p)p.hidden=id!==name;});
-  market.querySelectorAll('[data-market-tab]').forEach(b=>b.classList.toggle('active',b.dataset.marketTab===name));
-  const v=$('sna-market-video-player');if(v&&name!=='video')v.pause();
- }
- function openMarket(name='trial'){
-  market.hidden=false;marketPage(name);renderTrial();renderCompare();
-  market.dataset.previousFocus=document.activeElement?.id||'';
-  $('sna-market-close').focus();document.body.style.overflow='hidden';
- }
- function closeMarket(){market.hidden=true;document.body.style.overflow='';$('sna-market-video-player')?.pause();const p=$(market.dataset.previousFocus);if(p)p.focus();}
- $('sna-market-open-login')?.addEventListener('click',()=>openMarket('trial'));
- $('sna-market-open-waiting')?.addEventListener('click',()=>openMarket('trial'));
- $('sna-market-open-nav')?.addEventListener('click',()=>openMarket('trial'));
- $('sna-market-close').addEventListener('click',closeMarket);$('sna-market-done').addEventListener('click',closeMarket);
- $('sna-guide-to-trial').addEventListener('click',()=>marketPage('trial'));
- market.querySelectorAll('[data-market-tab]').forEach(b=>b.addEventListener('click',()=>marketPage(b.dataset.marketTab)));
- market.addEventListener('click',e=>{if(e.target===market)closeMarket();});
- document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!market.hidden)closeMarket();});
- const palettes={blue:['#0c1c33','#477bd3','#91b5ff'],rose:['#28182f','#b75b9c','#e4b0ee'],gold:['#141923','#b79954','#f5dca4']};
- function drawItem(c,x,y,w,h,i){
-  const set=['#a88af4','#d785bd','#7caee0','#d4a16b','#b8cf9a','#f28e9d'];
-  c.fillStyle=set[i%set.length];c.fillRect(x,y,w,h);
-  c.fillStyle='#1a2945';c.beginPath();c.arc(x+w*.5,y+h*.24,w*.12,0,Math.PI*2);c.fill();
-  c.beginPath();c.moveTo(x+w*.3,y+h*.4);c.lineTo(x+w*.7,y+h*.4);c.lineTo(x+w*.84,y+h*.83);c.lineTo(x+w*.16,y+h*.83);c.closePath();c.fill();
-  c.fillStyle='#f2db75';c.font='bold '+Math.max(10,Math.floor(w*.16))+'px sans-serif';c.fillText('6',x+5,y+h-7);
- }
- function renderTrial(){
-  const cvs=$('sna-trial-canvas'),c=cvs.getContext('2d');if(!c)return;
-  const count=+$('sna-trial-count').value,cols=+$('sna-trial-layout').value,theme=$('sna-trial-theme').value,p=palettes[theme]||palettes.blue;
-  $('sna-trial-count-label').textContent=count+'개';
-  const w=cvs.width,h=cvs.height,rows=Math.ceil(count/cols);
-  const bg=c.createLinearGradient(0,0,w,h);bg.addColorStop(0,p[0]);bg.addColorStop(1,'#101a2b');c.fillStyle=bg;c.fillRect(0,0,w,h);
-  c.fillStyle=p[1];c.fillRect(20,20,w-40,10);c.fillStyle='#f5f8ff';c.font='bold 36px sans-serif';c.fillText('ALL IN ONE · PREVIEW',34,83);
-  const top=125,gap=6,cellW=(w-68-(cols-1)*gap)/cols,cellH=Math.min(130,Math.floor((h-275-(rows-1)*gap)/rows));
-  for(let i=0;i<count;i++){const x=34+(i%cols)*(cellW+gap),y=top+Math.floor(i/cols)*(cellH+gap);drawItem(c,x,y,cellW,cellH,i);}
-  const boxY=top+rows*(cellH+gap)+15;c.fillStyle='#edf3ff';c.fillRect(25,boxY,w-50,80);c.textAlign='center';c.fillStyle=p[1];c.font='bold 32px sans-serif';c.fillText(($('sna-trial-text').value||'샘플 제작'),w/2,boxY+52);c.textAlign='left';
-  c.save();c.globalAlpha=.45;c.fillStyle='#ffffff';c.font='bold 95px sans-serif';c.translate(w/2,h/2);c.rotate(-.52);c.textAlign='center';c.fillText('SAMPLE',0,0);c.restore();c.textAlign='left';c.fillStyle=p[2];c.font='20px sans-serif';c.fillText('체험용 예시 · 실제 아이템 아님',30,h-28);
- }
- function renderCompare(){
-  const a=$('sna-before'),b=$('sna-after');if(!a||!b)return;
-  const ca=a.getContext('2d'),cb=b.getContext('2d');
-  ca.fillStyle='#aaa9b8';ca.fillRect(0,0,650,340);ca.fillStyle='#dfdce2';ca.fillRect(20,30,610,290);
-  for(let i=0;i<15;i++){const x=35+(i%5)*118,y=45+Math.floor(i/5)*85;drawItem(ca,x,y,100,76,i);}ca.fillStyle='#5a5c6f';ca.font='bold 25px sans-serif';ca.fillText('BEFORE · 원본 예시',25,25);
-  cb.fillStyle='#13243b';cb.fillRect(0,0,650,340);for(let i=0;i<12;i++){const x=25+(i%6)*101,y=44+Math.floor(i/6)*114;drawItem(cb,x,y,94,106,i);}cb.fillStyle='#eff5ff';cb.fillRect(25,277,599,48);cb.fillStyle='#396da8';cb.font='bold 26px sans-serif';cb.fillText('AFTER · 자동 배치 예시',135,307);
-  const slider=$('sna-compare-slider');b.style.clipPath=`inset(0 ${100-Number(slider.value)}% 0 0)`;
- }
- ['sna-trial-count','sna-trial-layout','sna-trial-theme','sna-trial-text'].forEach(id=>$(id)?.addEventListener('input',renderTrial));
- $('sna-trial-reset').addEventListener('click',()=>{ $('sna-trial-count').value='9';$('sna-trial-layout').value='3';$('sna-trial-theme').value='blue';$('sna-trial-text').value='대필 문의 · 샘플';renderTrial();});
- $('sna-compare-slider').addEventListener('input',renderCompare);
  const fire=(id)=>{const el=$(id);if(el)el.dispatchEvent(new Event('change',{bubbles:true}));};
  const boardReady=()=>window.canUseFeature?.('board')===true && typeof window.SnaBoardExtra?.count==='function';
  function autoLayout(){
