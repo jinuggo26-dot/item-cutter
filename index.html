@@ -7554,19 +7554,28 @@ saveBtn.addEventListener("click",async()=>{
     // On original-width pages never repaint it, because that created the
     // extra white strip/too-tight spacing the user reported.
     if(mode==="medium"){
+     // On wide medium boards the source's soft-white capsule and the
+     // hard-white extension previously met at a visible vertical seam.
+     // Paint ONE continuous capsule over the full original + extended width.
+     // Keep the original tree and "Date / Title" text outside its bounds.
      if(pageW<=bgW+1)return;
-     const y=bgW*(82/1086),pillH=bgW*(52/1086),r=pillH/2;
-     const oldEnd=pageX+bgW*(958/1086);
-     const newEnd=oldEnd+(pageW-bgW);
-     g.fillStyle="#FBE2E8";
-     g.fillRect(oldEnd-r-3,y-3,Math.max(0,newEnd-oldEnd)+r+8,pillH+6);
+     const x=pageX+bgW*(496/1086);
+     const y=bgW*(86/1086);
+     const pillH=bgW*(56/1086);
+     const r=pillH/2;
+     const end=Math.max(x+pillH,pageX+pageW-bgW*(72/1086));
      g.fillStyle="#FFFFFF";
      g.beginPath();
-     g.moveTo(oldEnd-r-4,y);g.lineTo(newEnd-r,y);
-     g.quadraticCurveTo(newEnd,y,newEnd,y+r);
-     g.lineTo(newEnd,y+pillH-r);
-     g.quadraticCurveTo(newEnd,y+pillH,newEnd-r,y+pillH);
-     g.lineTo(oldEnd-r-4,y+pillH);g.closePath();g.fill();
+     g.moveTo(x+r,y);
+     g.lineTo(end-r,y);
+     g.quadraticCurveTo(end,y,end,y+r);
+     g.lineTo(end,y+pillH-r);
+     g.quadraticCurveTo(end,y+pillH,end-r,y+pillH);
+     g.lineTo(x+r,y+pillH);
+     g.quadraticCurveTo(x,y+pillH,x,y+pillH-r);
+     g.lineTo(x,y+r);
+     g.quadraticCurveTo(x,y,x+r,y);
+     g.closePath();g.fill();
      return;
     }
     if(mode==="large"){
@@ -9028,13 +9037,13 @@ render();health();
 
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.6 · 구매자 메뉴 무료 체험 제거</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.7 · 구매자 메뉴 무료 체험 제거</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
  <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 사용자 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script>
-(()=>{const version='12.5.6';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.6: 구매자 메뉴 무료 체험 버튼 자동 제거';}}catch(_){} })();
+(()=>{const version='12.5.7';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.7: 구매자 메뉴 무료 체험 버튼 자동 제거';}}catch(_){} })();
 </script>
 
 <div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
@@ -9172,9 +9181,9 @@ render();health();
 })();
 </script>
 
-<!-- v12.5.6: Hide/remove free-trial shortcuts ONLY from the paid-user navigation.
+<!-- v12.5.7: Hide/remove free-trial shortcuts ONLY from the paid-user navigation.
      Keep the anonymous trial entry point on the login screen. -->
-<script id="sna-v1256-purchased-nav-guard">
+<script id="sna-v1257-purchased-nav-guard">
 (()=>{
   'use strict';
   const nav=document.querySelector('.global-tabs');
