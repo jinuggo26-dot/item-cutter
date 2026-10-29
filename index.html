@@ -1221,6 +1221,94 @@ body{background:radial-gradient(ellipse at 50% -15%,#20385c 0%,#0a101b 45%,#070b
  #board-tab .sna-board-preset-load-row #sna-preset-delete{grid-column:1/-1}
  #board-tab .sna-board-preset-save-row{grid-template-columns:minmax(0,1fr) 110px}
 }
+/* =============================================================
+   SNIPER Control Center / screen-only UI on v12.5.8
+   Presentation only: existing crop, export, auth and backend unchanged.
+   All SNA markups are in DOM/CSS, NEVER painted to export canvas.
+   ============================================================= */
+:root {
+ --sna-cy-bg:#080f1b; --sna-cy-panel:#101f30; --sna-cy-raised:#132b3b;
+ --sna-cy-border:#285e72; --sna-cy-muted:#8fafc3;
+ --sna-cy-cyan:#4de5e3; --sna-cy-bright:#b0fcfa;
+ --ui-bg:#080f1b; --ui-surface:#101f30; --ui-raised:#132b3b;
+ --ui-line:#285e72; --ui-ink:#e9f8ff; --ui-muted:#a0bbcd;
+ --ui-accent:#53dce8; --ui-accent2:#4de5e3;
+}
+body {background:radial-gradient(ellipse 80% 32% at 50% 0%,#13364c 0%,transparent 82%),#080f1b!important;color:#e9f8ff}
+/* Login keeps full original controls but matches the new identity */
+#auth-screen{background:#07121bF1!important}
+.auth-box{background:linear-gradient(155deg,#122c40,#0c1828)!important;border-color:#2a7084!important;box-shadow:0 30px 100px #000a,0 0 0 1px #38d9db12!important}
+.auth-box h2{color:#e9ffff}
+.auth-input:focus{border-color:#4de5e3!important;box-shadow:0 0 0 3px #4de5e329!important}
+.auth-btn,.sna-market-primary{background:linear-gradient(125deg,#65dfe6,#a2eaf5)!important;border-color:#92f7f7!important;color:#092331!important}
+/* A restrained HUD above the feature tabs */
+#sna-control-hud{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px max(14px,calc((100vw - 1340px)/2));border-bottom:1px solid #174355;background:linear-gradient(90deg,#081421,#10283b 55%,#081421);color:#dffaff;isolation:isolate}
+#sna-control-hud::after{content:"";position:absolute;inset:auto 0 0;height:1px;background:linear-gradient(90deg,transparent,#4de5e373,transparent);pointer-events:none}
+.sna-hud-brand{display:flex;align-items:center;gap:11px;min-width:0}
+.sna-hud-glyph{flex:0 0 auto;width:36px;height:36px;display:grid;place-items:center;border:1px solid #328498;border-radius:10px;background:#14394b;color:#4de5e3;font-size:21px;box-shadow:inset 0 0 14px #4de5e319,0 0 12px #4de5e316}
+.sna-hud-name{font-size:14px;font-weight:950;letter-spacing:.12em;line-height:1.3;color:#edffff;white-space:nowrap}
+.sna-hud-sub{font-size:10px;letter-spacing:.16em;color:#7fbecb;font-weight:750}
+.sna-hud-readouts{display:flex;gap:9px;align-items:center;justify-content:flex-end;min-width:0;flex-wrap:wrap}
+.sna-hud-readout{display:inline-flex;align-items:center;gap:7px;border:1px solid #285567;background:#092032;color:#a9cbd9;border-radius:9px;padding:8px 10px;font-size:10px;font-weight:850;letter-spacing:.06em;white-space:nowrap}
+.sna-hud-readout b{color:#c5fdfa;letter-spacing:.01em}
+.sna-hud-dot{width:7px;height:7px;border-radius:100%;background:#45e3cc;box-shadow:0 0 10px #45e3cc;display:inline-block}
+.global-tabs{background:linear-gradient(180deg,#0c1d2d,#0b1725)!important;border-bottom:1px solid #24596e!important;box-shadow:0 10px 30px #03080c80!important}
+.global-tabs>button,.global-tabs>#btn-creator-about,.global-tabs>#btn-logout,.global-tabs>#btn-member-info,.global-tabs>#btn-admin,.global-tabs>#btn-guide{background:#12273a!important;color:#bdd8e4!important;border:1px solid #245469!important;border-radius:12px!important;box-shadow:inset 0 1px 0 #b6ffff0b!important;transition:background .15s,border-color .15s,transform .15s,box-shadow .15s!important}
+.global-tabs>button:hover{background:#16384a!important;color:#f3ffff!important;border-color:#3a94a6!important}
+.global-tabs>button.active{color:#06202b!important;background:linear-gradient(115deg,#65d8e1,#a0f0ed)!important;border-color:#a8ffff!important;box-shadow:0 0 0 1px #88ffff25,0 6px 21px #39cfd63b!important}
+.global-tabs>button:focus-visible,.action:focus-visible,.board-btn:focus-visible,.ui-dialog-actions button:focus-visible{outline:2px solid #62f0eb!important;outline-offset:3px!important}
+/* Editing surfaces - do not alter canvases or picture data */
+.tab-pane>.app{position:relative}
+#board-tab{position:relative}
+.tab-pane .header .logo{background:linear-gradient(135deg,#165568,#1b354b)!important;color:#aafcff!important;border:1px solid #3ba8ae!important;box-shadow:0 0 19px #4de5e320!important}
+.tab-pane .title-wrap h1{color:#efffff}
+.tab-pane .upload{background:linear-gradient(130deg,#142e40,#0c1d2d)!important;border:1px dashed #3a8592!important;box-shadow:inset 0 1px 0 #96ffff13!important}
+.tab-pane .upload:hover{border-color:#6ddada!important;background:#19394b!important}
+.tab-pane .upload-icon{background:#1c5366!important;color:#b6ffff!important;border:1px solid #34889c}
+#clothes-tab .photo-panel,#guns-tab .photo-panel,#merge-tab .photo-panel,#clothes-tab .viewer,#guns-tab .viewer{border-color:#275e71!important;background:linear-gradient(155deg,#13283a,#111f30)!important}
+.tab-pane :is(.panel-head,.sna-qa-head) strong{color:#e9ffff}
+.tab-pane input[type=range]{accent-color:#4de5e3!important}
+.tab-pane :is(input[type=text],input[type=number],select,textarea):focus-visible{outline:2px solid #55cbd6!important;outline-offset:1px}
+/* Upgrade the existing custom alert/confirm rather than spawning duplicate popups */
+#ui-dialog-backdrop{background:#020b15dd!important;backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important;padding:16px!important}
+#ui-dialog-backdrop .ui-dialog-card{overflow:hidden;position:relative;width:min(100%,430px);background:linear-gradient(146deg,#142e40 0%,#0a1828 90%)!important;border:1px solid #2d8294!important;border-radius:20px!important;box-shadow:0 35px 95px #000b,0 0 0 1px #59e0e31a!important;padding:24px 22px 20px!important}
+#ui-dialog-backdrop .ui-dialog-card::before{content:'SNIPER  //  CONTROL CENTER';display:block;color:#72c9d3;font-weight:900;font-size:10px;letter-spacing:.17em;margin-bottom:17px}
+#ui-dialog-backdrop .ui-dialog-card::after{content:'';display:block;position:absolute;top:0;left:15%;right:15%;height:2px;background:linear-gradient(90deg,transparent,#4de5e3,transparent);pointer-events:none}
+#ui-dialog-backdrop .ui-dialog-symbol{width:49px;height:49px;border-radius:13px;background:#143b4c!important;border:1px solid #3a9ba7;color:#80f6f0!important;box-shadow:inset 0 0 15px #6ff2e41d!important}
+#ui-dialog-backdrop .ui-dialog-card[data-variant=warning] .ui-dialog-symbol{background:#3a2630!important;border-color:#a96779;color:#ffbec9!important}
+#ui-dialog-backdrop .ui-dialog-card h3{font-size:19px;color:#f2ffff;margin-bottom:10px}
+#ui-dialog-backdrop .ui-dialog-card p{color:#bddeea;line-height:1.7}
+#ui-dialog-backdrop .ui-dialog-actions button{min-height:47px;border-color:#3c677b!important;background:#163348!important;border-radius:11px!important;color:#e3fbff!important}
+#ui-dialog-backdrop .ui-dialog-actions button.primary{background:linear-gradient(120deg,#5ed8df,#a1f0eb)!important;color:#082634!important;border-color:#a1ffff!important}
+#ui-dialog-backdrop .ui-dialog-card[data-variant=warning] .ui-dialog-actions button.primary{background:linear-gradient(125deg,#f6afbf,#f6c6ca)!important;color:#371924!important;border-color:#ffdfdf!important}
+#ui-dialog-backdrop .ui-dialog-card{animation:sna-cy-dialog-in .2s cubic-bezier(.2,.7,.2,1)}
+@keyframes sna-cy-dialog-in{from{opacity:0;transform:translateY(12px) scale(.975)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:690px){
+ #sna-control-hud{padding:10px 11px;gap:5px}
+ .sna-hud-glyph{width:31px;height:31px;font-size:18px}
+ .sna-hud-name{font-size:11px;letter-spacing:.05em}
+ .sna-hud-sub{font-size:8px;letter-spacing:.08em}
+ .sna-hud-readouts{gap:5px}
+ .sna-hud-readout{padding:7px 7px;font-size:9px}
+ .sna-hud-readout.status{display:none}
+}
+@media(prefers-reduced-motion:reduce){#ui-dialog-backdrop .ui-dialog-card{animation:none!important}.global-tabs>button{transition:none!important}}
+
+/* 15번: 기기별 메뉴 레이아웃만 조절. 이미지/캔버스 내부 레이아웃은 변경하지 않음. */
+@media(max-width:620px){
+ .global-tabs{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;overflow-x:visible!important;gap:8px!important;padding:9px!important}
+ .global-tabs>button{min-width:0!important;width:100%!important;flex:none!important;min-height:52px!important;font-size:13px!important;padding:10px 6px!important;white-space:normal!important;line-height:1.3!important}
+ .global-tabs>#btn-member-info,.global-tabs>#btn-logout,.global-tabs>#btn-admin{min-width:0!important;width:100%!important;flex:none!important;font-size:13px!important;padding:10px 6px!important}
+}
+@media(min-width:621px) and (max-width:900px){
+ .global-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;overflow-x:visible!important;gap:9px!important}
+ .global-tabs>button{min-width:0!important;width:100%!important;flex:none!important;white-space:normal!important}
+}
+@media(min-width:901px) and (max-width:1200px){
+ .global-tabs{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;overflow-x:visible!important;gap:9px!important}
+ .global-tabs>button{min-width:0!important;width:100%!important;flex:none!important;white-space:normal!important}
+}
+
 </style>
 </head>
 
@@ -1945,7 +2033,7 @@ async function snaTrialReload(){
    snaTrialClaims[feature]=result.exists()||snaTrialIsLocalUsed(feature);
   }));
   snaTrialStatus('각 기능의 체험은 실제 결과물 저장·공유가 끝났을 때만 1회 차감됩니다.');
- }catch(err){console.warn('체험 기록 조회 오류',err);snaTrialStatus('서버 체험 기록 조회 실패. 연결 상태 또는 Firebase 규칙을 확인해 주세요.');}
+ }catch(err){console.warn('체험 기록 조회 오류',err);snaTrialStatus('체험 기록 확인 실패: '+(err?.code||err?.message||'Firestore 권한 또는 연결 오류'));}
  snaTrialUI();
 }
 async function snaTrialEnsureGuest(){
@@ -1960,14 +2048,44 @@ async function snaTrialEnsureGuest(){
  }
 }
 async function snaTrialOpen(){
- if(snaTrialHasPaidAccess()){window.uiAlert?.('활성 이용권이 있습니다. 일반 편집 메뉴에서 기능을 사용해 주세요.');return;}
+ // Keep the old trial entitlements: this function only improves opening and diagnostics.
+ if(snaTrialBusy)return;
+ if(snaTrialHasPaidAccess()){
+  if(snaTrialModal){snaTrialModal.hidden=true;snaTrialModal.style.removeProperty('display');}
+  window.uiAlert?.('활성 이용권이 있습니다. 일반 편집 메뉴에서 기능을 사용해 주세요.');
+  return;
+ }
+ if(!snaTrialModal){
+  window.uiAlert?.('무료체험 화면을 찾지 못했습니다.');
+  return;
+ }
+ snaTrialModal.hidden=false;
+ snaTrialBusy=true;
+ snaTrialStatus('무료체험 연결 중…');
+ snaTrialUI();
+ let timer=null;
  try{
-  snaTrialStatus('체험 계정 준비 중…');
-  await snaTrialEnsureGuest();
-  if(!snaTrialAllowed()){window.uiAlert?.('이 계정은 체험 대상이 아닙니다. 계정 상태를 확인해 주세요.');return;}
-  snaTrialModal.hidden=false;
+  const user=await Promise.race([
+   snaTrialEnsureGuest(),
+   new Promise((_,reject)=>{
+    timer=setTimeout(()=>reject(new Error('Firebase 로그인 응답 시간 초과. 인터넷이나 익명 로그인 설정을 확인해 주세요.')),15000);
+   })
+  ]);
+  // Restore the same authenticated UID after an asynchronous Auth state callback.
+  authUser=auth.currentUser||user;
+  if(!snaTrialAllowed()){
+   snaTrialStatus('현재 로그인된 계정에서는 무료체험을 시작할 수 없습니다. 계정 상태를 확인해 주세요.');
+   return;
+  }
   await snaTrialReload();
- }catch(err){window.uiAlert?.('체험 시작 실패: '+(err?.message||err));}
+ }catch(err){
+  console.error('무료체험 연결 실패',err);
+  snaTrialStatus('무료체험 오류: '+(err?.code||err?.message||String(err)));
+ }finally{
+  if(timer!==null)clearTimeout(timer);
+  snaTrialBusy=false;
+  snaTrialUI();
+ }
 }
 async function snaTrialStart(feature){
  if(!snaTrialAllowed()||!snaTrialFeatures[feature]||snaTrialBusy||snaTrialActive)return;
@@ -2020,8 +2138,7 @@ async function snaTrialFinish(){
  }
 }
 window.SnaTrial={get active(){return snaTrialActive;},open:snaTrialOpen,reload:snaTrialReload,finish:snaTrialFinish,end:snaTrialEnd,reset:()=>snaTrialEnd(false)};
-document.getElementById('sna-market-open-login')?.addEventListener('click',snaTrialOpen);
-document.getElementById('sna-market-open-waiting')?.addEventListener('click',snaTrialOpen);
+// Free-trial entry is bound in HTML above to remain diagnosable if Firebase initialization fails.
 document.getElementById('sna-realtrial-close')?.addEventListener('click',()=>{snaTrialModal.hidden=true;});
 document.getElementById('sna-realtrial-done')?.addEventListener('click',()=>{snaTrialModal.hidden=true;});
 document.getElementById('sna-realtrial-refresh')?.addEventListener('click',snaTrialReload);
@@ -3191,6 +3308,12 @@ window.closeAdmin=()=>{
   </div>
   <footer class="guide-footer"><button type="button" class="guide-done" data-close-guide>이해했어요</button></footer>
  </article>
+</div>
+
+<!-- SNIPER Control Center HUD: screen-only navigation status -->
+<div id="sna-control-hud" aria-label="SNA 편집기 상태 안내">
+  <div class="sna-hud-brand"><img class="sna-hud-glyph" alt="SNIPER 로고" src="data:image/webp;base64,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"><span><span class="sna-hud-name">SNIPER</span><span class="sna-hud-sub" style="display:block">CREATIVE EDITOR</span></span></div>
+  <div class="sna-hud-readouts"><span class="sna-hud-readout" role="status">MODULE <b id="sna-hud-module">옷 추출</b></span><span class="sna-hud-readout status"><span class="sna-hud-dot" aria-hidden="true"></span> EDIT MODE</span></div>
 </div>
 
 <div class="global-tabs">
@@ -9047,7 +9170,7 @@ render();health();
 
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.8 · 구매자 메뉴 무료 체험 제거</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.8 · SNIPER CONTROL UI</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
  <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 사용자 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
@@ -9076,7 +9199,7 @@ render();health();
 
 <section id="sna-realtrial" hidden class="sna-realtrial-overlay" role="dialog" aria-modal="true" aria-labelledby="sna-realtrial-title">
  <div class="sna-realtrial-panel">
-  <header class="sna-realtrial-header"><div><h2 id="sna-realtrial-title">✨ 실제 기능 무료 체험</h2><p>회원가입 전에도, 승인 대기 중에도 각 기능을 1회씩 체험할 수 있습니다.</p></div><button id="sna-realtrial-close" type="button" aria-label="닫기">✕</button></header>
+  <header class="sna-realtrial-header"><div><h2 id="sna-realtrial-title">✨ 실제 기능 무료 체험 <small style="font-size:10px;color:#8adce1">R2</small></h2><p>회원가입 전에도, 승인 대기 중에도 각 기능을 1회씩 체험할 수 있습니다.</p></div><button id="sna-realtrial-close" type="button" aria-label="닫기">✕</button></header>
   <div class="sna-realtrial-info">회원가입이나 결제 없이 자신의 사진으로 실제 편집 기능을 체험할 수 있습니다.<br><strong>결과물 저장·공유를 완료하면 해당 기능의 1회가 차감됩니다.</strong> 편집 화면만 열거나 저장 전에 취소했다면 횟수는 그대로입니다. 체험을 모두 사용하면 회원가입 후 이용권 구매·관리자 승인을 받아야 계속 사용할 수 있습니다.</div>
   <div id="sna-realtrial-grid" class="sna-realtrial-grid" aria-live="polite"></div>
   <p id="sna-realtrial-status" class="sna-realtrial-status" role="status"></p>
@@ -9155,66 +9278,4 @@ render();health();
  const shade=document.createElement('div');shade.id='sna-wizard';shade.className='sna-wizard-overlay';shade.hidden=true;
  shade.innerHTML='<section class="sna-wizard-card" role="dialog" aria-modal="true" aria-label="대필판 제작 안내"><h3 id="sna-wizard-title"></h3><p id="sna-wizard-body"></p><div class="sna-wizard-actions"><button id="sna-wizard-exit" type="button">닫기</button><button id="sna-wizard-act" type="button">실행</button><button id="sna-wizard-next" type="button">다음 단계 →</button></div></section>';document.body.append(shade);
  function showWizard(){const data=steps[wizardAt];$('sna-wizard-title').textContent=data.title;$('sna-wizard-body').textContent=data.body;$('sna-wizard-act').textContent=data.action;$('sna-wizard-next').textContent=wizardAt===steps.length-1?'처음부터 보기':'다음 단계 →';}
- $('sna-board-wizard').onclick=()=>{if(!boardReady())return setStatus('승인된 대필판 계정에서 이용할 수 있습니다.');wizardAt=0;showWizard();shade.hidden=false;};
- $('sna-wizard-exit').onclick=()=>{shade.hidden=true;};$('sna-wizard-act').onclick=async()=>{shade.hidden=true;await steps[wizardAt].go();};$('sna-wizard-next').onclick=()=>{wizardAt=(wizardAt+1)%steps.length;showWizard();};
-})();
-</script>
-
-<script id="sna-v1254-ui-adapter">
-(()=>{
-  'use strict';
-  const main=document.getElementById('b_savePng');
-  const format=document.getElementById('sna-board-export-format');
-  const alt=document.getElementById('sna-board-export-alt');
-  const smart=document.getElementById('sna-board-smart');
-  const layout=document.getElementById('sna-board-layout-apply');
-  const check=document.getElementById('sna-board-quality-check');
-  if(!main||!format||!alt)return;
-  const names={'image/png':'PNG','image/jpeg':'JPG','image/webp':'WebP'};
-  function update(){const type=names[format.value]||'이미지';main.textContent='↗ '+type+' 저장 / 공유';main.title='현재 선택한 이미지 형식으로 저장하거나 공유합니다.';}
-  format.addEventListener('change',update);update();
-  main.addEventListener('click',e=>{
-    if(main.disabled)return;
-    // Preserve legacy settings and workflows; invoke their existing actions.
-    const stats=window.SnaBoardExtra?.count?.();
-    if(stats&&(stats.clothes||stats.guns)&&smart?.checked){
-      // The smart-layout checkbox denotes permission to auto-adjust sizes before exporting.
-      try{layout?.click();}catch(err){console.warn('대필판 자동 배치 오류',err);}
-    }
-    try{check?.click();}catch(err){console.warn('대필판 저장 전 검사 오류',err);}
-    if(format.value!=='image/png'){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      alt.click();
-    }
-  },true);
-})();
-</script>
-
-<!-- v12.5.8: Hide/remove free-trial shortcuts ONLY from the paid-user navigation.
-     Keep the anonymous trial entry point on the login screen. -->
-<script id="sna-v1257-purchased-nav-guard">
-(()=>{
-  'use strict';
-  const nav=document.querySelector('.global-tabs');
-  if(!nav)return;
-  const isTrialShortcut=(el)=>{
-    if(!el.matches || !el.matches('button,a,[role="button"]'))return false;
-    const label=(el.textContent||'').replace(/\s+/g,'').toLowerCase();
-    const id=(el.id||'').toLowerCase();
-    return label.includes('무료체험') ||
-      ['btn-trial','btn-free-trial','btn-freeTrial','sna-trial-nav'].some(x=>id===x.toLowerCase()) ||
-      el.hasAttribute('data-sna-trial-nav');
-  };
-  function removeTrialLinks(){
-    for(const el of nav.querySelectorAll('button,a,[role="button"]')){
-      if(isTrialShortcut(el))el.remove();
-    }
-  }
-  removeTrialLinks();
-  const watcher=new MutationObserver(removeTrialLinks);
-  watcher.observe(nav,{childList:true,subtree:true,characterData:true});
-})();
-</script>
-</body>
-</html>
+ $('sna-board-wizard').onclick=()=>{if(!boardReady())return setStatus('승인된 대필판 계정에서 이용할 수 있습니
