@@ -1423,6 +1423,35 @@ body {background:radial-gradient(ellipse 80% 32% at 50% 0%,#13364c 0%,transparen
  .global-tabs > #sna-menu-more{font-size:13px!important}
 }
 </style>
+<style id="sna-spec-guide-style">
+/* 스펙별 배치표 안내만 추가 · 기존 계산 및 저장 기능 미변경 */
+#sna-spec-layout-guide{margin:12px 0 8px;border:1px solid #48658a;border-radius:15px;background:#142338;color:#ecf4ff;overflow:hidden}
+#sna-spec-layout-guide>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 15px;cursor:pointer;font-weight:850;font-size:14px;min-height:50px}
+#sna-spec-layout-guide>summary::-webkit-details-marker{display:none}
+#sna-spec-layout-guide>summary:after{content:'⌄';font-size:18px;color:#9dc4ff;flex:none}
+#sna-spec-layout-guide[open]>summary{border-bottom:1px solid #344f74}
+#sna-spec-layout-guide[open]>summary:after{content:'⌃'}
+.sna-spec-guide-inner{padding:13px}
+.sna-spec-guide-hint{font-size:12px;line-height:1.65;color:#bcd0ea;margin:0 0 12px}
+.sna-spec-guide-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:12px}
+.sna-spec-guide-tabs button{min-height:43px;border:1px solid #4b6991;border-radius:11px;background:#1c304b;color:#dbebff;font-size:13px;font-weight:800;padding:8px 4px;touch-action:manipulation;cursor:pointer}
+.sna-spec-guide-tabs button[aria-pressed=true]{border-color:#79e9e8;background:#1b525e;color:#eaffff;box-shadow:inset 0 0 0 1px #49bcb3}
+.sna-spec-guide-panel{border:1px solid #385377;border-radius:12px;padding:12px;background:#101d31}
+.sna-spec-guide-panel h3{font-size:14px;margin:0 0 6px;color:#eef5ff}
+.sna-spec-guide-panel p{font-size:12px;color:#b8cee6;line-height:1.6;margin:0 0 9px}
+.sna-spec-guide-current{font-size:12px;line-height:1.65;background:#1b354c;border-radius:9px;padding:9px 10px;color:#daefff;margin-bottom:10px;white-space:normal}
+.sna-spec-guide-apply{width:100%;min-height:43px;border:1px solid #8fc2f2;border-radius:10px;background:#3d6894;color:#fff;font-size:13px;font-weight:800;cursor:pointer;margin:0 0 10px}
+.sna-spec-guide-apply:disabled{opacity:.7;background:#2b435e;border-color:#4c6584;cursor:default}
+.sna-spec-guide-grids{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sna-spec-guide-grids>section{min-width:0}
+.sna-spec-guide-grids h4{font-size:13px;margin:0 0 8px;color:#ddecff}
+.sna-spec-guide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.sna-spec-guide-chip{border:1px solid #355779;border-radius:8px;padding:8px 6px;background:#20344e;color:#f1f7ff;text-align:center;font-size:11px;line-height:1.5;font-variant-numeric:tabular-nums}
+.sna-spec-guide-chip b{font-weight:850;color:#a6e9f5;display:block}
+.sna-spec-guide-bottom{margin-top:12px!important;margin-bottom:0!important;font-size:11px!important;color:#9fb6d2!important}
+@media(max-width:590px){.sna-spec-guide-grids{grid-template-columns:1fr}.sna-spec-guide-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:360px){.sna-spec-guide-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
 </head>
 
 <body>
@@ -4006,6 +4035,30 @@ window.closeAdmin=()=>{
    <div class="board-row" style="margin-top:8px">
     <div class="board-field"><label for="b_boardSize">원본 대필판 선택</label><select id="b_boardSize"><option value="small">저스펙</option><option value="medium" selected>중스펙</option><option value="large">고스펙</option></select></div>
    </div>
+
+   <!-- 기존 대필판 크기 선택은 유지 · 안내는 접어 둔 상태로 시작 -->
+   <details id="sna-spec-layout-guide">
+    <summary>📐 스펙별 사진 자동 배치표 보기 <span style="font-size:11px;color:#a8bad4;font-weight:500">옷·총기 장수별 배열</span></summary>
+    <div class="sna-spec-guide-inner">
+     <p class="sna-spec-guide-hint">저스펙·중스펙·고스펙을 선택해 판 형태를 확인하세요. 스펙별로 자주 참고할 만한 장수 예시를 나눠 보여줍니다. <b>안내용 분류</b>이며 장수를 제한하지 않아요. 실제 자동 배치는 모든 스펙에서 사진 장수에 맞춰 동일하게 계산합니다.</p>
+     <div class="sna-spec-guide-tabs" role="group" aria-label="대필판 스펙별 안내 선택">
+      <button type="button" data-sna-spec="small" aria-pressed="false">저스펙</button>
+      <button type="button" data-sna-spec="medium" aria-pressed="true">중스펙</button>
+      <button type="button" data-sna-spec="large" aria-pressed="false">고스펙</button>
+     </div>
+     <section class="sna-spec-guide-panel" aria-live="polite">
+      <h3 id="sna-spec-guide-title">중스펙 · 배치 안내</h3>
+      <p id="sna-spec-guide-desc">한 장 또는 두 장 연결을 선택할 수 있어요.</p>
+      <div id="sna-spec-guide-current" class="sna-spec-guide-current">현재 추가된 사진: 옷 0장 · 총기 0장</div>
+      <button type="button" id="sna-spec-guide-apply" class="sna-spec-guide-apply">현재 대필판에 중스펙 적용</button>
+      <div class="sna-spec-guide-grids">
+       <section><h4>👕 옷 사진 배치</h4><div id="sna-spec-guide-clothes" class="sna-spec-guide-grid"></div></section>
+       <section><h4>🔫 총기 사진 배치</h4><div id="sna-spec-guide-guns" class="sna-spec-guide-grid"></div></section>
+      </div>
+      <p class="sna-spec-guide-bottom">예: 3열 × 3행 = 옷 9장. 표에 없는 사진 장수는 기존 편집기의 자동 계산 방식을 사용합니다. 이미 추가된 사진은 지우지 않아요.</p>
+     </section>
+    </div>
+   </details>
    <div class="board-row" id="b_mediumPagesBox" style="margin-top:0">
     <div class="board-field"><label for="b_mediumPages">중스펙 대필판 연결 방식 (직접 선택)</label><select id="b_mediumPages"><option value="1" selected>1장 · 기존 한 장 배치</option><option value="2">2장 연결 · 왼쪽 옷 / 오른쪽 총기</option></select></div>
    </div>
@@ -4025,29 +4078,29 @@ window.closeAdmin=()=>{
     </div>
     <div class="board-counter" style="margin-top:8px;line-height:1.6">2장 연결: 왼쪽은 옷, 오른쪽은 총기예요. 양쪽 판의 폭은 같고, 왼쪽 맨 위 5칸에는 문구가 들어갑니다.</div>
    </div>
-   <div id="b_photoFineControls" class="board-field" style="display:none;margin-top:14px;padding:12px;border:1px solid #3d506b;border-radius:12px;background:#182332">
+   <div id="b_photoFineControls" class="board-field" style="display:block;margin-top:14px;padding:12px;border:1px solid #3d506b;border-radius:12px;background:#182332">
     <label for="b_photoFineEnabled" style="display:flex;align-items:center;gap:9px;font-weight:800;cursor:pointer">
      <input id="b_photoFineEnabled" type="checkbox" style="width:20px;height:20px;accent-color:#70b6ff;flex:none">
-     <span>사진 위치·크기 직접 조절</span>
+     <span>🎞️ 영상처럼 옷·총기 묶음 자유 이동·크기 조절</span>
     </label>
-    <p style="margin:8px 0;color:#b6c5d8;font-size:12px;line-height:1.6">체크하면 옷·총기 사진을 따로 확대하거나 이동할 수 있어요. 흰색 사진판 밖으로는 보이지 않습니다.</p>
+    <p style="margin:8px 0;color:#b6c5d8;font-size:12px;line-height:1.6">체크한 뒤 아래 미리보기에서 옷이나 총기 묶음을 손가락으로 끌어 이동하고, 선택된 테두리의 오른쪽 아래 ◢ 손잡이를 끌어 크기를 조절할 수 있어요. 저장 이미지에는 편집 테두리가 나오지 않습니다.</p>
     <label style="display:flex;align-items:center;gap:9px;line-height:1.5;font-size:13px;font-weight:700;color:#e1efff;cursor:pointer;margin:10px 0">
-      <input id="b_photoFineFill" type="checkbox" checked style="width:20px;height:20px;accent-color:#70b6ff;flex:none">
-      위·아래 흰 빈칸 자동 채우기
+      <input id="b_photoFineFill" type="checkbox" style="width:20px;height:20px;accent-color:#70b6ff;flex:none">
+      위·아래 흰 빈칸 자동 채우기 (선택)
     </label>
     <p style="color:#bacbe0;font-size:12px;line-height:1.5;margin:0 0 7px">빈칸을 채우기 위해 사진 묶음 전체를 확대해요. 사진 모양은 유지되지만 좌우 끝 일부가 가려질 수 있어요.</p>
     <div id="b_photoFineFillInfo" class="board-counter" aria-live="polite" style="margin:4px 0 8px;line-height:1.5"></div>
     <div id="b_photoFineEditor" style="display:none">
      <div style="margin-top:12px;font-weight:800;color:#eef4fd">👕 왼쪽 옷 사진 묶음</div>
-     <div class="board-field"><label for="b_clothesFineZoom">크기 <output id="b_clothesFineZoomValue">100%</output></label><input id="b_clothesFineZoom" class="board-range" type="range" min="70" max="170" step="1" value="100"></div>
-     <div class="board-field"><label for="b_clothesFineX">좌우 이동 <output id="b_clothesFineXValue">0px</output></label><input id="b_clothesFineX" class="board-range" type="range" min="-250" max="250" step="1" value="0"></div>
-     <div class="board-field"><label for="b_clothesFineY">상하 이동 <output id="b_clothesFineYValue">0px</output></label><input id="b_clothesFineY" class="board-range" type="range" min="-450" max="450" step="1" value="0"></div>
+     <div class="board-field"><label for="b_clothesFineZoom">크기 <output id="b_clothesFineZoomValue">100%</output></label><input id="b_clothesFineZoom" class="board-range" type="range" min="25" max="350" step="1" value="100"></div>
+     <div class="board-field"><label for="b_clothesFineX">좌우 이동 <output id="b_clothesFineXValue">0px</output></label><input id="b_clothesFineX" class="board-range" type="range" min="-900" max="900" step="1" value="0"></div>
+     <div class="board-field"><label for="b_clothesFineY">상하 이동 <output id="b_clothesFineYValue">0px</output></label><input id="b_clothesFineY" class="board-range" type="range" min="-1200" max="1200" step="1" value="0"></div>
      <div style="margin-top:14px;font-weight:800;color:#eef4fd">🔫 오른쪽 총기 사진 묶음</div>
-     <div class="board-field"><label for="b_gunsFineZoom">크기 <output id="b_gunsFineZoomValue">100%</output></label><input id="b_gunsFineZoom" class="board-range" type="range" min="70" max="170" step="1" value="100"></div>
-     <div class="board-field"><label for="b_gunsFineX">좌우 이동 <output id="b_gunsFineXValue">0px</output></label><input id="b_gunsFineX" class="board-range" type="range" min="-250" max="250" step="1" value="0"></div>
-     <div class="board-field"><label for="b_gunsFineY">상하 이동 <output id="b_gunsFineYValue">0px</output></label><input id="b_gunsFineY" class="board-range" type="range" min="-450" max="450" step="1" value="0"></div>
+     <div class="board-field"><label for="b_gunsFineZoom">크기 <output id="b_gunsFineZoomValue">100%</output></label><input id="b_gunsFineZoom" class="board-range" type="range" min="25" max="350" step="1" value="100"></div>
+     <div class="board-field"><label for="b_gunsFineX">좌우 이동 <output id="b_gunsFineXValue">0px</output></label><input id="b_gunsFineX" class="board-range" type="range" min="-900" max="900" step="1" value="0"></div>
+     <div class="board-field"><label for="b_gunsFineY">상하 이동 <output id="b_gunsFineYValue">0px</output></label><input id="b_gunsFineY" class="board-range" type="range" min="-1200" max="1200" step="1" value="0"></div>
      <div class="board-row" style="margin-top:10px"><button type="button" id="b_photoFineReset" class="board-btn">↩ 옷·총기 위치와 크기 초기화</button></div>
-     <p style="color:#bed6f0;font-size:12px;line-height:1.6;margin:10px 0 0">미리보기 사진을 손가락으로 밀어 움직일 수도 있어요. 전체 사진을 잘림 없이 보고 싶다면 위의 빈칸 자동 채우기를 꺼 주세요.</p>
+     <p style="color:#bed6f0;font-size:12px;line-height:1.6;margin:10px 0 0">미리보기에서 옷·총기 묶음을 터치해 선택하세요. 내부를 드래그하면 위치 이동, 오른쪽 아래 ◢ 손잡이를 드래그하면 비율 유지 크기 조절입니다. 필요하면 아래 슬라이더로 세밀하게 조정할 수도 있어요.</p>
     </div>
    </div>
   </section>
@@ -4150,7 +4203,7 @@ window.closeAdmin=()=>{
    <div class="board-row"><label class="kl8-check"><input type="checkbox" id="b_autoAlign" checked> 글자 이탈 자동 제한</label><button type="button" class="board-btn" id="b_alignNow">옷·총 및 글자 자동 정렬</button><span class="board-small">자동 제한을 꺼도 기존 수동 조절값은 유지</span></div>
     <div id="b_previewMeta" class="board-counter">옷 0장 · 총기 0장 · 대기 중</div>
    <div id="b_touch-sort-hint" style="margin-top:8px;border:1px solid #3a5279;background:#0e1c34;color:#d6e6ff;padding:11px 12px;border-radius:12px;font-size:13px;text-align:center">옷 순서 바꾸기: 미리보기에서 <b>첫 번째 옷</b>을 누르고, <b>바꿀 옷</b>을 누르세요.</div>
-   <div class="board-preview-wrap" style="margin-top:10px"><canvas id="b_preview" width="900" height="1300"></canvas></div>
+   <div class="board-row" style="margin-top:12px;align-items:center"><button type="button" id="b_fineQuickToggle" class="board-btn" aria-pressed="false">🎞️ 사진 묶음 자유 조절 켜기</button><span class="board-small">손가락으로 이동 · 모서리 ◢ 크기 변경</span></div><div class="board-preview-wrap" style="margin-top:10px"><canvas id="b_preview" width="900" height="1300"></canvas></div>
    <div class="member-panel" style="margin:10px 0"><h3>🏛️ 대필 전시관 자동 등록</h3>
     <p>PNG 대필판을 저장하면 전시관에 자동으로 등록되고 모든 회원에게 공개됩니다.</p>
     <div class="member-controls"><input type="text" id="board-work-title" placeholder="작품 제목 (선택)" maxlength="60" style="flex:1"></div>
@@ -8072,7 +8125,7 @@ saveBtn.addEventListener("click",async()=>{
   // larger bundle, restrict panning to positions that still cover the sheet;
   // the fixed canvas clip hides only pixels outside the sheet.
   function restrictFinePosition(prefix,viewW,viewH,naturalH){
-   const requested=Math.max(.7,Math.min(5,(Number($(prefix+"Zoom").value)||100)/100));
+   const requested=Math.max(.25,Math.min(3.5,(Number($(prefix+"Zoom").value)||100)/100));
    const fillOn=$("b_photoFineFill").checked;
    // With the fill option, the complete group must cover the photo band's
    // full height. Cropping can only occur OUTSIDE the white pane, never
@@ -8081,11 +8134,11 @@ saveBtn.addEventListener("click",async()=>{
    const zoom=Math.max(requested,minimum);
    const scaledW=viewW*zoom;
    const scaledH=naturalH*zoom;
-   const allowedX=Math.abs(viewW-scaledW)/2;
+   const allowedX=fillOn?Math.abs(viewW-scaledW)/2:viewW*.85;
    // If the group is taller than the pane, pan only while it still covers
    // both edges. If fill is disabled, leave the original free positioning.
-   const minY=Math.min(0,viewH-scaledH);
-   const maxY=Math.max(0,viewH-scaledH);
+   const minY=fillOn?Math.min(0,viewH-scaledH):-viewH*.85;
+   const maxY=fillOn?Math.max(0,viewH-scaledH):viewH*.85;
    const xInput=$(prefix+"X"),yInput=$(prefix+"Y");
    const bounded=(el,min,max)=>{
     const value=Number(el.value)||0;
@@ -8113,7 +8166,7 @@ saveBtn.addEventListener("click",async()=>{
    // Manual adjustments apply to the whole composed photo group, never to each
    // individual picture. Uniform scaling preserves source image aspect ratios.
    const fine=options.fine;
-   if(false&&fine&&$("b_photoFineEnabled").checked){
+   if(fine&&$("b_photoFineEnabled").checked){
     const {zoom,dx,dy}=restrictFinePosition(fine,w,Math.max(0,bodyBottom-top),packingHeight(layout));
     const cx=x+w/2;
     g.save();
@@ -8186,7 +8239,7 @@ saveBtn.addEventListener("click",async()=>{
     });
     rowY+=row.height;
    });
-   if(false&&fine&&$("b_photoFineEnabled").checked)g.restore();
+   if(fine&&$("b_photoFineEnabled").checked)g.restore();
   }
 
 
@@ -8198,8 +8251,8 @@ saveBtn.addEventListener("click",async()=>{
     drawItems(guns,rightGridX,rightInnerW,gunsCols,"name",{top:largeGunTop,bottom:bodyBottom,layout:gunsPacking,gunNames:true,fine:"b_gunsFine"});
    }
   }else{
-   drawItems(clothes,leftX,leftW,clothesCols,"name",{top:photoTop,bottom:bodyBottom,layout:clothesPacking});
-   drawItems(guns,rightX,rightW,gunsCols,"name",{top:photoTop,bottom:bodyBottom,layout:gunsPacking,gunNames:true});
+   drawItems(clothes,leftX,leftW,clothesCols,"name",{top:photoTop,bottom:bodyBottom,layout:clothesPacking,fine:"b_clothesFine"});
+   drawItems(guns,rightX,rightW,gunsCols,"name",{top:photoTop,bottom:bodyBottom,layout:gunsPacking,gunNames:true,fine:"b_gunsFine"});
   }
   const bottomGap=isLarge&&clothes.length&&guns.length?
    Math.abs((photoTop+packingHeight(clothesPacking))-(largeGunTop+packingHeight(gunsPacking))):0;
@@ -8208,11 +8261,52 @@ saveBtn.addEventListener("click",async()=>{
    photoRects:isLarge?{
     clothes:{x:margin,y:photoTop,w:largeLeftInnerW,h:Math.max(0,bodyBottom-photoTop),contentH:packingHeight(clothesPacking)},
     guns:{x:margin+largeLeftInnerW+seamW,y:largeGunTop,w:rightInnerW,h:Math.max(0,bodyBottom-largeGunTop),contentH:packingHeight(gunsPacking)}
-   }:null};
+   }:{
+    clothes:{x:leftX,y:photoTop,w:leftW,h:Math.max(0,bodyBottom-photoTop),contentH:packingHeight(clothesPacking)},
+    guns:{x:rightX,y:photoTop,w:rightW,h:Math.max(0,bodyBottom-photoTop),contentH:packingHeight(gunsPacking)}
+   }};
+ }
+ // The video-style edit box is drawn ONLY on the preview, never on the exported image.
+ let photoFineSide='clothes';
+ function photoGroupPreviewRect(layout,side){
+  const r=layout?.photoRects?.[side];
+  if(!r||!state[side].length||!r.w||!r.contentH)return null;
+  const prefix=side==='clothes'?'b_clothesFine':'b_gunsFine';
+  const z=(Number($(prefix+'Zoom').value)||100)/100;
+  const fill=$('b_photoFineFill').checked;
+  const zoom=Math.max(z,fill?Math.max(1,r.h/Math.max(1,r.contentH)):0);
+  const dx=Number($(prefix+'X').value)||0;
+  const dy=Number($(prefix+'Y').value)||0;
+  const left=r.x+(r.w-r.w*zoom)/2+dx,top=r.y+dy;
+  const right=left+r.w*zoom,bottom=top+r.contentH*zoom;
+  const x=Math.max(r.x,left),y=Math.max(r.y,top);
+  const xr=Math.min(r.x+r.w,right),yb=Math.min(r.y+r.h,bottom);
+  if(xr<=x||yb<=y)return null;
+  return {x,y,w:xr-x,h:yb-y,hx:Math.max(x+1,xr-6),hy:Math.max(y+1,yb-6),side,prefix};
+ }
+ function paintPhotoFineHandles(layout){
+  if(!$('b_photoFineEnabled').checked||!layout?.photoRects)return;
+  const g=canvas.getContext('2d'),unit=Math.max(12,layout.width/38);
+  g.save();g.setTransform(canvas.width/layout.width,0,0,canvas.height/layout.height,0,0);
+  for(const side of ['clothes','guns']){
+   const r=photoGroupPreviewRect(layout,side);if(!r)continue;
+   const active=photoFineSide===side;
+   g.strokeStyle=active?'#20f4d6':'#e7e9ff';g.lineWidth=active?3:1.6;
+   g.setLineDash(active?[unit*.45,unit*.25]:[unit*.20,unit*.22]);
+   g.strokeRect(r.x+1,r.y+1,Math.max(1,r.w-2),Math.max(1,r.h-2));g.setLineDash([]);
+   if(active){
+    const hs=unit*.90;
+    g.fillStyle='#052d43';g.fillRect(r.hx-hs/2,r.hy-hs/2,hs,hs);
+    g.strokeStyle='#20f4d6';g.lineWidth=2;g.strokeRect(r.hx-hs/2,r.hy-hs/2,hs,hs);
+    g.beginPath();g.strokeStyle='#ffffff';g.moveTo(r.hx-hs*.20,r.hy+hs*.20);g.lineTo(r.hx+hs*.20,r.hy-hs*.20);
+    g.moveTo(r.hx+hs*.03,r.hy+hs*.20);g.lineTo(r.hx+hs*.20,r.hy+hs*.03);g.stroke();
+   }
+  }
+  g.restore();
  }
  function scheduleDraw(){
   if(state.drawQueued)return;state.drawQueued=true;
-  requestAnimationFrame(()=>{state.drawQueued=false;try{const m=buildLayout(canvas,true);state.previewLayout=m;
+  requestAnimationFrame(()=>{state.drawQueued=false;try{const m=buildLayout(canvas,true);state.previewLayout=m;paintPhotoFineHandles(m);
     const coverStatus=$("b_photoFineFillInfo");
     if(coverStatus){
       if(!$("b_photoFineEnabled").checked){coverStatus.textContent="";}
@@ -8239,10 +8333,10 @@ saveBtn.addEventListener("click",async()=>{
   $("b_largeSizeControls").style.display="none";
   $("b_largeManualControls").style.display="none";
   $("b_largeSizePercentValue").textContent=$("b_largeSizePercent").value+"%";
-  $("b_photoFineControls").style.display="none";
-  $("b_photoFineEditor").style.display="none";
-  canvas.style.touchAction=on&&$("b_photoFineEnabled").checked?"none":"auto";
-  canvas.style.cursor=on&&$("b_photoFineEnabled").checked?"grab":"auto";
+  $("b_photoFineControls").style.display="block";
+  $("b_photoFineEditor").style.display=$("b_photoFineEnabled").checked?"block":"none";
+  canvas.style.touchAction=$("b_photoFineEnabled").checked?"none":"auto";
+  canvas.style.cursor=$("b_photoFineEnabled").checked?"grab":"auto";
  }
  ["b_largeScaleMode","b_largeSizePercent"].forEach(id=>{
   $(id).addEventListener("input",()=>{updateLargeSizeControls();scheduleDraw();});
@@ -8265,6 +8359,10 @@ saveBtn.addEventListener("click",async()=>{
  }
  photoFineIds.forEach(id=>$(id).addEventListener("input",()=>{refreshFineValues();scheduleDraw();}));
  $("b_photoFineEnabled").addEventListener("change",()=>{updateLargeSizeControls();scheduleDraw();});
+ const videoQuick=$("b_fineQuickToggle");
+ function syncVideoQuick(){const active=$("b_photoFineEnabled").checked;videoQuick.textContent=active?"✓ 사진 묶음 조절 중 · 끄기":"🎞️ 사진 묶음 자유 조절 켜기";videoQuick.setAttribute("aria-pressed",String(active));}
+ videoQuick.addEventListener("click",()=>{$("b_photoFineEnabled").checked=!$("b_photoFineEnabled").checked;updateLargeSizeControls();syncVideoQuick();scheduleDraw();});
+ $("b_photoFineEnabled").addEventListener("change",syncVideoQuick);syncVideoQuick();
  $("b_photoFineFill").addEventListener("change",scheduleDraw);
  $("b_photoFineReset").addEventListener("click",resetPhotoFine);
  refreshFineValues();
@@ -8303,8 +8401,18 @@ saveBtn.addEventListener("click",async()=>{
   const y=(event.clientY-rect.top)*layout.height/rect.height;
   const side=Object.entries(layout.photoRects).find(([key,r])=>x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h&&state[key].length);
   if(!side)return;
+  photoFineSide=side[0];
+  historyPush(); // one Undo snapshot per touch gesture
   const prefix=side[0]==="clothes"?"b_clothesFine":"b_gunsFine";
-  previewDrag={id:event.pointerId,prefix,startX:event.clientX,startY:event.clientY,originX:Number($(prefix+"X").value),originY:Number($(prefix+"Y").value),pixelX:layout.width/rect.width,pixelY:layout.height/rect.height};
+  const box=photoGroupPreviewRect(layout,side[0]);
+  const hx=box?.hx??-10000,hy=box?.hy??-10000;
+  const handleRadius=Math.max(18,22*layout.width/rect.width);
+  const resize=box&&Math.hypot(x-hx,y-hy)<=handleRadius;
+  previewDrag={id:event.pointerId,prefix,mode:resize?'resize':'move',
+   startX:event.clientX,startY:event.clientY,originX:Number($(prefix+"X").value),originY:Number($(prefix+"Y").value),
+   originZoom:Number($(prefix+"Zoom").value)||100,pixelX:layout.width/rect.width,pixelY:layout.height/rect.height,
+   viewWidth:side[1].w,viewHeight:side[1].h};
+  scheduleDraw();
   try{canvas.setPointerCapture(event.pointerId);}catch(e){}
   canvas.style.cursor="grabbing";
   event.preventDefault();
@@ -8317,15 +8425,22 @@ saveBtn.addEventListener("click",async()=>{
    const v=Math.max(Number(slider.min),Math.min(Number(slider.max),Math.round(n)));
    slider.value=String(v);
   };
-  update("X",drag.originX+(event.clientX-drag.startX)*drag.pixelX);
-  update("Y",drag.originY+(event.clientY-drag.startY)*drag.pixelY);
-  const rect=state.previewLayout?.photoRects?.[drag.prefix==="b_clothesFine"?"clothes":"guns"];
-  if(rect)restrictFinePosition(drag.prefix,rect.w,rect.h,rect.contentH);
+  if(drag.mode==='resize'){
+   const deltaX=(event.clientX-drag.startX)*drag.pixelX;
+   const deltaY=(event.clientY-drag.startY)*drag.pixelY;
+   const change=1+(deltaX/Math.max(1,drag.viewWidth)+deltaY/Math.max(1,drag.viewHeight))*.65;
+   const slider=$(drag.prefix+'Zoom');
+   slider.value=String(Math.max(Number(slider.min),Math.min(Number(slider.max),Math.round(drag.originZoom*change))));
+  }else{
+   update("X",drag.originX+(event.clientX-drag.startX)*drag.pixelX);
+   update("Y",drag.originY+(event.clientY-drag.startY)*drag.pixelY);
+  }
+  // buildLayout normalizes bounds; this handler must not call its local helper.
   refreshFineValues();scheduleDraw();event.preventDefault();
  });
  function endPreviewDrag(event){
   if(!previewDrag||previewDrag.id!==event.pointerId)return;
-  previewDrag=null;canvas.style.cursor="grab";
+  previewDrag=null;canvas.style.cursor="grab";window.SnaDraft?.queue?.("board");
  }
  canvas.addEventListener("pointerup",endPreviewDrag);
  canvas.addEventListener("pointercancel",endPreviewDrag);
@@ -8445,8 +8560,8 @@ saveBtn.addEventListener("click",async()=>{
   inputIds.forEach(id=>{if(typeof obj[id]==="string")$(id).value=obj[id];});
    $('b_exportScale').value=['1','2','4'].includes(obj.b_exportScale)?obj.b_exportScale:'1';
    $('b_autoAlign').checked=obj.b_autoAlign!==false;
-   $("b_photoFineEnabled").checked=false;
-  $("b_photoFineFill").checked=obj.b_photoFineFill!==false;
+   $("b_photoFineEnabled").checked=obj.b_photoFineEnabled===true;
+  $("b_photoFineFill").checked=obj.b_photoFineFill===true;
   refreshFineValues();
   colorDefs.forEach(d=>{
    ["A","B"].forEach(s=>{
@@ -8458,7 +8573,7 @@ saveBtn.addEventListener("click",async()=>{
   $("b_subWidthValue").textContent=$("b_subWidth").value+"%";
   $("b_inquiryWidthNumber").value=$("b_inquiryWidth").value;
   $("b_subWidthNumber").value=$("b_subWidth").value;
-  updateLargeSizeControls();
+  updateLargeSizeControls();syncVideoQuick();
   if($("b_outlineValue"))$("b_outlineValue").textContent=$("b_outline").value;
   ["b_shadowStrength","b_shadowX","b_shadowY"].forEach(id=>{const out=$(id+"Value");if(out)out.textContent=$(id).value+(id==="b_shadowStrength"?"%":"");});
   if($("b_saturationValue"))$("b_saturationValue").textContent=$("b_saturation").value+"%";
@@ -8477,7 +8592,7 @@ saveBtn.addEventListener("click",async()=>{
   ["b_topText","b_ownerText","b_titleText","b_inquiryText","b_subText","b_leftTitle","b_rightTitle"].forEach(id=>$(id).value="");
   ["b_topText","b_titleText","b_leftTitle","b_rightTitle"].forEach(id=>$(id).value="");
   $("b_mediumPages").value="1";$("b_largeScaleMode").value="auto";$("b_largeSizePercent").value="100";
-  $("b_photoFineEnabled").checked=false;$("b_photoFineFill").checked=true;resetPhotoFine();updateLargeSizeControls();
+  $("b_photoFineEnabled").checked=false;$("b_photoFineFill").checked=false;resetPhotoFine();updateLargeSizeControls();syncVideoQuick();
   $("b_boardSize").value="medium";$("b_ownerSize").value="100";$("b_ownerSizeValue").textContent="100%";$("b_inquiryWidth").value="110";$("b_subWidth").value="100";$("b_inquiryWidthValue").textContent="110%";$("b_subWidthValue").textContent="100%";$("b_inquiryWidthNumber").value="110";$("b_subWidthNumber").value="100";$("b_textScale").value="100";$("b_outline").value="4";$("b_gradientDirection").value="vertical";
   ["b_ownerX","b_ownerY","b_inquiryX","b_inquiryY","b_subX","b_subY"].forEach(id=>$(id).value="0");
   $("b_clothesCols").value="3";$("b_gunCols").value="3";$("b_nameSize").value="28";$("b_clothLevelSize").value="40";$("b_gunNameSize").value="32";$("b_levelSize").value="60";$("b_clothNameX").value="0";$("b_clothNameY").value="0";$("b_gunNameX").value="0";$("b_gunNameY").value="0";$("b_gunLevelX").value="0";$("b_gunLevelY").value="0";$("b_shadowStrength").value="85";$("b_shadowColor").value="#777777";$("b_shadowX").value="2";$("b_shadowY").value="2";$("b_saturation").value="100";$("b_outlineValue").textContent=$("b_outline").value;$("b_shadowStrengthValue").textContent=$("b_shadowStrength").value+"%";$("b_shadowXValue").textContent=$("b_shadowX").value;$("b_shadowYValue").textContent=$("b_shadowY").value;$("b_saturationValue").textContent=$("b_saturation").value+"%";
@@ -9581,6 +9696,90 @@ render();health();
   });
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&nav.classList.contains('sna-more-open'))setOpen(false)});
   setOpen(false);
+})();
+</script>
+
+<script id="sna-spec-guide-script">
+/* 안내 UI만 추가 · 원래 buildLayout() 및 사진·문구 데이터 불변 */
+(()=>{
+ const init=()=>{
+  const root=document.getElementById('sna-spec-layout-guide');
+  if(!root||root.dataset.ready==='1')return;
+  root.dataset.ready='1';
+  const $=id=>document.getElementById(id);
+  const presets={
+   small:{label:'저스펙',desc:'한 장으로 만드는 대필판이에요. 옷과 총기 이미지가 같은 결과물에 들어갑니다.'},
+   medium:{label:'중스펙',desc:'한 장 또는 두 장 연결 중 선택할 수 있어요. 두 장 연결은 왼쪽 옷 / 오른쪽 총기예요.'},
+   large:{label:'고스펙',desc:'두 장 연결 대필판이에요. 왼쪽은 옷, 오른쪽은 총기 사진으로 나눠 배치해요.'}
+  };
+  const cloth={9:3,12:3,15:3,18:3,21:3,24:3,30:5,40:5,45:5,48:6,54:6,96:8};
+  const gun={3:1,4:1,5:1,6:1,7:1,8:1,12:2,14:2,24:3,30:3,96:6,100:5};
+  const examples={small:{cloth:[9,12,15,18,21,24],gun:[3,4,5,6,7,8]},medium:{cloth:[30,40,45,48,54],gun:[12,14,24,30]},large:{cloth:[96],gun:[96,100]}};
+  let selected=presets[$('b_boardSize')?.value]?$('b_boardSize').value:'medium';
+  const tiles=(obj,id)=>{
+   const el=$(id);if(!el)return;
+   const fragment=document.createDocumentFragment();
+   Object.entries(obj).forEach(([number,cols])=>{
+    const item=document.createElement('div');item.className='sna-spec-guide-chip';
+    const top=document.createElement('b');top.textContent=number+'장';
+    const below=document.createElement('span');below.textContent=cols+'열 × '+(Number(number)/cols)+'행';
+    item.append(top,below);fragment.append(item);
+   });
+   el.replaceChildren(fragment);
+  };
+  function renderTiles(){
+   const range=examples[selected];
+   tiles(Object.fromEntries(range.cloth.map(n=>[n,cloth[n]])),'sna-spec-guide-clothes');
+   tiles(Object.fromEntries(range.gun.map(n=>[n,gun[n]])),'sna-spec-guide-guns');
+  }
+  const countText=id=>Number(($((id))?.textContent||'').match(/\d+/)?.[0]||0);
+  function calcColumns(n,type){
+   if(!n)return 0;
+   const fixed=(type==='cloth'?cloth:gun)[n];if(fixed)return fixed;
+   const desired=type==='cloth'?Math.min(8,Math.max(3,Math.round(Math.sqrt(n*.65)))):
+      (n<=8?1:n<=14?2:Math.min(9,Math.max(3,Math.round(Math.sqrt(n*.42)))));
+   const divisors=[];
+   for(let c=1;c<=Math.min(9,n);c++)if(n%c===0)divisors.push(c);
+   if(divisors.length>1){
+    const viable=divisors.filter(c=>c>1);
+    return viable.reduce((a,b)=>Math.abs(b-desired)<Math.abs(a-desired)?b:a);
+   }
+   return Math.min(n,Math.max(1,desired));
+  }
+  function render(){
+   const p=presets[selected];
+   renderTiles();
+   $('sna-spec-guide-title').textContent=p.label+' · 사진 자동 배치표';
+   $('sna-spec-guide-desc').textContent=p.desc;
+   root.querySelectorAll('[data-sna-spec]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.snaSpec===selected)));
+   const apply=$('sna-spec-guide-apply');
+   const active=$('b_boardSize')?.value===selected;
+   apply.textContent=active?'✓ 현재 '+p.label+' 적용 중':p.label+' 대필판에 적용하기';
+   apply.disabled=active;
+   const c=countText('b_clothesCount'),g=countText('b_gunCount');
+   const smart=$('sna-board-smart')?.checked!==false;
+   const arr=(n,type)=>{
+    if(!n)return '0장';
+    const cols=smart?calcColumns(n,type):Math.max(1,Math.min(n,Number($(type==='cloth'?'b_clothesCols':'b_gunCols')?.value)||1));
+    return n+'장 ('+cols+'열 × '+Math.ceil(n/cols)+'행)';
+   };
+   $('sna-spec-guide-current').textContent='현재 사진 · 옷 '+arr(c,'cloth')+' / 총기 '+arr(g,'gun')+(smart?' · 자동 배치 켜짐':' · 자동 배치 꺼짐');
+  }
+  root.querySelectorAll('[data-sna-spec]').forEach(b=>b.addEventListener('click',()=>{selected=b.dataset.snaSpec;render();}));
+  $('sna-spec-guide-apply').addEventListener('click',()=>{
+   const select=$('b_boardSize');if(!select||select.value===selected)return;
+   select.value=selected;
+   select.dispatchEvent(new Event('change',{bubbles:true}));
+   render();
+  });
+  $('b_boardSize')?.addEventListener('change',()=>{selected=$('b_boardSize').value;render();});
+  ['b_clothesCount','b_gunCount'].forEach(id=>{const el=$(id);if(el)new MutationObserver(render).observe(el,{subtree:true,childList:true,characterData:true});});
+  $('sna-board-smart')?.addEventListener('change',render);
+  root.addEventListener('toggle',()=>{if(root.open)render();});
+  render();
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
+ else init();
 })();
 </script>
 </body>
