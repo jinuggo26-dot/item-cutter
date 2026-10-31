@@ -4081,15 +4081,19 @@ window.closeAdmin=()=>{
    <div id="b_photoFineControls" class="board-field" style="display:block;margin-top:14px;padding:12px;border:1px solid #3d506b;border-radius:12px;background:#182332">
     <label for="b_photoFineEnabled" style="display:flex;align-items:center;gap:9px;font-weight:800;cursor:pointer">
      <input id="b_photoFineEnabled" type="checkbox" style="width:20px;height:20px;accent-color:#70b6ff;flex:none">
-     <span>🎞️ 영상처럼 옷·총기 묶음 자유 이동·크기 조절</span>
+     <span>사진 위치·크기 직접 조절</span>
     </label>
-    <p style="margin:8px 0;color:#b6c5d8;font-size:12px;line-height:1.6">체크한 뒤 아래 미리보기에서 옷이나 총기 묶음을 손가락으로 끌어 이동하고, 선택된 테두리의 오른쪽 아래 ◢ 손잡이를 끌어 크기를 조절할 수 있어요. 저장 이미지에는 편집 테두리가 나오지 않습니다.</p>
-    <label style="display:flex;align-items:center;gap:9px;line-height:1.5;font-size:13px;font-weight:700;color:#e1efff;cursor:pointer;margin:10px 0">
-      <input id="b_photoFineFill" type="checkbox" style="width:20px;height:20px;accent-color:#70b6ff;flex:none">
-      위·아래 흰 빈칸 자동 채우기 (선택)
-    </label>
-    <p style="color:#bacbe0;font-size:12px;line-height:1.5;margin:0 0 7px">빈칸을 채우기 위해 사진 묶음 전체를 확대해요. 사진 모양은 유지되지만 좌우 끝 일부가 가려질 수 있어요.</p>
-    <div id="b_photoFineFillInfo" class="board-counter" aria-live="polite" style="margin:4px 0 8px;line-height:1.5"></div>
+    <p style="margin:8px 0;color:#b6c5d8;font-size:13px;line-height:1.65">① 옷·총기 사진을 추가하세요. ② 체크 후 아래 <b>6. 미리보기</b>에 있는 사진을 손가락으로 끌어 이동하세요. ③ 선택한 사진 묶음의 <b>오른쪽 아래 손잡이</b>를 끌면 크기가 바뀝니다. 글자 칸과 사진 칸은 서로 구분되어 있습니다.</p>
+    <button type="button" class="board-btn" id="b_photoFineGoPreview" style="width:100%;margin:8px 0 12px;min-height:44px">↓ 사진 미리보기로 이동</button>
+    <details id="b_photoFineExtras" style="border:1px solid #3d506b;border-radius:10px;padding:10px 12px;margin:4px 0 12px">
+      <summary style="cursor:pointer;font-weight:800;color:#d6eaff">추가 설정 · 사진 칸의 빈 여백 줄이기</summary>
+      <label style="display:flex;align-items:center;gap:9px;line-height:1.5;font-size:13px;font-weight:700;color:#e1efff;cursor:pointer;margin:10px 0">
+        <input id="b_photoFineFill" type="checkbox" style="width:20px;height:20px;accent-color:#70b6ff;flex:none">
+        사진 칸 빈 여백 줄이기 (자동 확대)
+      </label>
+      <p style="color:#bacbe0;font-size:12px;line-height:1.6;margin:0 0 7px">이 기능은 <b>사진의 위·아래 빈 공간을 줄이기 위해 묶음을 추가 확대</b>합니다. 사진 비율은 유지되지만 <b>좌우 일부가 가려질 수 있어요.</b> 확대 뒤에도 직접 이동할 수 있으며, 이동한 위치에 따라 빈 공간이 다시 보일 수 있어요. 기본적으로 꺼져 있습니다.</p>
+      <div id="b_photoFineFillInfo" class="board-counter" aria-live="polite" style="margin:4px 0 8px;line-height:1.5"></div>
+    </details>
     <div id="b_photoFineEditor" style="display:none">
      <div style="margin-top:12px;font-weight:800;color:#eef4fd">👕 왼쪽 옷 사진 묶음</div>
      <div class="board-field"><label for="b_clothesFineZoom">크기 <output id="b_clothesFineZoomValue">100%</output></label><input id="b_clothesFineZoom" class="board-range" type="range" min="25" max="350" step="1" value="100"></div>
@@ -4100,7 +4104,7 @@ window.closeAdmin=()=>{
      <div class="board-field"><label for="b_gunsFineX">좌우 이동 <output id="b_gunsFineXValue">0px</output></label><input id="b_gunsFineX" class="board-range" type="range" min="-900" max="900" step="1" value="0"></div>
      <div class="board-field"><label for="b_gunsFineY">상하 이동 <output id="b_gunsFineYValue">0px</output></label><input id="b_gunsFineY" class="board-range" type="range" min="-1200" max="1200" step="1" value="0"></div>
      <div class="board-row" style="margin-top:10px"><button type="button" id="b_photoFineReset" class="board-btn">↩ 옷·총기 위치와 크기 초기화</button></div>
-     <p style="color:#bed6f0;font-size:12px;line-height:1.6;margin:10px 0 0">미리보기에서 옷·총기 묶음을 터치해 선택하세요. 내부를 드래그하면 위치 이동, 오른쪽 아래 ◢ 손잡이를 드래그하면 비율 유지 크기 조절입니다. 필요하면 아래 슬라이더로 세밀하게 조정할 수도 있어요.</p>
+     <p style="color:#bed6f0;font-size:12px;line-height:1.6;margin:10px 0 0">옷 또는 총기 사진이 있는 구역을 손가락으로 끌어 이동합니다. 선택된 사진 묶음 오른쪽 아래 손잡이를 끌어 크기를 바꿉니다. 슬라이더로도 조절할 수 있어요. 사진이 없는 칸은 이동할 수 없습니다.</p>
     </div>
    </div>
   </section>
@@ -4203,7 +4207,10 @@ window.closeAdmin=()=>{
    <div class="board-row"><label class="kl8-check"><input type="checkbox" id="b_autoAlign" checked> 글자 이탈 자동 제한</label><button type="button" class="board-btn" id="b_alignNow">옷·총 및 글자 자동 정렬</button><span class="board-small">자동 제한을 꺼도 기존 수동 조절값은 유지</span></div>
     <div id="b_previewMeta" class="board-counter">옷 0장 · 총기 0장 · 대기 중</div>
    <div id="b_touch-sort-hint" style="margin-top:8px;border:1px solid #3a5279;background:#0e1c34;color:#d6e6ff;padding:11px 12px;border-radius:12px;font-size:13px;text-align:center">옷 순서 바꾸기: 미리보기에서 <b>첫 번째 옷</b>을 누르고, <b>바꿀 옷</b>을 누르세요.</div>
-   <div class="board-row" style="margin-top:12px;align-items:center"><button type="button" id="b_fineQuickToggle" class="board-btn" aria-pressed="false">🎞️ 사진 묶음 자유 조절 켜기</button><span class="board-small">손가락으로 이동 · 모서리 ◢ 크기 변경</span></div><div class="board-preview-wrap" style="margin-top:10px"><canvas id="b_preview" width="900" height="1300"></canvas></div>
+   <div class="board-row" style="margin-top:12px;align-items:center"><button type="button" id="b_fineQuickToggle" class="board-btn" aria-pressed="false">사진 이동·크기 조절 시작</button><span class="board-small">사진 위에서 손가락 드래그 · 우측 아래 손잡이로 확대·축소</span></div>
+   <div class="board-row" style="margin-top:8px"><button type="button" id="b_fineQuickReset" class="board-btn" style="min-height:42px">↺ 사진 크기 100%·위치 초기화</button></div>
+   <div id="b_photoFineTouchStatus" aria-live="polite" style="margin:8px 0;border:1px solid #486b8d;background:#122844;color:#e1f7ff;border-radius:9px;padding:10px 12px;font-size:12px;line-height:1.5;display:none">사진을 추가한 뒤 조절을 켜세요.</div>
+   <div class="board-preview-wrap" style="margin-top:10px"><canvas id="b_preview" width="900" height="1300"></canvas></div>
    <div class="member-panel" style="margin:10px 0"><h3>🏛️ 대필 전시관 자동 등록</h3>
     <p>PNG 대필판을 저장하면 전시관에 자동으로 등록되고 모든 회원에게 공개됩니다.</p>
     <div class="member-controls"><input type="text" id="board-work-title" placeholder="작품 제목 (선택)" maxlength="60" style="flex:1"></div>
@@ -8134,11 +8141,12 @@ saveBtn.addEventListener("click",async()=>{
    const zoom=Math.max(requested,minimum);
    const scaledW=viewW*zoom;
    const scaledH=naturalH*zoom;
-   const allowedX=fillOn?Math.abs(viewW-scaledW)/2:viewW*.85;
-   // If the group is taller than the pane, pan only while it still covers
-   // both edges. If fill is disabled, leave the original free positioning.
-   const minY=fillOn?Math.min(0,viewH-scaledH):-viewH*.85;
-   const maxY=fillOn?Math.max(0,viewH-scaledH):viewH*.85;
+   // Free dragging must remain available even when optional auto-enlarge is on.
+   // The former fill-only clamping forced X=0 at 100% zoom and often Y=0,
+   // which made finger dragging appear broken (particularly on iPhone).
+   const allowedX=viewW*.85;
+   const minY=-viewH*.85;
+   const maxY=viewH*.85;
    const xInput=$(prefix+"X"),yInput=$(prefix+"Y");
    const bounded=(el,min,max)=>{
     const value=Number(el.value)||0;
@@ -8153,7 +8161,7 @@ saveBtn.addEventListener("click",async()=>{
     return Number(el.value)||0;
    };
    const dx=bounded(xInput,-allowedX,allowedX);
-   const dy=bounded(yInput,minY,fillOn?Math.min(0,maxY):maxY);
+   const dy=bounded(yInput,minY,maxY);
    return {zoom,dx,dy};
   }
 
@@ -8335,7 +8343,7 @@ saveBtn.addEventListener("click",async()=>{
   $("b_largeSizePercentValue").textContent=$("b_largeSizePercent").value+"%";
   $("b_photoFineControls").style.display="block";
   $("b_photoFineEditor").style.display=$("b_photoFineEnabled").checked?"block":"none";
-  canvas.style.touchAction=$("b_photoFineEnabled").checked?"none":"auto";
+  canvas.style.touchAction=$("b_photoFineEnabled").checked?"none":"manipulation";
   canvas.style.cursor=$("b_photoFineEnabled").checked?"grab":"auto";
  }
  ["b_largeScaleMode","b_largeSizePercent"].forEach(id=>{
@@ -8360,11 +8368,38 @@ saveBtn.addEventListener("click",async()=>{
  photoFineIds.forEach(id=>$(id).addEventListener("input",()=>{refreshFineValues();scheduleDraw();}));
  $("b_photoFineEnabled").addEventListener("change",()=>{updateLargeSizeControls();scheduleDraw();});
  const videoQuick=$("b_fineQuickToggle");
- function syncVideoQuick(){const active=$("b_photoFineEnabled").checked;videoQuick.textContent=active?"✓ 사진 묶음 조절 중 · 끄기":"🎞️ 사진 묶음 자유 조절 켜기";videoQuick.setAttribute("aria-pressed",String(active));}
- videoQuick.addEventListener("click",()=>{$("b_photoFineEnabled").checked=!$("b_photoFineEnabled").checked;updateLargeSizeControls();syncVideoQuick();scheduleDraw();});
- $("b_photoFineEnabled").addEventListener("change",syncVideoQuick);syncVideoQuick();
- $("b_photoFineFill").addEventListener("change",scheduleDraw);
- $("b_photoFineReset").addEventListener("click",resetPhotoFine);
+ const touchStatus=$("b_photoFineTouchStatus");
+ const previewWrap=canvas.closest('.board-preview-wrap');
+ const photoFineHint=$("b_touch-sort-hint");
+ function fineStatus(message){
+  touchStatus.textContent=message;
+  touchStatus.style.display=$("b_photoFineEnabled").checked?'block':'none';
+ }
+ function syncFineUI(){
+  const active=$("b_photoFineEnabled").checked;
+  videoQuick.textContent=active?'✓ 사진 직접 조절 중 · 종료':'사진 이동·크기 조절 시작';
+  videoQuick.setAttribute('aria-pressed',String(active));
+  if(photoFineHint)photoFineHint.style.display=active?'none':'';
+  if(previewWrap)previewWrap.style.touchAction=active?'none':'';
+  if(active){
+   const hasPhoto=state.clothes.length+state.guns.length>0;
+   fineStatus(hasPhoto?'사진을 손가락으로 끌면 이동합니다. 선택된 테두리의 오른쪽 아래 손잡이로 크기를 바꿔 보세요.':'먼저 옷 또는 총기 사진을 추가하세요. 사진이 없으면 움직일 수 없습니다.');
+  }else touchStatus.style.display='none';
+ }
+ function setFineEnabled(active){
+  $("b_photoFineEnabled").checked=!!active;
+  updateLargeSizeControls();syncFineUI();scheduleDraw();
+ }
+ videoQuick.addEventListener('click',()=>setFineEnabled(!$("b_photoFineEnabled").checked));
+ $("b_photoFineEnabled").addEventListener('change',()=>{updateLargeSizeControls();syncFineUI();scheduleDraw();});
+ $("b_fineQuickReset").addEventListener('click',()=>{resetPhotoFine();if($("b_photoFineEnabled").checked)fineStatus('옷·총기 크기를 100%, 위치를 0으로 초기화했어요.');});
+ $("b_photoFineGoPreview").addEventListener('click',()=>{
+  if(!$("b_photoFineEnabled").checked)setFineEnabled(true);
+  document.getElementById('b_fineQuickToggle').scrollIntoView({block:'start',behavior:'smooth'});
+ });
+ syncFineUI();
+ $("b_photoFineFill").addEventListener('change',scheduleDraw);
+ $("b_photoFineReset").addEventListener('click',resetPhotoFine);
  refreshFineValues();
  // 모바일/태블릿/PC 공통: 미리보기의 옷 칸을 두 번 선택해 서로 위치를 교체합니다.
  let tileSwapFrom=-1;
@@ -8389,61 +8424,96 @@ saveBtn.addEventListener("click",async()=>{
    $("b_touch-sort-hint").textContent=`${from+1}번 ↔ ${to+1}번 옷 순서를 바꿨어요. 계속 두 칸을 터치하면 다시 교체할 수 있어요.`;
   } else $("b_touch-sort-hint").textContent='같은 옷을 눌러 선택을 해제했어요.';
  });
- // Touch/mouse dragging in the preview updates the same X/Y controls that the
- // sliders use, so the exported PNG exactly matches the preview.
+ // iPhone Safari uses native touch events for photo drag. Pointer Events handle mouse/stylus.
+ // Both paths share the exact same X/Y/zoom settings, so PNG export matches preview.
  let previewDrag=null;
- canvas.addEventListener("pointerdown",event=>{
-  const layout=state.previewLayout;
-  if(!$("b_photoFineEnabled").checked||!layout?.photoRects||event.button>0)return;
-  const rect=canvas.getBoundingClientRect();
-  if(!rect.width||!rect.height)return;
-  const x=(event.clientX-rect.left)*layout.width/rect.width;
-  const y=(event.clientY-rect.top)*layout.height/rect.height;
-  const side=Object.entries(layout.photoRects).find(([key,r])=>x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h&&state[key].length);
-  if(!side)return;
-  photoFineSide=side[0];
-  historyPush(); // one Undo snapshot per touch gesture
-  const prefix=side[0]==="clothes"?"b_clothesFine":"b_gunsFine";
+ function finePoint(clientX,clientY){
+  const layout=state.previewLayout,rect=canvas.getBoundingClientRect();
+  if(!layout?.photoRects||!rect.width||!rect.height)return null;
+  return {layout,rect,x:(clientX-rect.left)*layout.width/rect.width,y:(clientY-rect.top)*layout.height/rect.height};
+ }
+ function beginFineDrag(clientX,clientY,identifier){
+  if(!$("b_photoFineEnabled").checked)return false;
+  const pt=finePoint(clientX,clientY);
+  if(!pt){fineStatus('미리보기가 아직 준비되지 않았습니다. 사진을 추가하고 다시 시도하세요.');return false;}
+  const {layout,rect,x,y}=pt;
+  if(!state.clothes.length&&!state.guns.length){fineStatus('먼저 옷 또는 총기 사진을 추가하세요.');return false;}
+  // Choose only the pane actually touched. Never mistake a writing area or empty
+  // outside the board for a valid photo group. Tap anywhere inside its pane.
+  const side=Object.entries(layout.photoRects).find(([key,r])=>
+   state[key].length&&r.w>0&&r.h>0&&x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h);
+  if(!side){fineStatus('사진이 들어 있는 칸을 터치하세요. 위쪽 문구 칸이나 바깥 여백에서는 사진이 움직이지 않습니다.');return false;}
   const box=photoGroupPreviewRect(layout,side[0]);
-  const hx=box?.hx??-10000,hy=box?.hy??-10000;
-  const handleRadius=Math.max(18,22*layout.width/rect.width);
-  const resize=box&&Math.hypot(x-hx,y-hy)<=handleRadius;
-  previewDrag={id:event.pointerId,prefix,mode:resize?'resize':'move',
-   startX:event.clientX,startY:event.clientY,originX:Number($(prefix+"X").value),originY:Number($(prefix+"Y").value),
-   originZoom:Number($(prefix+"Zoom").value)||100,pixelX:layout.width/rect.width,pixelY:layout.height/rect.height,
-   viewWidth:side[1].w,viewHeight:side[1].h};
-  scheduleDraw();
-  try{canvas.setPointerCapture(event.pointerId);}catch(e){}
-  canvas.style.cursor="grabbing";
-  event.preventDefault();
- });
- canvas.addEventListener("pointermove",event=>{
-  if(!previewDrag||previewDrag.id!==event.pointerId)return;
+  photoFineSide=side[0];
+  const prefix=side[0]==='clothes'?'b_clothesFine':'b_gunsFine';
+  // Give the resize handle a larger touch target on small phone screens.
+  const handleRadius=Math.max(30,32*layout.width/rect.width);
+  const resize=box&&Math.hypot(x-box.hx,y-box.hy)<=handleRadius;
+  historyPush();
+  previewDrag={id:identifier,prefix,mode:resize?'resize':'move',
+    startX:clientX,startY:clientY,originX:Number($(prefix+'X').value),originY:Number($(prefix+'Y').value),
+    originZoom:Number($(prefix+'Zoom').value)||100,pixelX:layout.width/rect.width,pixelY:layout.height/rect.height,
+    viewWidth:side[1].w,viewHeight:side[1].h};
+  canvas.style.cursor='grabbing';
+  fineStatus(`${side[0]==='clothes'?'옷':'총기'} 사진 ${resize?'크기 조절':'이동'} 중 · 손가락을 움직여 보세요.`);
+  scheduleDraw();return true;
+ }
+ function moveFineDrag(clientX,clientY,identifier){
+  if(!previewDrag||previewDrag.id!==identifier)return false;
   const drag=previewDrag;
-  const update=(axis,n)=>{
+  const setValue=(axis,n)=>{
    const slider=$(drag.prefix+axis);
-   const v=Math.max(Number(slider.min),Math.min(Number(slider.max),Math.round(n)));
-   slider.value=String(v);
+   slider.value=String(Math.max(Number(slider.min),Math.min(Number(slider.max),Math.round(n))));
   };
   if(drag.mode==='resize'){
-   const deltaX=(event.clientX-drag.startX)*drag.pixelX;
-   const deltaY=(event.clientY-drag.startY)*drag.pixelY;
-   const change=1+(deltaX/Math.max(1,drag.viewWidth)+deltaY/Math.max(1,drag.viewHeight))*.65;
-   const slider=$(drag.prefix+'Zoom');
-   slider.value=String(Math.max(Number(slider.min),Math.min(Number(slider.max),Math.round(drag.originZoom*change))));
+   const dx=(clientX-drag.startX)*drag.pixelX;
+   const dy=(clientY-drag.startY)*drag.pixelY;
+   const change=1+(dx/Math.max(1,drag.viewWidth)+dy/Math.max(1,drag.viewHeight))*.65;
+   setValue('Zoom',drag.originZoom*change);
   }else{
-   update("X",drag.originX+(event.clientX-drag.startX)*drag.pixelX);
-   update("Y",drag.originY+(event.clientY-drag.startY)*drag.pixelY);
+   setValue('X',drag.originX+(clientX-drag.startX)*drag.pixelX);
+   setValue('Y',drag.originY+(clientY-drag.startY)*drag.pixelY);
   }
-  // buildLayout normalizes bounds; this handler must not call its local helper.
-  refreshFineValues();scheduleDraw();event.preventDefault();
- });
- function endPreviewDrag(event){
-  if(!previewDrag||previewDrag.id!==event.pointerId)return;
-  previewDrag=null;canvas.style.cursor="grab";window.SnaDraft?.queue?.("board");
+  refreshFineValues();scheduleDraw();return true;
  }
- canvas.addEventListener("pointerup",endPreviewDrag);
- canvas.addEventListener("pointercancel",endPreviewDrag);
+ function finishFineDrag(identifier){
+  if(!previewDrag||previewDrag.id!==identifier)return;
+  const label=previewDrag.prefix==='b_clothesFine'?'옷':'총기';
+  const operation=previewDrag.mode==='resize'?'크기 변경':'위치 이동';
+  previewDrag=null;canvas.style.cursor='grab';
+  fineStatus(`${label} 사진 ${operation} 적용됨. 계속 끌어서 조절할 수 있습니다.`);
+  window.SnaDraft?.queue?.('board');
+ }
+ canvas.addEventListener('pointerdown',event=>{
+  // Native touch listeners below are more reliable on iOS Safari and WebView.
+  if(event.pointerType==='touch'||event.button>0)return;
+  if(beginFineDrag(event.clientX,event.clientY,event.pointerId)){
+   try{canvas.setPointerCapture(event.pointerId);}catch(_){}
+   event.preventDefault();
+  }
+ });
+ canvas.addEventListener('pointermove',event=>{
+  if(event.pointerType==='touch')return;
+  if(moveFineDrag(event.clientX,event.clientY,event.pointerId))event.preventDefault();
+ });
+ canvas.addEventListener('pointerup',event=>finishFineDrag(event.pointerId));
+ canvas.addEventListener('pointercancel',event=>finishFineDrag(event.pointerId));
+ canvas.addEventListener('touchstart',event=>{
+  if(!$("b_photoFineEnabled").checked||event.touches.length!==1)return;
+  const t=event.changedTouches[0];
+  if(beginFineDrag(t.clientX,t.clientY,'touch-'+t.identifier))event.preventDefault();
+ },{passive:false});
+ // Listen at window level so a finger moving outside the canvas still completes the gesture.
+ window.addEventListener('touchmove',event=>{
+  if(!previewDrag||typeof previewDrag.id!=='string'||!previewDrag.id.startsWith('touch-'))return;
+  const t=Array.from(event.changedTouches).find(t=>'touch-'+t.identifier===previewDrag.id);
+  if(t&&moveFineDrag(t.clientX,t.clientY,'touch-'+t.identifier))event.preventDefault();
+ },{passive:false});
+ for(const type of ['touchend','touchcancel'])window.addEventListener(type,event=>{
+  if(!previewDrag||typeof previewDrag.id!=='string'||!previewDrag.id.startsWith('touch-'))return;
+  const t=Array.from(event.changedTouches).find(t=>'touch-'+t.identifier===previewDrag.id);
+  if(t)finishFineDrag('touch-'+t.identifier);
+ },{passive:true});
  const inputIds=["b_clothesFineZoom","b_clothesFineX","b_clothesFineY","b_gunsFineZoom","b_gunsFineX","b_gunsFineY","b_mediumPages","b_largeScaleMode","b_largeSizePercent","b_boardSize","b_ownerText","b_ownerSize","b_ownerX","b_ownerY","b_inquiryText","b_inquiryWidth","b_inquiryX","b_inquiryY","b_subText","b_subWidth","b_subX","b_subY","b_gradientDirection","b_textScale","b_outline","b_clothesCols","b_gunCols","b_nameSize","b_gunNameSize","b_levelSize","b_clothLevelSize","b_clothNameX","b_clothNameY","b_gunNameX","b_gunNameY","b_gunLevelX","b_gunLevelY","b_shadowStrength","b_shadowColor","b_shadowX","b_shadowY","b_saturation"];
  {
   const el=$("b_ownerSize"),out=$("b_ownerSizeValue");
@@ -8573,7 +8643,7 @@ saveBtn.addEventListener("click",async()=>{
   $("b_subWidthValue").textContent=$("b_subWidth").value+"%";
   $("b_inquiryWidthNumber").value=$("b_inquiryWidth").value;
   $("b_subWidthNumber").value=$("b_subWidth").value;
-  updateLargeSizeControls();syncVideoQuick();
+  updateLargeSizeControls();syncFineUI();
   if($("b_outlineValue"))$("b_outlineValue").textContent=$("b_outline").value;
   ["b_shadowStrength","b_shadowX","b_shadowY"].forEach(id=>{const out=$(id+"Value");if(out)out.textContent=$(id).value+(id==="b_shadowStrength"?"%":"");});
   if($("b_saturationValue"))$("b_saturationValue").textContent=$("b_saturation").value+"%";
@@ -8592,7 +8662,7 @@ saveBtn.addEventListener("click",async()=>{
   ["b_topText","b_ownerText","b_titleText","b_inquiryText","b_subText","b_leftTitle","b_rightTitle"].forEach(id=>$(id).value="");
   ["b_topText","b_titleText","b_leftTitle","b_rightTitle"].forEach(id=>$(id).value="");
   $("b_mediumPages").value="1";$("b_largeScaleMode").value="auto";$("b_largeSizePercent").value="100";
-  $("b_photoFineEnabled").checked=false;$("b_photoFineFill").checked=false;resetPhotoFine();updateLargeSizeControls();syncVideoQuick();
+  $("b_photoFineEnabled").checked=false;$("b_photoFineFill").checked=false;resetPhotoFine();updateLargeSizeControls();syncFineUI();
   $("b_boardSize").value="medium";$("b_ownerSize").value="100";$("b_ownerSizeValue").textContent="100%";$("b_inquiryWidth").value="110";$("b_subWidth").value="100";$("b_inquiryWidthValue").textContent="110%";$("b_subWidthValue").textContent="100%";$("b_inquiryWidthNumber").value="110";$("b_subWidthNumber").value="100";$("b_textScale").value="100";$("b_outline").value="4";$("b_gradientDirection").value="vertical";
   ["b_ownerX","b_ownerY","b_inquiryX","b_inquiryY","b_subX","b_subY"].forEach(id=>$(id).value="0");
   $("b_clothesCols").value="3";$("b_gunCols").value="3";$("b_nameSize").value="28";$("b_clothLevelSize").value="40";$("b_gunNameSize").value="32";$("b_levelSize").value="60";$("b_clothNameX").value="0";$("b_clothNameY").value="0";$("b_gunNameX").value="0";$("b_gunNameY").value="0";$("b_gunLevelX").value="0";$("b_gunLevelY").value="0";$("b_shadowStrength").value="85";$("b_shadowColor").value="#777777";$("b_shadowX").value="2";$("b_shadowY").value="2";$("b_saturation").value="100";$("b_outlineValue").textContent=$("b_outline").value;$("b_shadowStrengthValue").textContent=$("b_shadowStrength").value+"%";$("b_shadowXValue").textContent=$("b_shadowX").value;$("b_shadowYValue").textContent=$("b_shadowY").value;$("b_saturationValue").textContent=$("b_saturation").value+"%";
