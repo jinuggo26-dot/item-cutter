@@ -1739,8 +1739,13 @@ const reviewSubmit=document.getElementById('sna-review-submit');
 const reviewNotice=document.getElementById('sna-review-notice');
 let reviewUid=null,reviewRecords={},reviewActive=null,reviewScore=0,reviewOpening=false;
 // Only a verified Firebase Custom Claim decides who is exempt. Keep reviews inactive during login.
-let reviewRoleReady=false,reviewIsAdmin=false;
-const reviewAllowed=()=>!!reviewUid&&reviewRoleReady&&!reviewIsAdmin;
+let reviewRoleReady=false,reviewIsAdmin=false,reviewActivatedUid=null;
+// Guest/anonymous users and pending accounts may try each editor once, but should
+// NEVER see the required review flow. Only approved, unexpired member accounts
+// (excluding administrator and trial mode) participate in feature reviews.
+const reviewAllowed=()=>!!reviewUid&&reviewRoleReady&&!reviewIsAdmin
+ &&!!authUser&&!authUser.isAnonymous&&currentMember?.status==='approved'
+ &&!expired(currentMember)&&!window.SnaTrial?.active;
 const reviewLocalKey=uid=>'sna-feature-reviews-v1:'+uid;
 function reviewSaveLocal(){if(!reviewUid)return;try{localStorage.setItem(reviewLocalKey(reviewUid),JSON.stringify(reviewRecords));}catch(e){console.warn('후기 기기 저장 실패',e);}}
 function reviewLoadLocal(uid){try{return JSON.parse(localStorage.getItem(reviewLocalKey(uid))||'{}')||{};}catch(e){return {};}}
@@ -1748,7 +1753,7 @@ function reviewCount(){return [...reviewBody.value.replace(/\s/g,'')].length;}
 function reviewStatus(){
  for(const feature of Object.keys(REVIEW_FEATURES)){
   const panel=document.querySelector('[data-sna-review="'+feature+'"]');if(!panel)continue;
-  panel.hidden=reviewIsAdmin;
+  panel.hidden=!reviewAllowed();
   const rec=reviewRecords[feature];const msg=panel.querySelector('.sna-review-state');const btn=panel.querySelector('button');
   const done=!!(rec?.done&&rec?.synced);const pending=!!(rec?.body&&!rec?.synced);
   msg.textContent=done?'· 서버 저장 완료':pending?'· 서버 미전송: 다시 제출 필요':rec?.used?'· 첫 이용 후기 작성 필요':'· 사용 후 최초 1회 작성';
@@ -1837,22 +1842,36 @@ async function reviewHydrateFromCloud(uid){
  if(reviewUid!==uid||!reviewAllowed())return;
  reviewSaveLocal();reviewStatus();await reviewSyncAll();
 }
+// Re-evaluate when the membership snapshot changes: role claims arrive before
+// the user's approved/pending status in Firestore. A pending trial must not
+// trigger reviews; on later approval, the normal one-time review flow resumes.
+function reviewRefreshAccess(){
+ const allowed=reviewAllowed();
+ if(!allowed){
+  reviewActive=null;reviewOpening=false;reviewModal.hidden=true;
+ }
+ reviewStatus();
+ if(allowed&&reviewActivatedUid!==reviewUid){
+  const uid=reviewUid;
+  reviewActivatedUid=uid;
+  void reviewHydrateFromCloud(uid);
+  setTimeout(()=>{
+   if(reviewUid===uid&&reviewAllowed()&&document.getElementById('auth-screen')?.style.display==='none')reviewNext();
+  },3600);
+ }
+}
 window.SnaReviews={
  used:reviewUsed,
+ refreshAccess:reviewRefreshAccess,
  setUser(uid){
   reviewUid=uid||null;reviewRecords=uid?reviewLoadLocal(uid):{};
-  reviewRoleReady=false;reviewIsAdmin=false;
-  reviewActive=null;reviewOpening=false;reviewModal.hidden=true;reviewStatus();
+  reviewRoleReady=false;reviewIsAdmin=false;reviewActivatedUid=null;
+  reviewActive=null;reviewOpening=false;reviewModal.hidden=true;reviewRefreshAccess();
  },
  setRole(isMasterAdmin){
   if(!reviewUid)return;
   reviewIsAdmin=isMasterAdmin===true;reviewRoleReady=true;
-  if(reviewIsAdmin){reviewActive=null;reviewOpening=false;reviewModal.hidden=true;}
-  reviewStatus();
-  if(!reviewIsAdmin){
-   const uid=reviewUid;void reviewHydrateFromCloud(uid);
-   setTimeout(()=>{if(reviewUid===uid&&reviewAllowed()&&document.getElementById('auth-screen')?.style.display==='none')reviewNext();},3600);
-  }
+  reviewRefreshAccess();
  }
 };
 
@@ -2275,6 +2294,7 @@ async function snaTrialStart(feature){
    snaTrialClaims[feature]=true;snaTrialStatus('이 기능의 체험은 이미 사용했습니다.');return;
   }
   snaTrialActive=feature;
+  window.SnaReviews?.refreshAccess?.();
   snaTrialFinishing=false;
   snaTrialModal.hidden=true;
   document.getElementById('auth-screen').style.display='none';
@@ -2291,7 +2311,7 @@ async function snaTrialStart(feature){
 }
 function snaTrialEnd(showWaitingScreen=true){
  const feature=snaTrialActive;snaTrialActive=null;snaTrialFinishing=false;
- snaTrialBanner.hidden=true;refreshGradeUI();
+ snaTrialBanner.hidden=true;refreshGradeUI();window.SnaReviews?.refreshAccess?.();
  if(feature&&showWaitingScreen&&!snaTrialHasPaidAccess()){
   if(authUser?.isAnonymous)displayLogin('체험을 종료했어요. 남은 기능은 「실제 기능 무료 체험」에서 사용하거나 회원가입해 주세요.');
   else showWaiting('남은 무료 체험 기능을 선택하거나 관리자 승인을 기다려 주세요.','pending');
@@ -2741,6 +2761,7 @@ function showWaiting(message="승인을 기다리는 중입니다.",kind="pendin
 async function handleExpired(){
  if(isAdminMode)return;
  expiredHandled=true;accessExpiry=0;
+ window.SnaReviews?.refreshAccess?.();
  if(memberContentUnsubscribes.length)stopMemberContentSubscriptions();
  showWaiting("로그인에 성공했지만 이용권 기간이 만료되었습니다. 기존 이메일로 재가입하지 말고 관리자에게 등급 기간 연장을 요청하세요. 연장되면 이 화면에서 다시 이용할 수 있습니다.","expired");
 }
@@ -2775,6 +2796,7 @@ function subscribeUser(name){
   downgradeExpiredGrade(name,user);
   lastEffectiveGrade=effectiveGrade(user);
   refreshGradeUI();
+  window.SnaReviews?.refreshAccess?.();
   if(expired(user)){
    handleExpired(name);
   }else if(user.status==="approved"){
