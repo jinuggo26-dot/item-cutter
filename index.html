@@ -4083,7 +4083,7 @@ window.closeAdmin=()=>{
      <input id="b_photoFineEnabled" type="checkbox" style="width:20px;height:20px;accent-color:#70b6ff;flex:none">
      <span>사진 위치·크기 직접 조절</span>
     </label>
-    <p style="margin:8px 0;color:#b6c5d8;font-size:13px;line-height:1.65">① 옷·총기 사진을 추가하세요. ② 체크 후 아래 <b>6. 미리보기</b>에 있는 사진을 손가락으로 끌어 이동하세요. ③ 선택한 사진 묶음의 <b>오른쪽 아래 손잡이</b>를 끌면 크기가 바뀝니다. 글자 칸과 사진 칸은 서로 구분되어 있습니다.</p>
+    <p style="margin:8px 0;color:#b6c5d8;font-size:13px;line-height:1.65">① 옷·총기 사진을 추가하세요. ② 체크 후 아래 <b>6. 미리보기</b>에 있는 사진을 손가락으로 끌어 이동하세요. ③ 사진 가운데를 끌면 묶음 전체가 이동합니다. ④ 테두리 <b>상·하·좌·우 네 방향 화살표</b>를 끌면 반대쪽 변을 기준으로 사진 묶음 크기를 조절합니다. 사진은 원래 비율을 유지하고, 기존 칸 경계에서 잘리지 않습니다.</p>
     <button type="button" class="board-btn" id="b_photoFineGoPreview" style="width:100%;margin:8px 0 12px;min-height:44px">↓ 사진 미리보기로 이동</button>
     <details id="b_photoFineExtras" style="border:1px solid #3d506b;border-radius:10px;padding:10px 12px;margin:4px 0 12px">
       <summary style="cursor:pointer;font-weight:800;color:#d6eaff">추가 설정 · 사진 칸의 빈 여백 줄이기</summary>
@@ -4097,14 +4097,14 @@ window.closeAdmin=()=>{
     <div id="b_photoFineEditor" style="display:none">
      <div style="margin-top:12px;font-weight:800;color:#eef4fd">👕 왼쪽 옷 사진 묶음</div>
      <div class="board-field"><label for="b_clothesFineZoom">크기 <output id="b_clothesFineZoomValue">100%</output></label><input id="b_clothesFineZoom" class="board-range" type="range" min="25" max="350" step="1" value="100"></div>
-     <div class="board-field"><label for="b_clothesFineX">좌우 이동 <output id="b_clothesFineXValue">0px</output></label><input id="b_clothesFineX" class="board-range" type="range" min="-900" max="900" step="1" value="0"></div>
-     <div class="board-field"><label for="b_clothesFineY">상하 이동 <output id="b_clothesFineYValue">0px</output></label><input id="b_clothesFineY" class="board-range" type="range" min="-1200" max="1200" step="1" value="0"></div>
+     <div class="board-field"><label for="b_clothesFineX">좌우 이동 <output id="b_clothesFineXValue">0px</output></label><input id="b_clothesFineX" class="board-range" type="range" min="-2500" max="2500" step="1" value="0"></div>
+     <div class="board-field"><label for="b_clothesFineY">상하 이동 <output id="b_clothesFineYValue">0px</output></label><input id="b_clothesFineY" class="board-range" type="range" min="-3000" max="3000" step="1" value="0"></div>
      <div style="margin-top:14px;font-weight:800;color:#eef4fd">🔫 오른쪽 총기 사진 묶음</div>
      <div class="board-field"><label for="b_gunsFineZoom">크기 <output id="b_gunsFineZoomValue">100%</output></label><input id="b_gunsFineZoom" class="board-range" type="range" min="25" max="350" step="1" value="100"></div>
-     <div class="board-field"><label for="b_gunsFineX">좌우 이동 <output id="b_gunsFineXValue">0px</output></label><input id="b_gunsFineX" class="board-range" type="range" min="-900" max="900" step="1" value="0"></div>
-     <div class="board-field"><label for="b_gunsFineY">상하 이동 <output id="b_gunsFineYValue">0px</output></label><input id="b_gunsFineY" class="board-range" type="range" min="-1200" max="1200" step="1" value="0"></div>
+     <div class="board-field"><label for="b_gunsFineX">좌우 이동 <output id="b_gunsFineXValue">0px</output></label><input id="b_gunsFineX" class="board-range" type="range" min="-2500" max="2500" step="1" value="0"></div>
+     <div class="board-field"><label for="b_gunsFineY">상하 이동 <output id="b_gunsFineYValue">0px</output></label><input id="b_gunsFineY" class="board-range" type="range" min="-3000" max="3000" step="1" value="0"></div>
      <div class="board-row" style="margin-top:10px"><button type="button" id="b_photoFineReset" class="board-btn">↩ 옷·총기 위치와 크기 초기화</button></div>
-     <p style="color:#bed6f0;font-size:12px;line-height:1.6;margin:10px 0 0">옷 또는 총기 사진이 있는 구역을 손가락으로 끌어 이동합니다. 선택된 사진 묶음 오른쪽 아래 손잡이를 끌어 크기를 바꿉니다. 슬라이더로도 조절할 수 있어요. 사진이 없는 칸은 이동할 수 없습니다.</p>
+     <p style="color:#bed6f0;font-size:12px;line-height:1.6;margin:10px 0 0">옷·총기 사진의 가운데를 끌면 묶음 전체가 이동합니다. 선택된 테두리의 ↑ ↓ ← → 화살표를 끌면 해당 변 방향으로 크기가 바뀝니다. 원본 비율은 유지하며, 기존 옷·총기 칸 경계를 넘어도 잘리지 않습니다. 저장 이미지에는 화살표가 표시되지 않습니다.</p>
     </div>
    </div>
   </section>
@@ -4207,7 +4207,7 @@ window.closeAdmin=()=>{
    <div class="board-row"><label class="kl8-check"><input type="checkbox" id="b_autoAlign" checked> 글자 이탈 자동 제한</label><button type="button" class="board-btn" id="b_alignNow">옷·총 및 글자 자동 정렬</button><span class="board-small">자동 제한을 꺼도 기존 수동 조절값은 유지</span></div>
     <div id="b_previewMeta" class="board-counter">옷 0장 · 총기 0장 · 대기 중</div>
    <div id="b_touch-sort-hint" style="margin-top:8px;border:1px solid #3a5279;background:#0e1c34;color:#d6e6ff;padding:11px 12px;border-radius:12px;font-size:13px;text-align:center">옷 순서 바꾸기: 미리보기에서 <b>첫 번째 옷</b>을 누르고, <b>바꿀 옷</b>을 누르세요.</div>
-   <div class="board-row" style="margin-top:12px;align-items:center"><button type="button" id="b_fineQuickToggle" class="board-btn" aria-pressed="false">사진 이동·크기 조절 시작</button><span class="board-small">사진 위에서 손가락 드래그 · 우측 아래 손잡이로 확대·축소</span></div>
+   <div class="board-row" style="margin-top:12px;align-items:center"><button type="button" id="b_fineQuickToggle" class="board-btn" aria-pressed="false">사진 이동·크기 조절 시작</button><span class="board-small">가운데 드래그: 이동 · 테두리 ↑ ↓ ← →: 크기 조절 (사진 비율 유지)</span></div>
    <div class="board-row" style="margin-top:8px"><button type="button" id="b_fineQuickReset" class="board-btn" style="min-height:42px">↺ 사진 크기 100%·위치 초기화</button></div>
    <div id="b_photoFineTouchStatus" aria-live="polite" style="margin:8px 0;border:1px solid #486b8d;background:#122844;color:#e1f7ff;border-radius:9px;padding:10px 12px;font-size:12px;line-height:1.5;display:none">사진을 추가한 뒤 조절을 켜세요.</div>
    <div class="board-preview-wrap" style="margin-top:10px"><canvas id="b_preview" width="900" height="1300"></canvas></div>
@@ -8125,12 +8125,9 @@ saveBtn.addEventListener("click",async()=>{
   if(subFit)text(subText,textAreaCenter+subX,subFit.baselineY+subY,1,"sub","center",maxCaptionWidth,{maxLines:1,fit:true,captionFontSize:subFit.size});
   g.restore();
 
-  // Keep the COMPOSED photo bundle within its own white photo area.
-  // Do not let manual controls drag photos over the 5-row writing strip,
-  // across the centre divider, or into the footer/header.
-  // For a smaller bundle, keep the entire bundle inside the sheet. For a
-  // larger bundle, restrict panning to positions that still cover the sheet;
-  // the fixed canvas clip hides only pixels outside the sheet.
+  // Editing operates on the WHOLE composed photo bundle, not a fixed pane.
+  // The original pane is used only as an initial anchor. Never crop the
+  // transformed bundle to that old pane, otherwise a moved edge disappears.
   function restrictFinePosition(prefix,viewW,viewH,naturalH){
    const requested=Math.max(.25,Math.min(3.5,(Number($(prefix+"Zoom").value)||100)/100));
    const fillOn=$("b_photoFineFill").checked;
@@ -8141,27 +8138,12 @@ saveBtn.addEventListener("click",async()=>{
    const zoom=Math.max(requested,minimum);
    const scaledW=viewW*zoom;
    const scaledH=naturalH*zoom;
-   // Free dragging must remain available even when optional auto-enlarge is on.
-   // The former fill-only clamping forced X=0 at 100% zoom and often Y=0,
-   // which made finger dragging appear broken (particularly on iPhone).
-   const allowedX=viewW*.85;
-   const minY=-viewH*.85;
-   const maxY=viewH*.85;
+   // Preserve true X/Y offsets even if the bundle leaves its original column.
+   // Drag constraints (when a full bundle fits) use the OUTER BOARD boundary,
+   // handled by the pointer/touch controller, not the old column boundary.
    const xInput=$(prefix+"X"),yInput=$(prefix+"Y");
-   const bounded=(el,min,max)=>{
-    const value=Number(el.value)||0;
-    const sliderMin=Number(el.min),sliderMax=Number(el.max);
-    const result=Math.max(Number.isFinite(sliderMin)?sliderMin:-Infinity,
-       Math.min(Number.isFinite(sliderMax)?sliderMax:Infinity,
-       Math.max(min,Math.min(max,value))));
-    if(Math.abs(result-value)>.0001){
-     el.value=String(Math.round(result));
-     const out=$(el.id+"Value");if(out)out.textContent=el.value+"px";
-    }
-    return Number(el.value)||0;
-   };
-   const dx=bounded(xInput,-allowedX,allowedX);
-   const dy=bounded(yInput,minY,maxY);
+   const dx=Number(xInput.value)||0;
+   const dy=Number(yInput.value)||0;
    return {zoom,dx,dy};
   }
 
@@ -8178,9 +8160,10 @@ saveBtn.addEventListener("click",async()=>{
     const {zoom,dx,dy}=restrictFinePosition(fine,w,Math.max(0,bodyBottom-top),packingHeight(layout));
     const cx=x+w/2;
     g.save();
-    // Clip to the corresponding page so neither photos nor their labels can
-    // cover the other sheet, the writing band, or the pastel footer.
-    g.beginPath();g.rect(x,top,w,Math.max(0,bodyBottom-top));g.clip();
+    // CRITICAL: do NOT clip to (x, top, w, photo height). The user is
+    // moving the entire bundle; keeping this old fixed rect cuts off photos
+    // as soon as they cross its left/right/top/bottom edge. Only the board
+    // canvas itself is the final image boundary.
     g.translate(cx+dx,top+dy);
     g.scale(zoom,zoom);
     g.translate(-cx,-top);
@@ -8251,17 +8234,18 @@ saveBtn.addEventListener("click",async()=>{
   }
 
 
-  if(isLarge){
-   const rightGridX=margin+largeLeftInnerW+seamW;
-   drawItems(clothes,margin,largeLeftInnerW,clothesCols,"name",{top:photoTop,bottom:bodyBottom,layout:clothesPacking,fine:"b_clothesFine"});
-   if(guns.length){
-    // Right photos use their own scale/position, independent of the clothes.
-    drawItems(guns,rightGridX,rightInnerW,gunsCols,"name",{top:largeGunTop,bottom:bodyBottom,layout:gunsPacking,gunNames:true,fine:"b_gunsFine"});
-   }
-  }else{
+  // While free-adjusting, draw the SELECTED whole bundle last. Without this,
+  // the second column would paint over moved clothes, looking like another crop.
+  // Preview and export intentionally use the same ordering.
+  const renderClothes=()=>isLarge?
+   drawItems(clothes,margin,largeLeftInnerW,clothesCols,"name",{top:photoTop,bottom:bodyBottom,layout:clothesPacking,fine:"b_clothesFine"}):
    drawItems(clothes,leftX,leftW,clothesCols,"name",{top:photoTop,bottom:bodyBottom,layout:clothesPacking,fine:"b_clothesFine"});
+  const renderGuns=()=>isLarge?
+   drawItems(guns,margin+largeLeftInnerW+seamW,rightInnerW,gunsCols,"name",{top:largeGunTop,bottom:bodyBottom,layout:gunsPacking,gunNames:true,fine:"b_gunsFine"}):
    drawItems(guns,rightX,rightW,gunsCols,"name",{top:photoTop,bottom:bodyBottom,layout:gunsPacking,gunNames:true,fine:"b_gunsFine"});
-  }
+  if($("b_photoFineEnabled").checked&&photoFineSide==='clothes'){
+   renderGuns();renderClothes();
+  }else{renderClothes();renderGuns();}
   const bottomGap=isLarge&&clothes.length&&guns.length?
    Math.abs((photoTop+packingHeight(clothesPacking))-(largeGunTop+packingHeight(gunsPacking))):0;
   applyBoardSaturation(target);
@@ -8280,34 +8264,59 @@ saveBtn.addEventListener("click",async()=>{
   const r=layout?.photoRects?.[side];
   if(!r||!state[side].length||!r.w||!r.contentH)return null;
   const prefix=side==='clothes'?'b_clothesFine':'b_gunsFine';
-  const z=(Number($(prefix+'Zoom').value)||100)/100;
+  const requested=(Number($(prefix+'Zoom').value)||100)/100;
   const fill=$('b_photoFineFill').checked;
-  const zoom=Math.max(z,fill?Math.max(1,r.h/Math.max(1,r.contentH)):0);
-  const dx=Number($(prefix+'X').value)||0;
-  const dy=Number($(prefix+'Y').value)||0;
-  const left=r.x+(r.w-r.w*zoom)/2+dx,top=r.y+dy;
-  const right=left+r.w*zoom,bottom=top+r.contentH*zoom;
-  const x=Math.max(r.x,left),y=Math.max(r.y,top);
-  const xr=Math.min(r.x+r.w,right),yb=Math.min(r.y+r.h,bottom);
-  if(xr<=x||yb<=y)return null;
-  return {x,y,w:xr-x,h:yb-y,hx:Math.max(x+1,xr-6),hy:Math.max(y+1,yb-6),side,prefix};
+  const zoom=Math.max(requested,fill?Math.max(1,r.h/Math.max(1,r.contentH)):0);
+  const dx=Number($(prefix+'X').value)||0,dy=Number($(prefix+'Y').value)||0;
+  // Unlike the old fixed-frame version, this is the ACTUAL UNCLIPPED group.
+  const x=r.x+(r.w-r.w*zoom)/2+dx,y=r.y+dy;
+  const w=r.w*zoom,h=r.contentH*zoom;
+  return {x,y,w,h,right:x+w,bottom:y+h,zoom,side,prefix,
+   handles:{left:{x,y:y+h/2},right:{x:x+w,y:y+h/2},top:{x:x+w/2,y},bottom:{x:x+w/2,y:y+h}}};
+ }
+ function displayedFineHandle(layout,point){
+  const pad=Math.max(6,layout.width/65);
+  return {x:Math.max(pad,Math.min(layout.width-pad,point.x)),
+   y:Math.max(pad,Math.min(layout.height-pad,point.y))};
+ }
+ function photoHandleHit(layout,x,y,rect){
+  // A generous mobile target, measured in device CSS pixels, for four arrows.
+  const radius=Math.max(13,21*layout.width/Math.max(1,rect.width));
+  const ordered=[photoFineSide,...['clothes','guns'].filter(s=>s!==photoFineSide)];
+  for(const side of ordered){
+   const b=photoGroupPreviewRect(layout,side);if(!b)continue;
+   for(const edge of ['left','right','top','bottom']){
+    const h=displayedFineHandle(layout,b.handles[edge]);
+    if(Math.hypot(h.x-x,h.y-y)<=radius)return {side,edge,b};
+   }
+  }
+  return null;
  }
  function paintPhotoFineHandles(layout){
   if(!$('b_photoFineEnabled').checked||!layout?.photoRects)return;
-  const g=canvas.getContext('2d'),unit=Math.max(12,layout.width/38);
+  const g=canvas.getContext('2d'),unit=Math.max(12,layout.width/48);
   g.save();g.setTransform(canvas.width/layout.width,0,0,canvas.height/layout.height,0,0);
   for(const side of ['clothes','guns']){
-   const r=photoGroupPreviewRect(layout,side);if(!r)continue;
+   const b=photoGroupPreviewRect(layout,side);if(!b)continue;
    const active=photoFineSide===side;
-   g.strokeStyle=active?'#20f4d6':'#e7e9ff';g.lineWidth=active?3:1.6;
-   g.setLineDash(active?[unit*.45,unit*.25]:[unit*.20,unit*.22]);
-   g.strokeRect(r.x+1,r.y+1,Math.max(1,r.w-2),Math.max(1,r.h-2));g.setLineDash([]);
-   if(active){
-    const hs=unit*.90;
-    g.fillStyle='#052d43';g.fillRect(r.hx-hs/2,r.hy-hs/2,hs,hs);
-    g.strokeStyle='#20f4d6';g.lineWidth=2;g.strokeRect(r.hx-hs/2,r.hy-hs/2,hs,hs);
-    g.beginPath();g.strokeStyle='#ffffff';g.moveTo(r.hx-hs*.20,r.hy+hs*.20);g.lineTo(r.hx+hs*.20,r.hy-hs*.20);
-    g.moveTo(r.hx+hs*.03,r.hy+hs*.20);g.lineTo(r.hx+hs*.20,r.hy+hs*.03);g.stroke();
+   g.strokeStyle=active?'#00efd2':'#7381b6';g.lineWidth=active?3:1.8;
+   g.setLineDash(active?[unit*.34,unit*.18]:[unit*.17,unit*.25]);
+   g.strokeRect(b.x,b.y,b.w,b.h);g.setLineDash([]);
+   if(!active)continue;
+   // Four handle arrows follow the actual group edges while the photo moves.
+   // Arrow marks live ONLY in the preview overlay, never in PNG export.
+   for(const edge of ['left','right','top','bottom']){
+    const p=displayedFineHandle(layout,b.handles[edge]),r=unit*.55;
+    g.fillStyle='#073347';g.strokeStyle='#00efd2';g.lineWidth=Math.max(1.7,unit*.10);
+    g.beginPath();g.arc(p.x,p.y,r,0,Math.PI*2);g.fill();g.stroke();
+    const vx=edge==='left'?-1:edge==='right'?1:0;
+    const vy=edge==='top'?-1:edge==='bottom'?1:0;
+    g.strokeStyle='#ffffff';g.lineWidth=Math.max(2,unit*.12);g.lineCap='round';g.lineJoin='round';
+    g.beginPath();g.moveTo(p.x-vx*r*.36,p.y-vy*r*.36);g.lineTo(p.x+vx*r*.27,p.y+vy*r*.27);
+    g.moveTo(p.x+vx*r*.27,p.y+vy*r*.27);
+    if(vx){g.lineTo(p.x-vx*r*.03,p.y-r*.16);g.moveTo(p.x+vx*r*.27,p.y);g.lineTo(p.x-vx*r*.03,p.y+r*.16);}
+    else{g.lineTo(p.x-r*.16,p.y-vy*r*.03);g.moveTo(p.x,p.y+vy*r*.27);g.lineTo(p.x+r*.16,p.y-vy*r*.03);}
+    g.stroke();
    }
   }
   g.restore();
@@ -8383,7 +8392,7 @@ saveBtn.addEventListener("click",async()=>{
   if(previewWrap)previewWrap.style.touchAction=active?'none':'';
   if(active){
    const hasPhoto=state.clothes.length+state.guns.length>0;
-   fineStatus(hasPhoto?'사진을 손가락으로 끌면 이동합니다. 선택된 테두리의 오른쪽 아래 손잡이로 크기를 바꿔 보세요.':'먼저 옷 또는 총기 사진을 추가하세요. 사진이 없으면 움직일 수 없습니다.');
+   fineStatus(hasPhoto?'사진 가운데는 이동 · 테두리 네 변의 ↑ ↓ ← → 화살표는 크기 조절입니다. 기존 사진 칸 경계에서 잘리지 않습니다.':'먼저 옷 또는 총기 사진을 추가하세요. 사진이 없으면 움직일 수 없습니다.');
   }else touchStatus.style.display='none';
  }
  function setFineEnabled(active){
@@ -8433,53 +8442,92 @@ saveBtn.addEventListener("click",async()=>{
   return {layout,rect,x:(clientX-rect.left)*layout.width/rect.width,y:(clientY-rect.top)*layout.height/rect.height};
  }
  function beginFineDrag(clientX,clientY,identifier){
-  if(!$("b_photoFineEnabled").checked)return false;
+  if(!$('b_photoFineEnabled').checked)return false;
   const pt=finePoint(clientX,clientY);
-  if(!pt){fineStatus('미리보기가 아직 준비되지 않았습니다. 사진을 추가하고 다시 시도하세요.');return false;}
+  if(!pt){fineStatus('사진을 먼저 추가하고 미리보기를 확인해 주세요.');return false;}
   const {layout,rect,x,y}=pt;
   if(!state.clothes.length&&!state.guns.length){fineStatus('먼저 옷 또는 총기 사진을 추가하세요.');return false;}
-  // Choose only the pane actually touched. Never mistake a writing area or empty
-  // outside the board for a valid photo group. Tap anywhere inside its pane.
-  const side=Object.entries(layout.photoRects).find(([key,r])=>
-   state[key].length&&r.w>0&&r.h>0&&x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h);
-  if(!side){fineStatus('사진이 들어 있는 칸을 터치하세요. 위쪽 문구 칸이나 바깥 여백에서는 사진이 움직이지 않습니다.');return false;}
-  const box=photoGroupPreviewRect(layout,side[0]);
-  photoFineSide=side[0];
-  const prefix=side[0]==='clothes'?'b_clothesFine':'b_gunsFine';
-  // Give the resize handle a larger touch target on small phone screens.
-  const handleRadius=Math.max(30,32*layout.width/rect.width);
-  const resize=box&&Math.hypot(x-box.hx,y-box.hy)<=handleRadius;
+  // Edge arrows are hit-tested FIRST, including when they leave the old pane.
+  const handle=photoHandleHit(layout,x,y,rect);
+  let chosen=handle?.side||null;
+  if(!chosen){
+   // Pick the true un-clipped visual group; if two overlap, choose the active one.
+   const ordered=[photoFineSide,...['clothes','guns'].filter(s=>s!==photoFineSide)];
+   chosen=ordered.find(side=>{const b=photoGroupPreviewRect(layout,side);return b&&x>=b.x&&x<=b.right&&y>=b.y&&y<=b.bottom;});
+  }
+  if(!chosen){fineStatus('옷 또는 총기 사진 안쪽을 누르면 이동하고, 네 변의 화살표를 끌면 크기를 바꿀 수 있어요.');return false;}
+  // Manual resizing and automatic crop-to-fill are conflicting actions.
+  // Only turn the optional fill mode off when a resize arrow is directly used.
+  if(handle&&$('b_photoFineFill').checked){$('b_photoFineFill').checked=false;}
+  const box=photoGroupPreviewRect(layout,chosen);
+  const r=layout.photoRects[chosen];
+  photoFineSide=chosen;
+  const prefix=chosen==='clothes'?'b_clothesFine':'b_gunsFine';
   historyPush();
-  previewDrag={id:identifier,prefix,mode:resize?'resize':'move',
-    startX:clientX,startY:clientY,originX:Number($(prefix+'X').value),originY:Number($(prefix+'Y').value),
-    originZoom:Number($(prefix+'Zoom').value)||100,pixelX:layout.width/rect.width,pixelY:layout.height/rect.height,
-    viewWidth:side[1].w,viewHeight:side[1].h};
-  canvas.style.cursor='grabbing';
-  fineStatus(`${side[0]==='clothes'?'옷':'총기'} 사진 ${resize?'크기 조절':'이동'} 중 · 손가락을 움직여 보세요.`);
+  previewDrag={id:identifier,prefix,side:chosen,mode:handle?'edge':'move',edge:handle?.edge||null,
+   startX:clientX,startY:clientY,originX:Number($(prefix+'X').value)||0,originY:Number($(prefix+'Y').value)||0,
+   originZoom:Number($(prefix+'Zoom').value)||100,actualZoom:box.zoom,
+   pixelX:layout.width/rect.width,pixelY:layout.height/rect.height,
+   startBox:{x:box.x,y:box.y,w:box.w,h:box.h,right:box.right,bottom:box.bottom},
+   pane:{x:r.x,y:r.y,w:r.w,h:r.contentH},layoutW:layout.width,layoutH:layout.height};
+  canvas.style.cursor=handle?'nwse-resize':'grabbing';
+  const names={left:'왼쪽',right:'오른쪽',top:'위쪽',bottom:'아래쪽'};
+  fineStatus(`${chosen==='clothes'?'옷':'총기'} 사진 ${handle?names[handle.edge]+' 변 크기 조절':'묶음 전체 이동'} 중`);
   scheduleDraw();return true;
  }
  function moveFineDrag(clientX,clientY,identifier){
   if(!previewDrag||previewDrag.id!==identifier)return false;
-  const drag=previewDrag;
+  const d=previewDrag,box=d.startBox;
+  const dx=(clientX-d.startX)*d.pixelX,dy=(clientY-d.startY)*d.pixelY;
   const setValue=(axis,n)=>{
-   const slider=$(drag.prefix+axis);
-   slider.value=String(Math.max(Number(slider.min),Math.min(Number(slider.max),Math.round(n))));
+   const slider=$(d.prefix+axis),min=Number(slider.min),max=Number(slider.max);
+   slider.value=String(Math.max(min,Math.min(max,Math.round(n))));
+   return Number(slider.value)||0;
   };
-  if(drag.mode==='resize'){
-   const dx=(clientX-drag.startX)*drag.pixelX;
-   const dy=(clientY-drag.startY)*drag.pixelY;
-   const change=1+(dx/Math.max(1,drag.viewWidth)+dy/Math.max(1,drag.viewHeight))*.65;
-   setValue('Zoom',drag.originZoom*change);
+  if(d.mode==='edge'){
+   // Scale uniformly from the OPPOSITE edge. Every individual photo retains
+   // its aspect ratio; arrows never stretch or crop a source photo.
+   let rawZoom=d.actualZoom;
+   if(d.edge==='right')rawZoom=d.actualZoom*(box.w+dx)/Math.max(1,box.w);
+   if(d.edge==='left')rawZoom=d.actualZoom*(box.w-dx)/Math.max(1,box.w);
+   if(d.edge==='bottom')rawZoom=d.actualZoom*(box.h+dy)/Math.max(1,box.h);
+   if(d.edge==='top')rawZoom=d.actualZoom*(box.h-dy)/Math.max(1,box.h);
+   // If the bundle fits, never let an arrow push any photo past the
+   // OUTER page edge. Nothing is clamped to its old inner pane.
+   let safeMax=3.5;
+   const centerX=box.x+box.w/2;
+   if(d.edge==='right')safeMax=Math.min(safeMax,(d.layoutW-box.x)/d.pane.w);
+   if(d.edge==='left')safeMax=Math.min(safeMax,box.right/d.pane.w);
+   if(d.edge==='top'||d.edge==='bottom')safeMax=Math.min(safeMax,2*Math.min(centerX,d.layoutW-centerX)/d.pane.w);
+   if(d.edge==='bottom')safeMax=Math.min(safeMax,(d.layoutH-box.y)/d.pane.h);
+   if(d.edge==='top')safeMax=Math.min(safeMax,box.bottom/d.pane.h);
+   if(d.edge==='right'||d.edge==='left')safeMax=Math.min(safeMax,(d.layoutH-box.y)/d.pane.h);
+   const z=setValue('Zoom',Math.max(25,Math.min(rawZoom*100,100*Math.max(.25,safeMax))))/100;
+   const newW=d.pane.w*z,newH=d.pane.h*z;
+   // Fixed opposite edge: left handle -> keep right; bottom handle -> keep top.
+   let newX=box.x,newY=box.y;
+   if(d.edge==='top'||d.edge==='bottom')newX=box.x+(box.w-newW)/2;
+   if(d.edge==='left')newX=box.right-newW;
+   if(d.edge==='top')newY=box.bottom-newH;
+   // The original transform scales around the column's center in X,
+   // and around the bundle's top in Y.
+   setValue('X',newX-d.pane.x-(d.pane.w-newW)/2);
+   setValue('Y',newY-d.pane.y);
   }else{
-   setValue('X',drag.originX+(clientX-drag.startX)*drag.pixelX);
-   setValue('Y',drag.originY+(clientY-drag.startY)*drag.pixelY);
+   // Keep the entire photo group visible inside the OUTER board when possible.
+   // Do not constrain it to the initial clothes/guns column.
+   let newX=box.x+dx,newY=box.y+dy;
+   if(box.w<=d.layoutW){newX=Math.min(Math.max(newX,0),d.layoutW-box.w);}
+   if(box.h<=d.layoutH){newY=Math.min(Math.max(newY,0),d.layoutH-box.h);}
+   setValue('X',d.originX+newX-box.x);
+   setValue('Y',d.originY+newY-box.y);
   }
   refreshFineValues();scheduleDraw();return true;
  }
  function finishFineDrag(identifier){
   if(!previewDrag||previewDrag.id!==identifier)return;
   const label=previewDrag.prefix==='b_clothesFine'?'옷':'총기';
-  const operation=previewDrag.mode==='resize'?'크기 변경':'위치 이동';
+  const operation=previewDrag.mode==='edge'?'네 변 손잡이 크기 변경':'위치 이동';
   previewDrag=null;canvas.style.cursor='grab';
   fineStatus(`${label} 사진 ${operation} 적용됨. 계속 끌어서 조절할 수 있습니다.`);
   window.SnaDraft?.queue?.('board');
