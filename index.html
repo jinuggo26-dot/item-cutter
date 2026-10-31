@@ -521,6 +521,15 @@ input[type=file]{display:none}
 #board-tab .board-preset.active{outline:2px solid #a4c1ec;border-color:#a4c1ec}
 #board-tab .board-preset span{display:block;color:#bac6d8;font-size:11px;margin-top:4px}
 #board-tab .board-preview-wrap{padding:10px;background:#101725;border:1px solid #354157;border-radius:16px;overflow:auto}
+/* iPhone: the preview and the controls ABOVE it must not change height while adjusting. */
+#board-tab #b_touch-sort-hint{height:88px;min-height:88px;overflow:hidden;box-sizing:border-box;display:block;line-height:1.42}
+#board-tab #b_fineQuickToggle{height:48px;min-height:48px;line-height:1.2;white-space:nowrap;font-size:13px}
+#board-tab.sna-photo-editing .board-preview-wrap,#board-tab.sna-photo-editing #b_preview{touch-action:none!important;overscroll-behavior:contain!important}
+html.sna-photo-no-anchor,#board-tab.sna-photo-editing{overflow-anchor:none!important;scroll-behavior:auto!important}
+#board-tab #b_photoFineTouchStatus{box-sizing:border-box}
+#board-tab #b_photoFineDetailPanel{padding:12px;background:#152236;border:1px solid #536b96;border-radius:12px;margin:12px 0;color:#dceaff}
+#board-tab #b_photoFineDetailPanel>summary{cursor:pointer;list-style:revert;font-size:14px;font-weight:800;min-height:36px;line-height:36px;touch-action:manipulation}
+
 #board-tab #b_preview{display:block;width:100%;height:auto;border-radius:6px;background:#fff;touch-action:manipulation;cursor:pointer}
 #board-tab .board-preview-wrap{width:min(calc(100vw - 24px),1250px);max-width:none;margin-left:50%;transform:translateX(-50%)}
 #board-tab .board-sticky-actions{position:sticky;bottom:8px;z-index:20;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;padding:8px 0;background:linear-gradient(transparent,#08090d 25%)}
@@ -4216,7 +4225,7 @@ window.closeAdmin=()=>{
    
    <div class="board-row"><label class="kl8-check"><input type="checkbox" id="b_autoAlign" checked> 글자 이탈 자동 제한</label><button type="button" class="board-btn" id="b_alignNow">옷·총 및 글자 자동 정렬</button><span class="board-small">자동 제한을 꺼도 기존 수동 조절값은 유지</span></div>
     <div id="b_previewMeta" class="board-counter">옷 0장 · 총기 0장 · 대기 중</div>
-   <div id="b_touch-sort-hint" style="margin-top:8px;border:1px solid #3a5279;background:#0e1c34;color:#d6e6ff;padding:11px 12px;border-radius:12px;font-size:13px;text-align:center"><b>사진 순서 바꾸기</b> · <b>옷끼리 또는 총기끼리</b> 첫 번째 사진을 터치하고, 바꿀 두 번째 사진을 터치하세요. (사진 크기 조절이 꺼져 있어야 합니다.)</div>
+   <div id="b_touch-sort-hint" style="margin-top:8px;border:1px solid #3a5279;background:#0e1c34;color:#d6e6ff;padding:11px 12px;border-radius:12px;font-size:13px;text-align:center"><b>사진 순서 바꾸기</b> · 조절을 종료한 뒤 옷끼리 또는 총기끼리 교환할 사진 두 장을 차례로 터치하세요.</div>
    <div class="board-row" style="margin-top:12px;align-items:center"><button type="button" id="b_fineQuickToggle" class="board-btn" aria-pressed="false">사진 이동·크기 조절 시작</button><span class="board-small">가운데 드래그: 묶음 이동 · ← →: 가로폭만 · ↑ ↓: 세로 높이만 · 순서 변경은 조절 종료 후 사진 두 번 터치</span></div>
    <div class="board-row" style="margin-top:8px"><button type="button" id="b_fineQuickReset" class="board-btn" style="min-height:42px">↺ 사진 크기·가로폭·세로높이·위치 초기화</button></div>
    <div id="b_photoFineTouchStatus" aria-live="polite" style="margin:8px 0;border:1px solid #486b8d;background:#122844;color:#e1f7ff;border-radius:9px;padding:10px 12px;font-size:12px;line-height:1.5;display:none">사진을 추가한 뒤 조절을 켜세요.</div>
@@ -8380,7 +8389,9 @@ saveBtn.addEventListener("click",async()=>{
   $("b_largeManualControls").style.display="none";
   $("b_largeSizePercentValue").textContent=$("b_largeSizePercent").value+"%";
   $("b_photoFineControls").style.display="block";
-  $("b_photoFineEditor").style.display=$("b_photoFineEnabled").checked?"block":"none";
+  // The numeric editor is below the preview inside a collapsed details panel.
+  // Do not expand a huge block ABOVE the preview on start/stop.
+  $("b_photoFineEditor").style.display="block";
   canvas.style.touchAction=$("b_photoFineEnabled").checked?"none":"manipulation";
   canvas.style.cursor=$("b_photoFineEnabled").checked?"grab":"auto";
  }
@@ -8409,6 +8420,19 @@ saveBtn.addEventListener("click",async()=>{
  const touchStatus=$("b_photoFineTouchStatus");
  const previewWrap=canvas.closest('.board-preview-wrap');
  const photoFineHint=$("b_touch-sort-hint");
+ const normalSortHintHTML=photoFineHint?.innerHTML||'';
+ // Move advanced numeric sliders BELOW the preview, where expanding them cannot
+ // push the canvas away from the finger or trigger iOS scroll anchoring.
+ const fineDetailPanel=document.createElement('details');
+ fineDetailPanel.id='b_photoFineDetailPanel';
+ fineDetailPanel.style.display='none';
+ const fineSummary=document.createElement('summary');
+ fineSummary.textContent='수치로 세밀하게 조절하기 · 옷/총기 가로폭·높이·위치';
+ fineDetailPanel.appendChild(fineSummary);
+ fineDetailPanel.appendChild($("b_photoFineEditor"));
+ previewWrap.insertAdjacentElement('afterend',fineDetailPanel);
+ // A live status under (not above) the canvas cannot change canvas Y position.
+ fineDetailPanel.insertAdjacentElement('beforebegin',touchStatus);
  function fineStatus(message){
   touchStatus.textContent=message;
   touchStatus.style.display=$("b_photoFineEnabled").checked?'block':'none';
@@ -8417,20 +8441,39 @@ saveBtn.addEventListener("click",async()=>{
   const active=$("b_photoFineEnabled").checked;
   videoQuick.textContent=active?'✓ 사진 직접 조절 중 · 종료':'사진 이동·크기 조절 시작';
   videoQuick.setAttribute('aria-pressed',String(active));
-  if(photoFineHint)photoFineHint.style.display=active?'none':'';
-  if(previewWrap)previewWrap.style.touchAction=active?'none':'';
+  // Keep the instruction bar's height fixed. Hiding it made the entire preview
+  // jump up and then down every time users tapped Start / Finish.
+  if(photoFineHint){
+   photoFineHint.innerHTML=active
+    ?'<b>사진 위치·크기 조절 중</b> · 사진 가운데를 끌어 이동하고, 테두리 네 변의 화살표로 가로폭 또는 세로 높이만 조절하세요.'
+    :normalSortHintHTML;
+  }
+  fineDetailPanel.style.display=active?'block':'none';
+  document.getElementById('board-tab').classList.toggle('sna-photo-editing',active);
+  document.documentElement.classList.toggle('sna-photo-no-anchor',active);
+  if(previewWrap){previewWrap.style.touchAction=active?'none':'auto';previewWrap.style.overflow=active?'hidden':'auto';}
   if(active){
    const hasPhoto=state.clothes.length+state.guns.length>0;
    fineStatus(hasPhoto?'사진 가운데는 이동 · ← → 가로폭만 · ↑ ↓ 세로 높이만 조절합니다. 반대쪽 변은 고정됩니다.':'먼저 옷 또는 총기 사진을 추가하세요. 사진이 없으면 움직일 수 없습니다.');
   }else touchStatus.style.display='none';
  }
  function setFineEnabled(active){
+  // Keep the viewport at the EXACT same scroll coordinate on mode changes.
+  // Moving numeric settings below the canvas makes this a safeguard only.
+  const y=window.scrollY,x=window.scrollX;
   state.previewSort=null;
   $("b_photoFineEnabled").checked=!!active;
   updateLargeSizeControls();syncFineUI();scheduleDraw();
+  if(Math.abs(window.scrollY-y)>1)window.scrollTo({left:x,top:y,behavior:'instant'});
+  requestAnimationFrame(()=>{
+   if(Math.abs(window.scrollY-y)>1)window.scrollTo({left:x,top:y,behavior:'instant'});
+  });
  }
  videoQuick.addEventListener('click',()=>setFineEnabled(!$("b_photoFineEnabled").checked));
- $("b_photoFineEnabled").addEventListener('change',()=>{updateLargeSizeControls();syncFineUI();scheduleDraw();});
+ $("b_photoFineEnabled").addEventListener('change',()=>{
+  // Checkbox and quick button share the same stable-layout implementation.
+  setFineEnabled($("b_photoFineEnabled").checked);
+ });
  $("b_fineQuickReset").addEventListener('click',()=>{resetPhotoFine();if($("b_photoFineEnabled").checked)fineStatus('옷·총기 크기를 100%, 위치를 0으로 초기화했어요.');});
  $("b_photoFineGoPreview").addEventListener('click',()=>{
   if(!$("b_photoFineEnabled").checked)setFineEnabled(true);
@@ -8469,6 +8512,7 @@ saveBtn.addEventListener("click",async()=>{
  // iPhone Safari uses native touch events for photo drag. Pointer Events handle mouse/stylus.
  // Both paths share the exact same X/Y/zoom settings, so PNG export matches preview.
  let previewDrag=null;
+ let fineLockedScroll=null;
  function finePoint(clientX,clientY){
   const layout=state.previewLayout,rect=canvas.getBoundingClientRect();
   if(!layout?.photoRects||!rect.width||!rect.height)return null;
@@ -8497,6 +8541,7 @@ saveBtn.addEventListener("click",async()=>{
   photoFineSide=chosen;
   const prefix=chosen==='clothes'?'b_clothesFine':'b_gunsFine';
   historyPush();
+  fineLockedScroll={x:window.scrollX,y:window.scrollY};
   previewDrag={id:identifier,prefix,side:chosen,mode:handle?'edge':'move',edge:handle?.edge||null,
    startX:clientX,startY:clientY,originX:Number($(prefix+'X').value)||0,originY:Number($(prefix+'Y').value)||0,
    originZoom:Number($(prefix+'Zoom').value)||100,actualZoom:box.zoom,
@@ -8551,13 +8596,19 @@ saveBtn.addEventListener("click",async()=>{
    setValue('X',d.originX+newX-box.x);
    setValue('Y',d.originY+newY-box.y);
   }
-  refreshFineValues();scheduleDraw();return true;
+  refreshFineValues();scheduleDraw();
+  // Guard iOS Safari/WebView against momentum or accidental scroll while
+  // a resize gesture is in progress (only correct real drift, no forced jump).
+  if(fineLockedScroll&&Math.abs(window.scrollY-fineLockedScroll.y)>1){
+   window.scrollTo({left:fineLockedScroll.x,top:fineLockedScroll.y,behavior:'instant'});
+  }
+  return true;
  }
  function finishFineDrag(identifier){
   if(!previewDrag||previewDrag.id!==identifier)return;
   const label=previewDrag.prefix==='b_clothesFine'?'옷':'총기';
   const operation=previewDrag.mode==='edge'?'가로/세로 독립 크기 변경':'위치 이동';
-  previewDrag=null;canvas.style.cursor='grab';
+  previewDrag=null;fineLockedScroll=null;canvas.style.cursor='grab';
   fineStatus(`${label} 사진 ${operation} 적용됨. 계속 끌어서 조절할 수 있습니다.`);
   window.SnaDraft?.queue?.('board');
  }
@@ -8576,9 +8627,13 @@ saveBtn.addEventListener("click",async()=>{
  canvas.addEventListener('pointerup',event=>finishFineDrag(event.pointerId));
  canvas.addEventListener('pointercancel',event=>finishFineDrag(event.pointerId));
  canvas.addEventListener('touchstart',event=>{
-  if(!$("b_photoFineEnabled").checked||event.touches.length!==1)return;
+  if(!$("b_photoFineEnabled").checked)return;
+  // Even an initial tap on a blank grid area must not start page scrolling.
+  // Only the canvas is locked; page scrolling elsewhere remains normal.
+  event.preventDefault();
+  if(event.touches.length!==1)return;
   const t=event.changedTouches[0];
-  if(beginFineDrag(t.clientX,t.clientY,'touch-'+t.identifier))event.preventDefault();
+  beginFineDrag(t.clientX,t.clientY,'touch-'+t.identifier);
  },{passive:false});
  // Listen at window level so a finger moving outside the canvas still completes the gesture.
  window.addEventListener('touchmove',event=>{
