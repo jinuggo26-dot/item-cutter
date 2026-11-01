@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-sna-browser="pending">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
@@ -1461,9 +1461,17 @@ body {background:radial-gradient(ellipse 80% 32% at 50% 0%,#13364c 0%,transparen
 @media(max-width:590px){.sna-spec-guide-grids{grid-template-columns:1fr}.sna-spec-guide-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:360px){.sna-spec-guide-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
+<style id="sna-browser-gate-style">
+html:not([data-sna-browser="allowed"]) body > :not(#sna-browser-gate){display:none!important}
+#sna-browser-gate{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;background:#08090d;color:#f5f7fb;padding:24px;font-family:system-ui,sans-serif}
+#sna-browser-gate section{width:100%;max-width:420px;padding:28px;border:1px solid #303541;border-radius:20px;background:#11131a;text-align:center}
+#sna-browser-gate h1{font-size:23px;margin-bottom:18px}#sna-browser-gate p{font-size:15px;line-height:1.8;margin-top:14px;color:#bbc4d6}
+html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
+</style>
 </head>
 
 <body>
+<div id="sna-browser-gate" role="alert"><section><h1>이용 가능한 브라우저 안내</h1><p>삼성 기기 → 네이버 앱<br>아이폰·아이패드 → 사파리</p><p id="sna-browser-status">기기와 브라우저를 확인하고 있습니다.</p><noscript>자바스크립트를 활성화한 뒤 다시 접속해 주세요.</noscript></section></div>
 
 <div id="auth-consent-screen" style="display:none;position:fixed;inset:0;z-index:1000001;background:#080e18ed;align-items:center;justify-content:center;padding:18px">
  <div style="width:min(100%,480px);border:1px solid #415676;border-radius:20px;background:#182438;padding:24px 22px;box-shadow:0 22px 65px #0009;color:#e9f0ff">
@@ -1482,7 +1490,7 @@ body {background:radial-gradient(ellipse 80% 32% at 50% 0%,#13364c 0%,transparen
   <p id="auth-consent-error" role="status" style="min-height:1em;font-size:12px;color:#ffb0b0;margin-top:8px"></p>
  </div>
 </div>
-<script>
+<script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 (()=>{
  const overlay=document.getElementById('auth-consent-screen');
  const check=document.getElementById('auth-consent-check');
@@ -1624,7 +1632,7 @@ body {background:radial-gradient(ellipse 80% 32% at 50% 0%,#13364c 0%,transparen
 
 
 <div id="ui-dialog-backdrop" role="presentation"><div class="ui-dialog-card" role="dialog" aria-modal="true" aria-labelledby="ui-dialog-title"><div class="ui-dialog-symbol" id="ui-dialog-icon">✦</div><h3 id="ui-dialog-title">알림</h3><p id="ui-dialog-message"></p><div class="ui-dialog-actions" id="ui-dialog-actions"></div></div></div>
-<script>
+<script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 (function(){
  const nativeAlert=window.alert.bind(window);
  let queue=[],active=false;
@@ -1655,7 +1663,7 @@ body {background:radial-gradient(ellipse 80% 32% at 50% 0%,#13364c 0%,transparen
 </div></div>
 <div id="member-info-overlay" class="member-shade" role="dialog" aria-modal="true" aria-label="내 이용 정보"><div class="member-modal"><h2>👤 내 이용 정보</h2><div id="member-info-content"></div><div class="member-controls"><button class="member-btn" id="member-open-notice" type="button">공지사항 보기</button><button class="member-btn primary" id="member-info-close" type="button">닫기</button></div></div></div>
 <div id="gallery-image-overlay" class="member-shade" role="dialog" aria-modal="true" aria-label="대필 작품 확대"><div class="member-modal" style="width:min(96vw,900px)"><button class="member-btn" type="button" id="gallery-image-close">닫기 ✕</button><h2 id="gallery-image-title"></h2><img id="gallery-image-large" alt="전시 작품"></div></div>
-<script type="module">
+<script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="module">
 import {initializeApp}
 from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 
@@ -4343,7 +4351,7 @@ window.closeAdmin=()=>{
  </div>
 </div>
 
-<script>
+<script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 
 /* =====================================================
    공통
@@ -4554,6 +4562,130 @@ window.SnaQuality=(()=>{
  document.querySelectorAll('[data-qa-run]').forEach(btn=>btn.addEventListener('click',()=>batch(btn.dataset.qaRun)));
  return {inspect,check:batch,scheduleCheck};
 })();
+
+window.SnaDetectItemGrid=function(image,imageCanvas){
+  const iw=imageCanvas.width,ih=imageCanvas.height;
+  if(iw<160||ih<120)return null;
+  const ratio=Math.min(1,1400/Math.max(iw,ih));
+  const w=Math.max(1,Math.round(iw*ratio));
+  const h=Math.max(1,Math.round(ih*ratio));
+  const scratch=document.createElement('canvas');
+  scratch.width=w;scratch.height=h;
+  const ctx=scratch.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(image,0,0,w,h);
+  const data=ctx.getImageData(0,0,w,h).data;
+  const colored=new Uint8Array(w*h);
+  const xCounts=new Int32Array(w);
+  // 아이템 형태 대신 자주색/보라색/빨강색 카드의 색상 영역을 판정한다.
+  for(let y=0,p=0,k=0;y<h;y++){
+    for(let x=0;x<w;x++,k++,p+=4){
+      const r=data[p],g=data[p+1],b=data[p+2];
+      const hit=(g<155&&(
+        (r>65&&r>g*1.23&&(b>g*1.02||r>b*1.20))||
+        (b>65&&b>g*1.27&&r>g*1.16)
+      ))||(r>130&&g>70&&b<g*.8&&r>g*1.07);
+      if(hit){colored[k]=1;xCounts[x]++;}
+    }
+  }
+  function median(a){
+    const sorted=a.slice().sort((a,b)=>a-b);
+    return sorted.length?sorted[Math.floor(sorted.length/2)]:0;
+  }
+  function runs(counts,denom,threshold,minlen,holes){
+    const active=Array.from(counts,v=>v/Math.max(1,denom)>=threshold);
+    for(let i=0;i<active.length;){
+      if(active[i]){i++;continue;}
+      let j=i+1;while(j<active.length&&!active[j])j++;
+      if(i>0&&j<active.length&&j-i<=holes){for(let k=i;k<j;k++)active[k]=true;}
+      i=j;
+    }
+    const out=[];
+    for(let i=0;i<active.length;){
+      if(!active[i]){i++;continue;}
+      let j=i+1;while(j<active.length&&active[j])j++;
+      if(j-i>=minlen)out.push({start:i,end:j,width:j-i,center:(i+j)/2});
+      i=j;
+    }
+    return out;
+  }
+  const rawCols=runs(xCounts,h,.085,Math.max(9,Math.round(w*.024)),Math.max(0,Math.floor(w*.0014)));
+  if(rawCols.length<5)return null;
+  const commonW=median(rawCols.map(c=>c.width));
+  const cols=rawCols.filter(c=>c.width>=commonW*.68&&c.width<=commonW*1.34);
+  if(cols.length<5||cols.length>22)return null;
+  const steps=cols.slice(1).map((c,i)=>c.center-cols[i].center);
+  const typicalStep=median(steps);
+  if(typicalStep<commonW*.97||typicalStep>commonW*1.80||
+    steps.some(s=>Math.abs(s-typicalStep)>typicalStep*.19))return null;
+
+  // 이전 코드는 열의 테두리 4개 픽셀만 샘플링했다.
+  // 어두운 카드의 테두리가 검게 보이면 통째로 행이 빠지는 문제를 방지하기 위해
+  // 각 열의 내부 전체에서 3px 간격으로 색상 비율을 취합한다.
+  const probeX=[];
+  for(const col of cols){
+    const inset=Math.max(2,Math.round(col.width*.14));
+    for(let x=col.start+inset;x<col.end-inset;x+=3)probeX.push(x);
+  }
+  if(probeX.length<20)return null;
+  const yCount=new Int32Array(h);
+  for(let y=0;y<h;y++){
+    const off=y*w;let sum=0;
+    for(const x of probeX)sum+=colored[off+x];
+    yCount[y]=sum;
+  }
+  // 카드 안 글자/아이템이 많은 줄에서도 충분히 검출되도록 낮은 비율(8%)을 사용한다.
+  // 카드 사이 5~7px의 흰색 틈은 합치지 않는다.
+  const rows=runs(yCount,probeX.length,.08,Math.max(9,Math.round(commonW*.20)),Math.max(0,Math.floor(commonW*.022)));
+  if(rows.length<1||rows.length>22)return null;
+  const tall=rows.map(r=>r.width).filter(v=>v>=commonW*.80);
+  if(!tall.length)return [];
+  // 연한 카드의 위쪽 몇 픽셀이 누락될 수 있으므로 충분히 긴 행을 기준으로
+  // 통일된 높이를 산출한다. 카드의 아래 테두리 위치를 앵커로 복구한다.
+  const tallSorted=tall.slice().sort((a,b)=>a-b);
+  const typicalH=tallSorted[tallSorted.length-1];
+  if(typicalH<commonW*.80||typicalH>commonW*1.85)return null;
+  const fullRows=[];
+  for(const row of rows){
+    // 실제로 잘린 위/아래 카드 줄은 감지 목록에 넣지 않는다.
+    if(row.width<typicalH*.90||row.width>typicalH*1.14)continue;
+    const y0=Math.max(0,row.end-typicalH);
+    if(y0<3||row.end>h-3)continue;
+    // 컬러 영역 바깥에 화면의 밝은 구분선이 존재하는지 재확인한다.
+    const at=(y)=>y>=0&&y<h?yCount[y]/probeX.length:0;
+    let before=0,after=0;
+    for(let k=1;k<=3;k++){before+=at(y0-k);after+=at(row.end-1+k);}
+    // 시작/끝이 검출된 유효한 한 줄인지 확인한다. 일부 행에서 시작이
+    // 늦게 감지되어도 아래 경계를 기준으로 완전한 카드 크기를 복원한다.
+    if(before/3>.30||after/3>.30)continue;
+    fullRows.push({start:y0,end:row.end});
+  }
+  // 실제 카드 열이 보이지만 완전한 줄이 없는 경우, 오래된 모양 감지기로
+  // 되돌아가지 않고 빈 배열을 반환한다(부분 카드 오탐 방지).
+  if(!fullRows.length)return [];
+  const cardW=Math.round(commonW/ratio);
+  const cardH=Math.round(typicalH/ratio);
+  const out=[];
+  for(let ri=0;ri<fullRows.length;ri++){
+    const row=fullRows[ri];
+    for(let ci=0;ci<cols.length;ci++){
+      const col=cols[ci];
+      const x=Math.round(col.start/ratio),y=Math.round(row.start/ratio);
+      if(x<0||y<0||x+cardW>iw||y+cardH>ih)continue;
+      // Validate each cell: a short last row must not create phantom cards.
+      let samples=0,coloredSamples=0,darkSamples=0;
+      for(let py=row.start+4;py<row.end-4;py+=3){
+        for(let px=col.start+4;px<col.end-4;px+=3){
+          const pos=py*w+px,p=pos*4;
+          samples++;coloredSamples+=colored[pos];
+          if(Math.max(data[p],data[p+1],data[p+2])<135)darkSamples++;
+        }
+      }
+      if(!samples||(coloredSamples/samples<.12&&darkSamples/samples<.60))continue;
+      out.push({x,y,width:cardW,height:cardH,partial:false,gridColumn:ci,gridRow:ri});
+    }
+  }
+  return out;
+};
 
 /* =====================================================
    👕 옷 추출
@@ -5034,7 +5166,7 @@ function showPhoto(index){
  updatePhotoButtons();
 
  currentPhoto.textContent=
-  `사진 ${index+1} · ${photo.name}`;
+  `사진 ${index+1} · ${photo.name} · 감지 ${cards.length}장 [R2]`;
 }
 
 function isTierPixel(r,g,b){
@@ -5376,129 +5508,7 @@ function cardOverlap(a,b){
 // 특별히 이 규칙을 만족하지 않는 화면은 기존 인식기로 되돌린다.
 // 아이템/의상/모자/가방 공통: 실제 색상 카드의 열과 행을 독립적으로 검출한다.
 // 스크린샷 전체 크기나 장비 그림의 외곽선을 격자 좌표에 사용하지 않는다.
-function detectRegularItemGrid(){
-  const iw=imageCanvas.width,ih=imageCanvas.height;
-  if(iw<160||ih<120)return null;
-  const ratio=Math.min(1,1400/Math.max(iw,ih));
-  const w=Math.max(1,Math.round(iw*ratio));
-  const h=Math.max(1,Math.round(ih*ratio));
-  const scratch=document.createElement('canvas');
-  scratch.width=w;scratch.height=h;
-  const ctx=scratch.getContext('2d',{willReadFrequently:true});
-  ctx.drawImage(image,0,0,w,h);
-  const data=ctx.getImageData(0,0,w,h).data;
-  const colored=new Uint8Array(w*h);
-  const xCounts=new Int32Array(w);
-  // 아이템 형태 대신 자주색/보라색/빨강색 카드의 색상 영역을 판정한다.
-  for(let y=0,p=0,k=0;y<h;y++){
-    for(let x=0;x<w;x++,k++,p+=4){
-      const r=data[p],g=data[p+1],b=data[p+2];
-      const hit=(g<155&&(
-        (r>65&&r>g*1.23&&(b>g*1.02||r>b*1.20))||
-        (b>65&&b>g*1.27&&r>g*1.16)
-      ))||(r>130&&g>70&&b<g*.8&&r>g*1.07);
-      if(hit){colored[k]=1;xCounts[x]++;}
-    }
-  }
-  function median(a){
-    const sorted=a.slice().sort((a,b)=>a-b);
-    return sorted.length?sorted[Math.floor(sorted.length/2)]:0;
-  }
-  function runs(counts,denom,threshold,minlen,holes){
-    const active=Array.from(counts,v=>v/Math.max(1,denom)>=threshold);
-    for(let i=0;i<active.length;){
-      if(active[i]){i++;continue;}
-      let j=i+1;while(j<active.length&&!active[j])j++;
-      if(i>0&&j<active.length&&j-i<=holes){for(let k=i;k<j;k++)active[k]=true;}
-      i=j;
-    }
-    const out=[];
-    for(let i=0;i<active.length;){
-      if(!active[i]){i++;continue;}
-      let j=i+1;while(j<active.length&&active[j])j++;
-      if(j-i>=minlen)out.push({start:i,end:j,width:j-i,center:(i+j)/2});
-      i=j;
-    }
-    return out;
-  }
-  const rawCols=runs(xCounts,h,.085,Math.max(9,Math.round(w*.024)),Math.max(0,Math.floor(w*.0014)));
-  if(rawCols.length<5)return null;
-  const commonW=median(rawCols.map(c=>c.width));
-  const cols=rawCols.filter(c=>c.width>=commonW*.68&&c.width<=commonW*1.34);
-  if(cols.length<5||cols.length>22)return null;
-  const steps=cols.slice(1).map((c,i)=>c.center-cols[i].center);
-  const typicalStep=median(steps);
-  if(typicalStep<commonW*.97||typicalStep>commonW*1.80||
-    steps.some(s=>Math.abs(s-typicalStep)>typicalStep*.19))return null;
-
-  // 이전 코드는 열의 테두리 4개 픽셀만 샘플링했다.
-  // 어두운 카드의 테두리가 검게 보이면 통째로 행이 빠지는 문제를 방지하기 위해
-  // 각 열의 내부 전체에서 3px 간격으로 색상 비율을 취합한다.
-  const probeX=[];
-  for(const col of cols){
-    const inset=Math.max(2,Math.round(col.width*.14));
-    for(let x=col.start+inset;x<col.end-inset;x+=3)probeX.push(x);
-  }
-  if(probeX.length<20)return null;
-  const yCount=new Int32Array(h);
-  for(let y=0;y<h;y++){
-    const off=y*w;let sum=0;
-    for(const x of probeX)sum+=colored[off+x];
-    yCount[y]=sum;
-  }
-  // 카드 안 글자/아이템이 많은 줄에서도 충분히 검출되도록 낮은 비율(8%)을 사용한다.
-  // 카드 사이 5~7px의 흰색 틈은 합치지 않는다.
-  const rows=runs(yCount,probeX.length,.08,Math.max(9,Math.round(commonW*.20)),Math.max(0,Math.floor(commonW*.022)));
-  if(rows.length<1||rows.length>22)return null;
-  const tall=rows.map(r=>r.width).filter(v=>v>=commonW*.80);
-  if(!tall.length)return [];
-  // 연한 카드의 위쪽 몇 픽셀이 누락될 수 있으므로 충분히 긴 행을 기준으로
-  // 통일된 높이를 산출한다. 카드의 아래 테두리 위치를 앵커로 복구한다.
-  const tallSorted=tall.slice().sort((a,b)=>a-b);
-  const typicalH=tallSorted[tallSorted.length-1];
-  if(typicalH<commonW*.80||typicalH>commonW*1.85)return null;
-  const fullRows=[];
-  for(const row of rows){
-    // 실제로 잘린 위/아래 카드 줄은 감지 목록에 넣지 않는다.
-    if(row.width<typicalH*.90||row.width>typicalH*1.14)continue;
-    const y0=Math.max(0,row.end-typicalH);
-    if(y0<3||row.end>h-3)continue;
-    // 컬러 영역 바깥에 화면의 밝은 구분선이 존재하는지 재확인한다.
-    const at=(y)=>y>=0&&y<h?yCount[y]/probeX.length:0;
-    let before=0,after=0;
-    for(let k=1;k<=3;k++){before+=at(y0-k);after+=at(row.end-1+k);}
-    // 시작/끝이 검출된 유효한 한 줄인지 확인한다. 일부 행에서 시작이
-    // 늦게 감지되어도 아래 경계를 기준으로 완전한 카드 크기를 복원한다.
-    if(before/3>.30||after/3>.30)continue;
-    fullRows.push({start:y0,end:row.end});
-  }
-  // 실제 카드 열이 보이지만 완전한 줄이 없는 경우, 오래된 모양 감지기로
-  // 되돌아가지 않고 빈 배열을 반환한다(부분 카드 오탐 방지).
-  if(!fullRows.length)return [];
-  const cardW=Math.round(commonW/ratio);
-  const cardH=Math.round(typicalH/ratio);
-  const out=[];
-  for(let ri=0;ri<fullRows.length;ri++){
-    const row=fullRows[ri];
-    for(let ci=0;ci<cols.length;ci++){
-      const col=cols[ci];
-      const x=Math.round(col.start/ratio),y=Math.round(row.start/ratio);
-      if(x<0||y<0||x+cardW>iw||y+cardH>ih)continue;
-      // Validate each cell: a short last row must not create phantom cards.
-      let samples=0,coloredSamples=0,darkSamples=0;
-      for(let py=row.start+4;py<row.end-4;py+=3){
-        for(let px=col.start+4;px<col.end-4;px+=3){
-          const pos=py*w+px,p=pos*4;
-          samples++;coloredSamples+=colored[pos];
-          if(Math.max(data[p],data[p+1],data[p+2])<135)darkSamples++;
-        }
-      }
-      if(!samples||(coloredSamples/samples<.12&&darkSamples/samples<.60))continue;
-      out.push({x,y,width:cardW,height:cardH,partial:false,gridColumn:ci,gridRow:ri});
-    }
-  }
-  return out;
-}
+function detectRegularItemGrid(){return window.SnaDetectItemGrid(image,imageCanvas);}
 
 function detectCards(){
   const regularGrid=detectRegularItemGrid();
@@ -5700,7 +5710,7 @@ window.c_autoExtractAll=async()=>{
  for(let i=0;i<photos.length;i++){
   if(!photos[i])continue;
   showPhoto(i);
-  if(!photos[i].selected?.length){
+  {
    const found=cards.filter(c=>c&&!c.partial&&c.width>12&&c.height>12&&c.x>=0&&c.y>=0&&c.x+c.width<=imageCanvas.width+2&&c.y+c.height<=imageCanvas.height+2).slice(0,60);
    photos[i].selected=found;
   }
@@ -6111,7 +6121,7 @@ function showPhoto(index){
  updatePhotoButtons();
 
  currentPhoto.textContent=
-  `사진 ${index+1} · ${photo.name}`;
+  `사진 ${index+1} · ${photo.name} · 감지 ${cards.length}장 [R2]`;
 }
 
 
@@ -6200,6 +6210,9 @@ function detectVehicleCards(){
 ===================================================== */
 
 function detectCards(){
+ const itemGrid=window.SnaDetectItemGrid(image,imageCanvas);
+ if(itemGrid&&itemGrid.length){cards=itemGrid;return;}
+
 
  cards=[];
 
@@ -6617,7 +6630,7 @@ window.g_autoExtractAll=async()=>{
  for(let i=0;i<photos.length;i++){
   if(!photos[i])continue;
   showPhoto(i);
-  if(!photos[i].selected?.length){
+  {
    const found=cards.filter(c=>c&&c.width>12&&c.height>12&&c.x>=0&&c.y>=0&&c.x+c.width<=imageCanvas.width+2&&c.y+c.height<=imageCanvas.height+2).slice(0,60);
    photos[i].selected=found;
   }
@@ -8907,7 +8920,7 @@ saveBtn.addEventListener("click",async()=>{
 })();
 </script>
 
-<script>
+<script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 /* Killlog v11: editable boundaries and erasable restored background. */
 (()=>{
 'use strict';
@@ -9466,7 +9479,7 @@ render();health();
 
 </script>
 
-<script>
+<script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 // 화면 전용: 기존 옷·총 저장 함수/공유 방식은 변경하지 않고 버튼 상태만 동기화합니다.
 (()=>{
  for(const p of ['c','g']){
@@ -9490,7 +9503,7 @@ render();health();
 })();
 </script>
 
-<script>
+<script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 // 제작자 정보창: 편집 엔진 / 회원 인증 / 저장 로직과 독립적으로 동작합니다.
 (()=>{
  const overlay=document.getElementById('creator-about-overlay');
@@ -9534,7 +9547,7 @@ render();health();
 </script>
 
 
-<script>
+<script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 // One integrated guide, independent of Firebase or feature modules.
 (()=>{
  const overlay=document.getElementById('editor-guide');
@@ -9571,7 +9584,7 @@ render();health();
 })();
 </script>
 
-<script>
+<script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 // 기기 내부 IndexedDB에 원본 파일과 설정을 저장하는 임시 작업 시스템.
 (()=>{
  'use strict';
@@ -9670,7 +9683,7 @@ render();health();
  <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
-<script>
+<script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 (()=>{const version='12.5.8';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.8: 중스펙 흰색 격자 중첩 제거';}}catch(_){} })();
 </script>
 
@@ -9703,7 +9716,7 @@ render();health();
 </section>
 <div id="sna-trial-session" hidden role="status"><span id="sna-trial-session-text">무료 체험 진행 중</span><button type="button" id="sna-trial-session-exit">체험 종료</button></div>
 
-<script>
+<script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 /* v12.5.0 independent sample demo + paid-app extension hooks */
 (()=>{
  'use strict';
@@ -9778,7 +9791,7 @@ render();health();
 })();
 </script>
 
-<script id="sna-v1254-ui-adapter">
+<script id="sna-v1254-ui-adapter" type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 (()=>{
   'use strict';
   const main=document.getElementById('b_savePng');
@@ -9811,7 +9824,7 @@ render();health();
 
 <!-- v12.5.8: Hide/remove free-trial shortcuts ONLY from the paid-user navigation.
      Keep the anonymous trial entry point on the login screen. -->
-<script id="sna-v1257-purchased-nav-guard">
+<script id="sna-v1257-purchased-nav-guard" type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 (()=>{
   'use strict';
   const nav=document.querySelector('.global-tabs');
@@ -9834,7 +9847,7 @@ render();health();
   watcher.observe(nav,{childList:true,subtree:true,characterData:true});
 })();
 </script>
-<script id="sniper-cyber-restore-hud-sync">
+<script id="sniper-cyber-restore-hud-sync" type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 (()=>{
   'use strict';
   const nav=document.querySelector('.global-tabs');
@@ -9854,7 +9867,7 @@ render();health();
   // Screen-only branding - rendering and export canvases are not touched.
 })();
 </script>
-<script id="sniper-trial-entry-guard-r2">
+<script id="sniper-trial-entry-guard-r2" type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 /* R2: Browser-native entry handler. Runs without Firebase or module imports. */
 (()=>{
  'use strict';
@@ -9911,7 +9924,7 @@ render();health();
 })();
 </script>
 
-<script id="sniper-compact-navigation-v3-handler">
+<script id="sniper-compact-navigation-v3-handler" type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 (function(){
   'use strict';
   const nav=document.querySelector('.global-tabs');
@@ -9932,7 +9945,7 @@ render();health();
 })();
 </script>
 
-<script id="sna-spec-guide-script">
+<script id="sna-spec-guide-script" type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 /* 안내 UI만 추가 · 원래 buildLayout() 및 사진·문구 데이터 불변 */
 (()=>{
  const init=()=>{
@@ -10014,6 +10027,49 @@ render();health();
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
  else init();
 })();
+</script>
+<script id="sna-browser-gate-bootstrap">
+(()=>{
+ 'use strict';
+ const gate=document.getElementById('sna-browser-gate');
+ function classifyBrowser(ua,touchPoints,standalone,model){
+  ua=String(ua||'');
+  const apple=/iPhone|iPad|iPod/i.test(ua)||(/Macintosh/i.test(ua)&&touchPoints>1);
+  const android=/Android/i.test(ua);
+  const naver=/NAVER(?:\b|\()/i.test(ua);
+  const foreign=/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA\/|NAVER|KAKAOTALK|DaumApps|Whale|DuckDuckGo|Ddg\/|FBAN|FBAV|Instagram|Line\/|MicroMessenger/i.test(ua);
+  const safari=apple&&!foreign&&/AppleWebKit/i.test(ua)&&(/Version\/[\d.]+.*Safari\//i.test(ua)||standalone===true);
+  const samsung=/\b(?:SM-[A-Z0-9]+|GT-[A-Z0-9]+|SHV-[A-Z0-9]+|SHW-[A-Z0-9]+|SCH-[A-Z0-9]+|SGH-[A-Z0-9]+)\b|Samsung|Galaxy/i.test(ua+' '+String(model||''));
+  return {allowed:safari||(android&&naver&&samsung),needsModel:android&&naver&&!samsung,apple,android};
+ }
+ const ua=navigator.userAgent||'';
+ const initial=classifyBrowser(ua,navigator.maxTouchPoints||0,navigator.standalone);
+ async function decide(){
+  let decision=initial;
+  if(decision.needsModel&&navigator.userAgentData?.getHighEntropyValues){
+   try{
+    const hints=await Promise.race([navigator.userAgentData.getHighEntropyValues(['model']),new Promise(resolve=>setTimeout(()=>resolve({}),2500))]);
+    decision=classifyBrowser(ua,navigator.maxTouchPoints||0,navigator.standalone,hints.model);
+   }catch(_){}
+  }
+  if(!decision.allowed){
+   document.documentElement.dataset.snaBrowser='blocked';
+   document.getElementById('sna-browser-status').textContent=decision.apple?'이 주소를 사파리에서 열어 주세요.':decision.android?'삼성 기기의 네이버 앱에서 이 주소를 열어 주세요.':'삼성 기기의 네이버 앱 또는 아이폰·아이패드의 사파리에서 이용해 주세요.';
+   return;
+  }
+  window.SnaBrowserAllowed=true;
+  document.documentElement.dataset.snaBrowser='allowed';gate.remove();
+  // Original app scripts stay inert until the browser has passed the gate.
+  for(const source of document.querySelectorAll('script[data-sna-original-script]')){
+   const active=document.createElement('script');
+   for(const attr of source.attributes){if(attr.name!=='type'&&attr.name!=='data-sna-original-script'&&attr.name!=='data-sna-script-type')active.setAttribute(attr.name,attr.value);}
+   const type=source.getAttribute('data-sna-script-type');if(type)active.type=type;
+   active.textContent=source.textContent;source.replaceWith(active);
+  }
+ }
+ decide();
+})();
+
 </script>
 </body>
 </html>
