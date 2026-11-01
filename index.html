@@ -3014,7 +3014,7 @@ function snaStatsClassification(log){
  if(a==='옷 추출 / 자르기 시작')return 'clothes';
  if(a==='총기 카드 자르기 시작')return 'guns';
  if(a==='이미지 합치기 저장 요청')return 'merge';
- if(a==='대필판 PNG 저장')return 'board';
+ if(a==='대필판 JPG 저장')return 'board';
  return null;
 }
 function snaKpi(label,value){const node=document.createElement('div');node.className='sna-stats-kpi';const a=document.createElement('span');a.textContent=label;const b=document.createElement('strong');b.textContent=String(value);node.append(a,b);return node;}
@@ -3285,7 +3285,7 @@ window.deleteUser=async id=>{
 
 // ========= 대필 전시관 =========
 // 개인 작품 원본은 이 브라우저의 IndexedDB에 자동 저장한다.
-// 대필판 PNG 저장 시 용량을 줄인 미리보기 이미지가 자동으로 Firestore 전시관에 게시된다.
+// 대필판 JPG 저장 시 용량을 줄인 미리보기 이미지가 자동으로 Firestore 전시관에 게시된다.
 function openGalleryDB(){
  return new Promise((resolve,reject)=>{
   if(!window.indexedDB){reject(new Error('IndexedDB 미지원'));return;}
@@ -3372,14 +3372,14 @@ async function loadGallery(){
  if(galleryMode==='public'){
   galStatus.textContent='전체 공개 작품';
   for(const item of publicGalleryItems)list.append(showGalleryCard(item,false));
-  if(!publicGalleryItems.length)galStatus.textContent='아직 공개된 작품이 없어요. 대필판에서 PNG를 저장하면 자동으로 등록됩니다.';
+  if(!publicGalleryItems.length)galStatus.textContent='아직 공개된 작품이 없어요. 대필판에서 JPG를 저장하면 자동으로 등록됩니다.';
  }else{
   galStatus.textContent='이 기기에 저장된 내 작품을 불러오는 중…';
   try{
    const works=(await galleryLocalList()).filter(x=>x.ownerUid===authUser?.uid).sort((a,b)=>b.createdAt-a.createdAt);
    if(token!==galleryLoadToken)return;
    for(const item of works)list.append(showGalleryCard(item,true));
-   galStatus.textContent=works.length?`내 작품 ${works.length}개 · 이 기기에 저장됨`:'아직 저장한 작품이 없어요. 대필판 PNG를 저장하면 자동으로 추가돼요.';
+   galStatus.textContent=works.length?`내 작품 ${works.length}개 · 이 기기에 저장됨`:'아직 저장한 작품이 없어요. 대필판 JPG를 저장하면 자동으로 추가돼요.';
   }catch(e){galStatus.textContent='내 작품을 읽지 못했어요. 브라우저의 저장소 설정을 확인해 주세요.';}
  }
 }
@@ -3504,10 +3504,10 @@ window.closeAdmin=()=>{
    <div class="guide-alert"><strong>처음 시작할 때</strong> 회원가입 후 관리자 승인이 완료되면 사용할 수 있어요. 사진은 가급적 게임의 원본 스크린샷을 사용하세요. 이미 한 번 잘린 사진은 빠진 장식을 완전히 복구하지 못할 수 있어요.</div>
    <section><h3>1. 👕 옷 사진 추출</h3><ol><li><strong>옷 추출</strong>을 선택하고 게임 스크린샷을 추가하세요.</li><li>사진에서 자를 옷 카드를 터치해 선택하세요. 여러 장도 선택할 수 있어요.</li><li><strong>선택한 옷 자르기</strong>를 누르고 결과를 확인하세요.</li><li><strong>개별 저장</strong> 또는 <strong>모두 저장</strong>으로 필요한 사진을 저장하세요.</li></ol></section>
    <section><h3>2. ✂ 총기·차량 카드 자르기</h3><ol><li><strong>총 자르기</strong>에서 총기 또는 차량 카드가 표시된 게임 스크린샷을 불러오세요.</li><li>총기·차량 카드를 선택하고 <strong>선택한 카드 자르기</strong>를 누르세요.</li><li>누락되거나 잘못 선택한 카드는 확인 후 다시 선택하세요.</li><li>개별 저장 또는 모두 저장을 사용하세요.</li></ol></section>
-   <section><h3>3. 🎯 킬로그 커팅과 보정</h3><ol><li><strong>킬로그 커팅</strong>에서 원본 스크린샷을 추가하세요.</li><li><strong>추출</strong> 또는 <strong>전체 추출</strong>을 누르고 결과를 확인하세요.</li><li><strong>보정</strong>에서 살리기는 원본 색을 복원하고, 지우기는 칠하는 즉시 해당 픽셀을 지웁니다. 살린 부분은 지우기에서 보호됩니다.</li><li><strong>＋/－</strong>로 확대하며, 가로 바형의 윗·아랫변을 유지하려면 <strong>바형 킬로그 윗·아랫변 고정</strong>을 켜 두세요.</li><li><strong>보정 저장</strong>을 누른 뒤 PNG 저장 또는 모두 저장/공유를 사용하세요.</li></ol></section>
+   <section><h3>3. 🎯 킬로그 커팅과 보정</h3><ol><li><strong>킬로그 커팅</strong>에서 원본 스크린샷을 추가하세요.</li><li><strong>추출</strong> 또는 <strong>전체 추출</strong>을 누르고 결과를 확인하세요.</li><li><strong>보정</strong>에서 살리기는 원본 색을 복원하고, 지우기는 칠하는 즉시 해당 픽셀을 지웁니다. 살린 부분은 지우기에서 보호됩니다.</li><li><strong>＋/－</strong>로 확대하며, 가로 바형의 윗·아랫변을 유지하려면 <strong>바형 킬로그 윗·아랫변 고정</strong>을 켜 두세요.</li><li><strong>보정 저장</strong>을 누른 뒤 JPG 저장 또는 모두 저장/공유를 사용하세요.</li></ol></section>
    <section><h3>4. 🖼️ 이미지 합치기</h3><ol><li><strong>합치기</strong>에서 여러 사진을 추가하세요.</li><li>배치와 순서를 확인하고 위치 옵션을 선택하세요.</li><li>미리보기에 문제가 없는지 확인한 뒤 <strong>JPG 이미지 저장</strong>을 누르세요.</li></ol></section>
-   <section><h3>5. 📝 대필판 만들기</h3><ol><li><strong>대필판</strong>에서 옷 사진과 총기·차량 사진을 각각 추가하세요.</li><li>저스펙·중스펙·고스펙 판을 선택하고 사진 순서와 배치를 확인하세요.</li><li>문의 문구, 보조 문구, 대필 이름, 옷·총 이름과 레벨을 입력하세요.</li><li>필요하면 글자 크기·위치·색상·그림자를 조절하고 미리보기를 확인하세요.</li><li><strong>PNG 저장</strong>을 누르면 대필판 결과를 저장할 수 있어요.</li></ol></section>
-   <section><h3>6. 🏛️ 전시관과 작품 관리</h3><ol><li>대필판 PNG 저장 시 작품이 <strong>전시관에 자동 등록·공개</strong>될 수 있어요. 저장 전 공개될 내용과 사진을 확인하세요.</li><li><strong>전시관</strong>에서 전체 공개 작품을 확인하거나 <strong>내 작품</strong>을 선택하세요.</li><li>필요하면 본인이 등록한 작품을 찾아 삭제할 수 있어요. 이용 권한·기간에 따라 접근이 제한될 수 있어요.</li></ol></section>
+   <section><h3>5. 📝 대필판 만들기</h3><ol><li><strong>대필판</strong>에서 옷 사진과 총기·차량 사진을 각각 추가하세요.</li><li>저스펙·중스펙·고스펙 판을 선택하고 사진 순서와 배치를 확인하세요.</li><li>문의 문구, 보조 문구, 대필 이름, 옷·총 이름과 레벨을 입력하세요.</li><li>필요하면 글자 크기·위치·색상·그림자를 조절하고 미리보기를 확인하세요.</li><li><strong>JPG 저장</strong>을 누르면 대필판 결과를 저장할 수 있어요.</li></ol></section>
+   <section><h3>6. 🏛️ 전시관과 작품 관리</h3><ol><li>대필판 JPG 저장 시 작품이 <strong>전시관에 자동 등록·공개</strong>될 수 있어요. 저장 전 공개될 내용과 사진을 확인하세요.</li><li><strong>전시관</strong>에서 전체 공개 작품을 확인하거나 <strong>내 작품</strong>을 선택하세요.</li><li>필요하면 본인이 등록한 작품을 찾아 삭제할 수 있어요. 이용 권한·기간에 따라 접근이 제한될 수 있어요.</li></ol></section>
    <section><h3>7. 📥 저장과 문제 해결</h3><ul><li>기기에 공유·저장 창이 뜨면 사진 또는 파일 앱에 저장할 곳을 선택하세요. 브라우저에 따라 다운로드 방식이 달라질 수 있어요.</li><li>사진이 인식되지 않으면 잘린 결과가 아니라 <strong>원본 스크린샷</strong>을 사용하고, 해당 기능을 다시 확인하세요.</li><li>장식이 잘렸거나 검은 잔배경이 남으면 보정 기능을 사용하고 저장 전에 PNG를 확대해서 확인하세요.</li><li>프로그램 변경 사항은 <strong>ℹ 제작자 → 업데이트 내역</strong>에서 확인할 수 있어요.</li></ul></section>
    <section><h3>8. 💾 새 기능: 작업 저장·프리셋·일괄 추출</h3><ol><li><strong>작업 이어하기:</strong> 대필판의 '현재 작업 임시 저장' 또는 킬로그 사진함의 '지금 저장'을 누르세요. 자동 저장도 작동하며, 다시 접속할 때 '이전 작업 이어하기'로 원본과 설정을 불러올 수 있어요. 이 기기의 브라우저 데이터를 삭제하면 사라질 수 있어요.</li><li><strong>실행 취소·다시 실행:</strong> 킬로그의 '자동 추출' 창에서 이전 작업을 확인하세요.</li><li><strong>개인별 설정:</strong> 대필판 아래에 설정 이름을 쓰고 '내 설정 추가'를 누른 뒤, 목록에서 불러오거나 삭제하세요. Firebase 규칙이 없으면 기기 내부에만 임시 저장돼요.</li><li><strong>일괄 추출:</strong> 옷·총은 '사진함 자동 추출', 킬로그는 '현재 사진함 일괄 추출'을 누르세요. 인식 실패 사진은 직접 확인하세요.</li><li><strong>오류 신고:</strong> 로그인 후 화면 오른쪽 아래의 '오류 신고'를 누르세요. 사진 첨부는 선택사항이며 동의한 경우에만 전송합니다.</li></ol></section>
   </div>
@@ -3830,7 +3830,7 @@ window.closeAdmin=()=>{
 <button id="g_saveAllButton" class="all-save" onclick="window.g_saveAllCards()" disabled>
  📥 선택한 카드 모두 저장
 </button>
-<p class="sna-samsung-save-hint" style="display:none;margin:8px 0 0;color:#e9bc85;font-size:12px;line-height:1.5;text-align:center">⚠️ 삼성 기기에서는 모두 저장 시 한 번에 10장까지만 가능합니다. 11장 이상은 나누어 저장해 주세요.</p>
+<p class="sna-samsung-save-hint" style="display:none;margin:8px 0 0;color:#e9bc85;font-size:12px;line-height:1.5;text-align:center">여러 장 저장 시 브라우저에서 다중 다운로드 허용을 요청하면 허용해 주세요.</p>
 
 </div>
 </div>
@@ -3844,7 +3844,7 @@ window.closeAdmin=()=>{
 <div id="kill-tab" class="tab-pane">
 <div class="sna-review-inline" data-sna-review="kill"><span><strong>📝 킬로그 커팅 이용 후기</strong> <span class="sna-review-state">처음 사용한 후 한 번만 작성해 주세요.</span></span><button type="button" data-sna-review-open="kill">후기 작성</button></div>
  <div class="app kl8-app">
-  <header class="header"><div class="title-wrap"><h1>🎯 킬로그 커팅</h1><p>킬로그 자동 추출 · 실시간 보정 · PNG 저장</p></div></header>
+  <header class="header"><div class="title-wrap"><h1>🎯 킬로그 커팅</h1><p>킬로그 자동 추출 · 실시간 보정 · JPG 저장</p></div></header>
   <div class="photo-panel">
    <div class="kl8-toolbar">
     <label for="kl8-files" class="kl8-btn kl8-primary">＋ 원본 사진 추가</label>
@@ -3875,7 +3875,7 @@ window.closeAdmin=()=>{
  <div class="sna-qa-status" id="sna-qa-status-kill" role="status" aria-live="polite">추출한 결과가 있으면 자동으로 검사합니다.</div>
  <div class="sna-qa-list" id="sna-qa-list-kill"></div>
 </section>
-<div id="kl8-results" class="kl8-results"><div class="empty">아직 추출 결과가 없습니다.</div></div><button type="button" id="kl8-saveall" class="all-save" disabled>추출한 킬로그 모두 저장 / 공유</button><p class="sna-samsung-save-hint" style="display:none;margin:8px 0 0;color:#e9bc85;font-size:12px;line-height:1.5;text-align:center">삼성 기기에서 한 번에 공유할 수 있는 파일 수는 기기와 앱에 따라 제한될 수 있습니다.</p></div>
+<div id="kl8-results" class="kl8-results"><div class="empty">아직 추출 결과가 없습니다.</div></div><button type="button" id="kl8-saveall" class="all-save" disabled>추출한 킬로그 모두 저장</button><p class="sna-samsung-save-hint" style="display:none;margin:8px 0 0;color:#e9bc85;font-size:12px;line-height:1.5;text-align:center">여러 장 저장 시 브라우저에서 다중 다운로드 허용을 요청하면 허용해 주세요.</p></div>
  </div>
 </div>
 <div class="kl8-modal" id="kl8-manual-modal" role="dialog" aria-label="킬로그 수동 영역 지정" hidden>
@@ -4003,9 +4003,9 @@ window.closeAdmin=()=>{
  <canvas id="m_resultCanvas" style="display:block;width:100%;height:auto"></canvas>
 </div>
 
- <label class="sna-merge-format">저장 형식 <select id="sna-merge-export-format" aria-label="합치기 저장 형식"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option><option value="image/webp">WebP</option></select></label>
+ <label class="sna-merge-format">저장 형식 <select id="sna-merge-export-format" aria-label="합치기 저장 형식"><option value="image/jpeg">JPG · 저장</option></select></label>
 <div class="action-row" style="grid-template-columns:1fr 60px">
-<button id="m_saveBtn" class="action main" style="min-height:48px">💾 이미지 공유 / 저장</button>
+<button id="m_saveBtn" class="action main" style="min-height:48px">💾 이미지 저장</button>
  <button id="m_clearBtn" class="action" style="min-height:48px;background:#242832">🗑️</button>
 </div>
 
@@ -4017,7 +4017,7 @@ window.closeAdmin=()=>{
      대필판 - 옷/총기 이미지와 문구를 조합한 거래판 제작
 ===================================================== -->
 <div id="gallery-tab" class="tab-pane">
- <div class="member-panel"><h2>🏛️ 대필 전시관</h2><p>대필판을 PNG로 저장하면 전시관에 자동으로 공개됩니다. 다른 회원도 작품 이미지와 작성자 닉네임을 볼 수 있어요. 등록한 작품은 내 작품에서 삭제할 수 있습니다.</p>
+ <div class="member-panel"><h2>🏛️ 대필 전시관</h2><p>대필판을 JPG로 저장하면 전시관에 자동으로 공개됩니다. 다른 회원도 작품 이미지와 작성자 닉네임을 볼 수 있어요. 등록한 작품은 내 작품에서 삭제할 수 있습니다.</p>
  <div class="member-controls"><button class="member-btn primary" id="gallery-refresh" type="button">전시관 새로고침</button><button class="member-btn" id="gallery-my" type="button">내 작품</button><button class="member-btn" id="gallery-public" type="button">전체 공개 작품</button></div>
  <p id="gallery-status" role="status">작품을 불러오는 중…</p><div class="member-grid" id="gallery-items"></div>
  </div>
@@ -4253,7 +4253,7 @@ window.closeAdmin=()=>{
    <div id="b_photoFineTouchStatus" aria-live="polite" style="margin:8px 0;border:1px solid #486b8d;background:#122844;color:#e1f7ff;border-radius:9px;padding:10px 12px;font-size:12px;line-height:1.5;display:none">사진을 추가한 뒤 조절을 켜세요.</div>
    <div class="board-preview-wrap" style="margin-top:10px"><canvas id="b_preview" width="900" height="1300"></canvas></div>
    <div class="member-panel" style="margin:10px 0"><h3>🏛️ 대필 전시관 자동 등록</h3>
-    <p>PNG 대필판을 저장하면 전시관에 자동으로 등록되고 모든 회원에게 공개됩니다.</p>
+    <p>JPG 대필판을 저장하면 전시관에 자동으로 등록되고 모든 회원에게 공개됩니다.</p>
     <div class="member-controls"><input type="text" id="board-work-title" placeholder="작품 제목 (선택)" maxlength="60" style="flex:1"></div>
     <p>※ 별도의 공개 버튼은 없습니다. 저장 시 작품 이미지와 작성자 닉네임이 자동 공개됩니다. 전시관의 ‘내 작품’에서 삭제할 수 있습니다.</p>
     <p id="board-gallery-status" role="status"></p>
@@ -4262,7 +4262,7 @@ window.closeAdmin=()=>{
   <!-- v12.5.5: 한 화면에서 저장하기, 세부 항목은 펼쳐보기 -->
   <section class="sna-enhance-panel sna-board-simple" id="sna-board-magic">
     <div class="sna-enhance-head sna-board-simple-head">
-      <div><h3>✨ 대필판 간편 제작</h3><p>사진을 추가하고 설정을 선택한 뒤, 아래 <b>저장 / 공유</b> 버튼만 누르세요.</p></div>
+      <div><h3>✨ 대필판 간편 제작</h3><p>사진을 추가하고 설정을 선택한 뒤, 아래 <b>저장</b> 버튼만 누르세요.</p></div>
       <button id="sna-board-wizard" class="sna-wizard-link" type="button">🧭 사용 안내</button>
     </div>
     <div class="sna-enhance-grid sna-board-basics">
@@ -4294,12 +4294,12 @@ window.closeAdmin=()=>{
   <div class="board-sticky-actions sna-board-save-panel">
     <div class="sna-board-save-row">
       <label for="sna-board-export-format" class="sna-save-field"><span>저장 형식</span>
-        <select id="sna-board-export-format"><option value="image/png">PNG · 무손실</option><option value="image/jpeg">JPG · 사진 공유</option><option value="image/webp">WebP · 지원 기기</option></select>
+        <select id="sna-board-export-format"><option value="image/jpeg">JPG · 저장</option></select>
       </label>
       <label for="b_exportScale" class="sna-save-field"><span>화질 배율</span>
         <select id="b_exportScale" aria-label="대필판 저장 화질"><option value="1">표준</option><option value="2">2배</option><option value="4">4배</option></select>
       </label>
-      <button id="b_savePng" type="button" class="board-btn primary sna-board-main-save">↗ 저장 / 공유</button>
+      <button id="b_savePng" type="button" class="board-btn primary sna-board-main-save">↗ 저장</button>
     </div>
     <div class="sna-board-undo-row">
       <button id="b_undo" type="button" class="board-btn" disabled>↶ 되돌리기</button>
@@ -4371,17 +4371,36 @@ function switchTab(tabId, silent=false){
    (아이폰, 갤럭시 등 모바일에서 네이티브 공유창/저장창 띄우기)
 ===================================================== */
 
-// v12: unified one-shot native sharing, with download fallback for browsers without file sharing.
+// Shared JPG export path for every image save action.
+window.SnaJpgFile=async function(file){
+ const filename=String(file.name||'image').replace(/\.(?:png|webp|jpe?g)$/i,'')+'.jpg';
+ if(file.type==='image/jpeg')return new File([file],filename,{type:'image/jpeg'});
+ const url=URL.createObjectURL(file);
+ try{
+  const img=await new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(Error('저장할 이미지를 읽지 못했습니다.'));i.src=url;});
+  const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
+  const ctx=c.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0);
+  return window.SnaDataFile(c.toDataURL('image/jpeg',.95),filename);
+ }finally{URL.revokeObjectURL(url);}
+};
 window.SnaShareFiles=async function(files){
- const list=Array.from(files||[]).filter(Boolean);if(!list.length)return false;
- if(window.snaSamsungSaveLimit&&list.length>10&&window.snaSamsungSaveLimit.shouldBlock(list.length))return false;
- const payload={files:list};
- try{if(navigator.share && navigator.canShare?.(payload)){
-   await navigator.share(payload);window.SnaTrial?.finish?.();return true;
- }}catch(err){if(err?.name==='AbortError')return false;console.warn('공유창 열기 실패',err);}
- for(const file of list){const u=URL.createObjectURL(file),a=document.createElement('a');a.href=u;a.download=file.name||'image';a.style.display='none';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),30000);}
+ let list=Array.from(files||[]).filter(Boolean);if(!list.length)return false;
+ if(list.some(f=>f.type!=='image/jpeg'))list=await Promise.all(list.map(window.SnaJpgFile));
+ else list=list.map(f=>new File([f],String(f.name||'image').replace(/\.(?:png|webp|jpe?g)$/i,'')+'.jpg',{type:'image/jpeg'}));
+ let supported=false;
+ try{supported=!!(navigator.share&&(!navigator.canShare||navigator.canShare({files:list})));}catch(_){}
+ if(supported){
+  try{await navigator.share({files:list});window.SnaTrial?.finish?.();return true;}
+  catch(err){if(err?.name==='AbortError')return false;console.warn('파일 다운로드로 저장합니다.',err);}
+ }
+ for(const file of list){
+  const url=URL.createObjectURL(file),link=document.createElement('a');
+  link.href=url;link.download=file.name;link.style.display='none';document.body.append(link);
+  try{link.click();}finally{link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}
+ }
  window.SnaTrial?.finish?.();return true;
 };
+
 window.SnaDataFile=function(dataURL,filename){
  const [head,encoded]=String(dataURL).split(',');const mime=(head.match(/^data:([^;]+)/)||[])[1]||'image/jpeg';
  const raw=atob(encoded),buf=new Uint8Array(raw.length);for(let j=0;j<raw.length;j++)buf[j]=raw.charCodeAt(j);
@@ -4401,25 +4420,7 @@ async function downloadMultipleFiles(dataURLs,prefix){
 // 카카오톡이 공유 대상에 없더라도 JPG를 단말에 직접 저장해
 // 삼성 「내 파일 > 다운로드」 또는 갤러리에서 카카오톡으로 전송할 수 있습니다.
 // 공유 대상 앱 목록 자체는 OS가 정하므로 웹사이트에서 강제로 카카오톡을 추가할 수 없습니다.
-function saveJpgForKakao(dataURL, filename){
-  const mimeMatch=/^data:(image\/(?:jpeg|png|webp));base64,/i.exec(dataURL);
-  const mime=mimeMatch?mimeMatch[1].toLowerCase():'image/jpeg';
-  const ext=mime==='image/png'?'.png':mime==='image/webp'?'.webp':'.jpg';
-  const clean=String(filename||'item').replace(/\.(?:jpg|jpeg|png|webp)$/i,'');
-  const arr=dataURL.split(',');
-  const binary=atob(arr[1]);
-  const bytes=new Uint8Array(binary.length);
-  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-  const url=URL.createObjectURL(new Blob([bytes],{type:mime}));
-  const a=document.createElement('a');
-  a.href=url;
-  a.download=clean+ext;
-  a.style.display='none';
-  document.body.appendChild(a);
-  a.click();
-  window.SnaTrial?.finish?.();
-  setTimeout(()=>{a.remove();URL.revokeObjectURL(url);},12000);
-}
+function saveJpgForKakao(dataURL,filename){return window.SnaShareData(dataURL,filename);}
 
 async function shareFile(dataURL, filename) {
   await downloadFile(dataURL, filename);
@@ -4430,7 +4431,7 @@ async function shareMultipleFiles(dataURLs, prefix) {
   await downloadMultipleFiles(dataURLs, prefix);
 }
 
-// 삼성 기기: 옷/총/킬로그 '모두 저장'에서만 10장 초과 저장을 사전에 차단합니다.
+// 저장 가능 수는 브라우저의 실제 파일 공유 지원 여부로 확인합니다.
 // 기기 판정에는 Samsung Internet 및 Galaxy 모델 문자열을 사용합니다.
 // Android Chrome이 모델을 숨기는 경우를 위해 UA Client Hints를 미리 확인합니다.
 const snaSamsungSaveLimit = (() => {
@@ -4456,9 +4457,8 @@ const snaSamsungSaveLimit = (() => {
   updateHint();
   return {
     shouldBlock(count) {
-      if (!isSamsung || count <= 10) return false;
-      alert(`⚠️ 삼성 기기에서는 한 번에 최대 10장까지만 모두 저장할 수 있습니다.\n현재 ${count}장이므로 저장을 진행하지 않았습니다.\n10장 이하로 나누어 저장하거나 개별 저장을 이용해 주세요.`);
-      return true;
+      return false; // Let the actual browser file-sharing capability decide.
+
     }
   };
 })();
@@ -5421,7 +5421,7 @@ function detectRegularItemGrid(){
     }
     return out;
   }
-  const rawCols=runs(xCounts,h,.17,Math.max(9,Math.round(w*.024)),2);
+  const rawCols=runs(xCounts,h,.085,Math.max(9,Math.round(w*.024)),Math.max(0,Math.floor(w*.0014)));
   if(rawCols.length<5)return null;
   const commonW=median(rawCols.map(c=>c.width));
   const cols=rawCols.filter(c=>c.width>=commonW*.68&&c.width<=commonW*1.34);
@@ -5448,7 +5448,7 @@ function detectRegularItemGrid(){
   }
   // 카드 안 글자/아이템이 많은 줄에서도 충분히 검출되도록 낮은 비율(8%)을 사용한다.
   // 카드 사이 5~7px의 흰색 틈은 합치지 않는다.
-  const rows=runs(yCount,probeX.length,.08,Math.max(9,Math.round(commonW*.20)),3);
+  const rows=runs(yCount,probeX.length,.08,Math.max(9,Math.round(commonW*.20)),Math.max(0,Math.floor(commonW*.022)));
   if(rows.length<1||rows.length>22)return null;
   const tall=rows.map(r=>r.width).filter(v=>v>=commonW*.80);
   if(!tall.length)return [];
@@ -5484,6 +5484,16 @@ function detectRegularItemGrid(){
       const col=cols[ci];
       const x=Math.round(col.start/ratio),y=Math.round(row.start/ratio);
       if(x<0||y<0||x+cardW>iw||y+cardH>ih)continue;
+      // Validate each cell: a short last row must not create phantom cards.
+      let samples=0,coloredSamples=0,darkSamples=0;
+      for(let py=row.start+4;py<row.end-4;py+=3){
+        for(let px=col.start+4;px<col.end-4;px+=3){
+          const pos=py*w+px,p=pos*4;
+          samples++;coloredSamples+=colored[pos];
+          if(Math.max(data[p],data[p+1],data[p+2])<135)darkSamples++;
+        }
+      }
+      if(!samples||(coloredSamples/samples<.12&&darkSamples/samples<.60))continue;
       out.push({x,y,width:cardW,height:cardH,partial:false,gridColumn:ci,gridRow:ri});
     }
   }
@@ -5779,7 +5789,7 @@ window.c_extractSelected=()=>{
    </div>
    <button class="save"
     onclick="shareFile('${dataURL}','clothes_${index+1}.jpg')">
-    📥 JPG 저장
+    ↗ JPG 저장
    </button>
   `;
 
@@ -5823,7 +5833,7 @@ async function cRestore(data){if(!data)return;restoringCloth=true;
    const url=URL.createObjectURL(p.file),img=new Image();await new Promise(ok=>{img.onload=ok;img.onerror=ok;img.src=url;});
    photos[index]={image:img,url,name:p.file.name,file:p.file,selected:p.selected||[]};}));
   cDeleteMarks.clear();makePhotoButtons();if(photos.length)showPhoto(Math.min(photos.length-1,data.current||0));else resetCEmptyViewer();
-  results.replaceChildren();for(const [idx,url] of croppedCards.entries()){const card=document.createElement('div');card.className='card';const img=document.createElement('img');img.src=url;const btn=document.createElement('button');btn.className='save';btn.textContent='↗ JPG 공유 / 저장';btn.onclick=()=>shareFile(url,`clothes_${idx+1}.jpg`);card.append(img,btn);results.append(card);}
+  results.replaceChildren();for(const [idx,url] of croppedCards.entries()){const card=document.createElement('div');card.className='card';const img=document.createElement('img');img.src=url;const btn=document.createElement('button');btn.className='save';btn.textContent='↗ JPG 저장';btn.onclick=()=>shareFile(url,`clothes_${idx+1}.jpg`);card.append(img,btn);results.append(card);}
   resultCountTitle.textContent=String(croppedCards.length);resultCountText.textContent=String(croppedCards.length);saveAllButton.disabled=!croppedCards.length;
   document.getElementById('c_saveAllTop').disabled=!croppedCards.length;
  }finally{restoringCloth=false;cButtons();}}
@@ -6705,7 +6715,7 @@ window.g_extractSelected=()=>{
    </div>
    <button class="save"
     onclick="shareFile('${dataURL}','gun_${index+1}.jpg')">
-    ↗ JPG 공유 / 저장
+    ↗ JPG 저장
    </button>
   `;
 
@@ -6751,7 +6761,7 @@ async function gRestore(data){if(!data)return;restoringGun=true;
    const url=URL.createObjectURL(p.file),img=new Image();await new Promise(ok=>{img.onload=ok;img.onerror=ok;img.src=url;});
    photos[index]={image:img,url,name:p.file.name,file:p.file,selected:p.selected||[]};}));
   gDeleteMarks.clear();makePhotoButtons();if(photos.length)showPhoto(Math.min(photos.length-1,data.current||0));else resetGEmptyViewer();
-  results.replaceChildren();for(const [idx,url] of croppedCards.entries()){const card=document.createElement('div');card.className='card';const img=document.createElement('img');img.src=url;const btn=document.createElement('button');btn.className='save';btn.textContent='↗ JPG 공유 / 저장';btn.onclick=()=>shareFile(url,`guns_${idx+1}.jpg`);card.append(img,btn);results.append(card);}
+  results.replaceChildren();for(const [idx,url] of croppedCards.entries()){const card=document.createElement('div');card.className='card';const img=document.createElement('img');img.src=url;const btn=document.createElement('button');btn.className='save';btn.textContent='↗ JPG 저장';btn.onclick=()=>shareFile(url,`guns_${idx+1}.jpg`);card.append(img,btn);results.append(card);}
   resultCountTitle.textContent=String(croppedCards.length);resultCountText.textContent=String(croppedCards.length);saveAllButton.disabled=!croppedCards.length;
   document.getElementById('g_saveAllTop').disabled=!croppedCards.length;
  }finally{restoringGun=false;gButtons();}}
@@ -8840,22 +8850,21 @@ saveBtn.addEventListener("click",async()=>{
   try{
    // For iOS a Web Share call after awaiting canvas.toBlob can lose the user's click activation.
    // On file-share capable browsers produce the PNG synchronously, then invoke share immediately.
-   const filename="daepil_board.png";
-   let file;
-   const mobileNative=!!(navigator.share&&navigator.canShare);
-   if(mobileNative){file=window.SnaDataFile(exportCanvas.toDataURL('image/png'),filename);}
-   else{const png=await new Promise((resolve,reject)=>exportCanvas.toBlob(b=>b?resolve(b):reject(new Error("PNG 변환 실패")),'image/png'));file=new File([png],filename,{type:'image/png'});}
+   const filename="daepil_board.jpg";
+   const jpgCanvas=document.createElement('canvas');jpgCanvas.width=exportCanvas.width;jpgCanvas.height=exportCanvas.height;
+   const jpgCtx=jpgCanvas.getContext('2d');jpgCtx.fillStyle='#ffffff';jpgCtx.fillRect(0,0,jpgCanvas.width,jpgCanvas.height);jpgCtx.drawImage(exportCanvas,0,0);
+   const file=window.SnaDataFile(jpgCanvas.toDataURL('image/jpeg',.95),filename);
    const shared=await window.SnaShareFiles([file]);
    if(!shared)return;
    const blob=file;
-   if(window.logActivity)window.logActivity("대필판 PNG 저장",{clothes:state.clothes.length,guns:state.guns.length,width:info.width,height:info.height});
+   if(window.logActivity)window.logActivity("대필판 JPG 저장",{clothes:state.clothes.length,guns:state.guns.length,width:info.width,height:info.height});
    window.SnaReviews?.used('board');
-   // 원본 PNG 저장 성공 이후에만 전시관에 등록한다. 전시관 등록 실패는 PNG 저장을 취소하지 않는다.
+   // 원본 JPG 저장 성공 이후에만 전시관에 등록한다. 전시관 등록 실패는 JPG 저장을 취소하지 않는다.
    if(window.addBoardToGallery&&!window.SnaTrial?.active){
     const title=document.getElementById('board-work-title')?.value.trim()||'나의 대필 작품';
     window.addBoardToGallery(blob,{title}).catch(err=>{
      console.warn('전시관 등록 실패',err);
-     const label=document.getElementById('board-gallery-status');if(label)label.textContent='전시관 등록에 실패했어요. PNG 저장은 완료됐습니다.';
+     const label=document.getElementById('board-gallery-status');if(label)label.textContent='전시관 등록에 실패했어요. JPG 저장은 완료됐습니다.';
     });
    }
   }catch(err){console.error(err);alert("이미지를 저장하지 못했습니다. 사진 수를 줄이거나 브라우저의 저장 권한을 확인해 주세요.");}
@@ -8918,7 +8927,7 @@ const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const name=i=>(i.file?.name||'manual').replace(/\.[^.]+$/,'').slice(0,70)+'_killlog.png';
 function revoke(i){if(i.sourceUrl)URL.revokeObjectURL(i.sourceUrl);if(i.url)URL.revokeObjectURL(i.url);}
 function urlFor(blob){return URL.createObjectURL(blob);}
-function download(blob,filename){const u=urlFor(blob),a=document.createElement('a');a.href=u;a.download=filename;document.body.append(a);a.click();a.remove();window.SnaTrial?.finish?.();setTimeout(()=>URL.revokeObjectURL(u),60000);}
+function download(blob,filename){return window.SnaShareFiles([new File([blob],filename,{type:blob.type})]);}
 function canShare(f){try{return !!(navigator.canShare&&navigator.share&&navigator.canShare({files:f}));}catch(_){return false;}}
 async function shareOne(i){
  const result=validBlob(i.blob)?i.blob:validBlob(i.baseBlob)?i.baseBlob:null;
@@ -8926,7 +8935,7 @@ async function shareOne(i){
  try{
   const file=new File([result],name(i),{type:'image/png'});
   const shared=await window.SnaShareFiles([file]);
-  status(shared?'저장 / 공유 요청 완료':'공유가 취소되었거나 지원되지 않습니다.');
+  status(shared?'저장 요청 완료':'공유가 취소되었거나 지원되지 않습니다.');
  }catch(e){status('저장 실패: '+e.message);}
 }
 function validBlob(value){return value instanceof Blob&&value.size>0;}
@@ -9057,7 +9066,7 @@ function render(){
   const manual=createBtn('수동 박스 지정','',()=>openManual(i,false));
   const adjust=createBtn('감지 박스 수정','',()=>openManual(i,true));
   const edit=createBtn('보정','',()=>openEditor(i));
-  const save=createBtn('PNG 저장 / 공유','',()=>shareOne(i));
+  const save=createBtn('JPG 저장','',()=>shareOne(i));
   const recover=createBtn('원본 다시 선택','',()=>replacement.click());
   const replacement=document.createElement('input');replacement.type='file';replacement.accept='image/*,.heic,.heif';replacement.hidden=true;
   replacement.onchange=async()=>{
@@ -9138,7 +9147,7 @@ async function zipFiles(arr){const enc=new TextEncoder(),local=[],central=[];let
  const c=new Uint8Array(46+fn.length),v=new DataView(c.buffer);set32(v,0,0x02014b50);set16(v,4,20);set16(v,6,20);set16(v,8,0x0800);set32(v,16,crc);set32(v,20,dat.length);set32(v,24,dat.length);set16(v,28,fn.length);set32(v,42,offset);c.set(fn,46);central.push(c);offset+=h.length+dat.length;}
  const t=new Uint8Array(22),v=new DataView(t.buffer);set32(v,0,0x06054b50);set16(v,8,arr.length);set16(v,10,arr.length);set32(v,12,central.reduce((s,b)=>s+b.length,0));set32(v,16,offset);return new Blob([...local,...central,t],{type:'application/zip'});
 }
-$('kl8-saveall').onclick=async()=>{const ready=items.filter(i=>validBlob(i.blob)||validBlob(i.baseBlob));if(!ready.length)return status('저장할 킬로그가 없습니다.');const fs=ready.map(i=>new File([validBlob(i.blob)?i.blob:i.baseBlob],name(i),{type:'image/png'}));try{if(snaSamsungSaveLimit.shouldBlock(fs.length))return;await window.SnaShareFiles(fs);status('공유 / 저장 요청을 완료했습니다.');}catch(e){status('저장 실패 · '+e.message);}};
+$('kl8-saveall').onclick=async()=>{const ready=items.filter(i=>validBlob(i.blob)||validBlob(i.baseBlob));if(!ready.length)return status('저장할 킬로그가 없습니다.');const fs=ready.map(i=>new File([validBlob(i.blob)?i.blob:i.baseBlob],name(i),{type:'image/png'}));try{if(snaSamsungSaveLimit.shouldBlock(fs.length))return;const shared=await window.SnaShareFiles(fs);status(shared?'저장 요청을 완료했습니다.':'저장이 취소되었습니다.');}catch(e){status('저장 실패 · '+e.message);}};
 
 // Manual selection: drawn directly on the original image, independent of the server or auto-detection.
 function imageBox(r){return {x:r.x,y:r.y,w:r.w,h:r.h};}
@@ -9428,7 +9437,7 @@ async function openEditor(i){
   barLockInfo=i.barLock?{...i.barLock}:autoBarEdges();$('kl8-barlock').checked=i.barLockEnabled!==false;
   $('kl8-rightlock').checked=i.rightLockEnabled!==false;syncBarSliders();zoom=1;E.pointer=null;el.cursor.hidden=true;
   mode('keep');fitEditor();redraw();status('보정 화면 준비 완료 · 다른 사진의 추출도 계속 진행됩니다.');
- }catch(e){editing=null;el.modal.hidden=true;updateCard(i);status('보정 실패: '+e.message+' · 추출본이 있다면 PNG 저장은 계속 사용할 수 있습니다.');}
+ }catch(e){editing=null;el.modal.hidden=true;updateCard(i);status('보정 실패: '+e.message+' · 추출본이 있다면 JPG 저장은 계속 사용할 수 있습니다.');}
 }
 function closeEditor(){const i=editing;E.undo=[];E.redo=[];updateHistoryButtons();editing=null;painting=false;lastPoint=null;E.pointer=null;el.cursor.hidden=true;el.modal.hidden=true;barLockInfo=null;if(i)updateCard(i);}
 $('kl8-close').onclick=closeEditor;el.modal.addEventListener('click',e=>{if(e.target===el.modal)closeEditor();});
@@ -9759,7 +9768,7 @@ render();health();
   {title:'1 / 4 · 사진 추가',body:'옷과 총 사진을 대필판의 사진 추가 버튼으로 넣어 주세요. 파일은 이 기기의 브라우저에서 처리합니다.',action:'사진 추가 위치 보기',go:()=>{$('b_clothesFiles')?.closest('label')?.scrollIntoView({behavior:'smooth',block:'center'});}},
   {title:'2 / 4 · 자동 배치',body:'이미 넣은 사진 수를 기준으로 판 크기와 열 수를 추천하고 정렬합니다. 사진 순서는 수동으로 바꿀 수 있습니다.',action:'자동 배치 실행',go:autoLayout},
   {title:'3 / 4 · 이미지 검사',body:'업로드 상태와 미리보기 크기를 확인합니다. 장식·이름·레벨 잘림은 원본과 최종 확인하세요.',action:'검사 실행',go:quality},
-  {title:'4 / 4 · 파일 저장',body:'완성본을 확인한 다음 저장 형식(PNG·JPG·WebP)과 화질을 선택하고 저장 / 공유를 누르세요.',action:'저장 버튼 위치 보기',go:()=>{$('b_savePng')?.scrollIntoView({behavior:'smooth',block:'center'});}}
+  {title:'4 / 4 · 파일 저장',body:'완성본을 확인한 다음 JPG 형식과 화질을 선택하고 저장를 누르세요.',action:'저장 버튼 위치 보기',go:()=>{$('b_savePng')?.scrollIntoView({behavior:'smooth',block:'center'});}}
  ];let wizardAt=0;
  const shade=document.createElement('div');shade.id='sna-wizard';shade.className='sna-wizard-overlay';shade.hidden=true;
  shade.innerHTML='<section class="sna-wizard-card" role="dialog" aria-modal="true" aria-label="대필판 제작 안내"><h3 id="sna-wizard-title"></h3><p id="sna-wizard-body"></p><div class="sna-wizard-actions"><button id="sna-wizard-exit" type="button">닫기</button><button id="sna-wizard-act" type="button">실행</button><button id="sna-wizard-next" type="button">다음 단계 →</button></div></section>';document.body.append(shade);
@@ -9780,7 +9789,7 @@ render();health();
   const check=document.getElementById('sna-board-quality-check');
   if(!main||!format||!alt)return;
   const names={'image/png':'PNG','image/jpeg':'JPG','image/webp':'WebP'};
-  function update(){const type=names[format.value]||'이미지';main.textContent='↗ '+type+' 저장 / 공유';main.title='현재 선택한 이미지 형식으로 저장하거나 공유합니다.';}
+  function update(){const type=names[format.value]||'이미지';main.textContent='↗ '+type+' 저장';main.title='현재 선택한 이미지 형식으로 저장하거나 공유합니다.';}
   format.addEventListener('change',update);update();
   main.addEventListener('click',e=>{
     if(main.disabled)return;
@@ -9791,7 +9800,7 @@ render();health();
       try{layout?.click();}catch(err){console.warn('대필판 자동 배치 오류',err);}
     }
     try{check?.click();}catch(err){console.warn('대필판 저장 전 검사 오류',err);}
-    if(format.value!=='image/png'){
+    if(format.value!=='image/jpeg'){
       e.preventDefault();
       e.stopImmediatePropagation();
       alt.click();
