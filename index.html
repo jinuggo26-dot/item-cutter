@@ -10044,7 +10044,19 @@ render();health();
  }
  const ua=navigator.userAgent||'';
  const initial=classifyBrowser(ua,navigator.maxTouchPoints||0,navigator.standalone);
+ function isDiscordEntry(){
+  if(/discord/i.test(ua))return true;
+  try{
+   const host=new URL(document.referrer).hostname.toLowerCase();
+   return /(^|\.)(discord\.com|discordapp\.com|discord\.gg|discordapp\.net)$/.test(host);
+  }catch(_){return false;}
+ }
  async function decide(){
+  if(isDiscordEntry()){
+   document.documentElement.dataset.snaBrowser='blocked';
+   document.getElementById('sna-browser-status').textContent='디스코드를 통한 접속은 허용하지 않습니다. 디스코드 창을 닫고, 삼성은 네이버 앱에서, 아이폰·아이패드는 사파리에서 주소를 직접 입력해 접속해 주세요.';
+   return;
+  }
   let decision=initial;
   if(decision.needsModel&&navigator.userAgentData?.getHighEntropyValues){
    try{
