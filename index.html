@@ -1468,6 +1468,7 @@ html:not([data-sna-browser="allowed"]) body > :not(#sna-browser-gate){display:no
 #sna-browser-gate h1{font-size:23px;margin-bottom:18px}#sna-browser-gate p{font-size:15px;line-height:1.8;margin-top:14px;color:#bbc4d6}
 html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
 </style>
+<style>[data-sna-review-export-admin][hidden]{display:none!important}</style>
 </head>
 
 <body>
@@ -1587,6 +1588,13 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  <div id="admin-notice-list"></div>
 </div>
 <!-- Firebase에 저장되는 관리자 전용 업데이트 내역 -->
+<section class="member-panel" id="sna-admin-trial-settings">
+ <h3>무료체험 운영 설정</h3>
+ <p class="member-tip">회원가입 없는 체험과 승인 대기 회원의 체험에 함께 적용됩니다. 끄면 진행 중인 체험도 횟수 차감 없이 종료됩니다. 구매 회원의 이용권에는 영향을 주지 않습니다.</p>
+ <p id="sna-admin-trial-state" role="status">설정 확인 중</p>
+ <button type="button" class="member-btn primary" id="sna-admin-trial-toggle" aria-pressed="false" disabled>설정 확인 중…</button>
+ <p class="member-tip" id="sna-admin-trial-status" role="status" aria-live="polite"></p>
+</section>
 <section id="admin-release-panel" aria-labelledby="admin-release-heading">
  <h3 id="admin-release-heading">🗓️ 업데이트 내역 관리</h3>
  <p class="release-help">제작자 소개창에 표시되는 업데이트를 추가·수정·삭제합니다. 저장하면 다른 기기에도 자동 반영됩니다. 관리자 권한이 있어야 변경할 수 있습니다.</p>
@@ -1668,7 +1676,7 @@ import {initializeApp}
 from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 
 import {
- getFirestore,doc,setDoc,getDoc,onSnapshot,
+ getFirestore,doc,setDoc,getDoc,getDocFromServer,onSnapshot,
  collection,updateDoc,deleteDoc,deleteField,addDoc,query,orderBy,limit,runTransaction
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -2057,6 +2065,14 @@ function snaCreateReviewImage(data,featureNames,filterLabel,options={}){
  ctx.font='20px sans-serif';ctx.fillStyle='#a8b9d2';ctx.fillText('관리자가 게시한 실제 회원 이용 후기',pad,height-25);
  return {canvas,count:cards.length,lineCount:cards.reduce((n,c)=>n+c.lines.length,0)};
 }
+function snaCanExportReviews(){
+ return isAdminMode===true&&!!auth.currentUser&&!auth.currentUser.isAnonymous&&authUser?.uid===auth.currentUser.uid;
+}
+function snaSyncReviewExportAdmin(){
+ const allowed=snaCanExportReviews();
+ document.querySelectorAll('[data-sna-review-export-admin]').forEach(el=>{el.hidden=!allowed;});
+ return allowed;
+}
 function snaReviewExportData(){
  const filter=document.getElementById('sna-public-review-filter')?.value||'all';
  const reverse=document.getElementById('sna-public-review-sort')?.value!=='old';
@@ -2071,12 +2087,18 @@ function snaReviewPageGroups(data,size){
  const pages=[];for(let i=0;i<data.length;i+=size)pages.push(data.slice(i,i+size));return pages;
 }
 function snaUpdateReviewExportCount(){
+ if(!snaSyncReviewExportAdmin())return;
  const target=document.getElementById('sna-public-review-page-count');if(!target)return;
  const size=snaReviewPageSize(),{data}=snaReviewExportData();
  target.textContent=!snaPublishedReviewsReady?'후기 불러오는 중':!size?'한 장당 후기 수를 1~10 사이의 정수로 입력해 주세요.':data.length?'후기 '+data.length+'개 → 사진 '+Math.ceil(data.length/size)+'장 (한 장당 최대 '+size+'개)':'저장할 공개 후기가 없습니다.';
 }
 let snaReviewExportBusy=false;
 async function snaSaveReviewImages(multiple){
+ if(!snaCanExportReviews()){
+  snaSyncReviewExportAdmin();
+  window.uiAlert?.('후기 이미지 저장은 관리자만 이용할 수 있습니다.');
+  return;
+ }
  if(snaReviewExportBusy)return;
  const status=document.getElementById('sna-public-review-export-status');
  if(!snaPublishedReviewsReady){status.textContent='후기를 불러온 뒤 다시 저장해 주세요.';return;}
@@ -2104,7 +2126,6 @@ document.getElementById('sna-public-review-save')?.addEventListener('click',()=>
 document.getElementById('sna-public-review-save-pages')?.addEventListener('click',()=>snaSaveReviewImages(true));
 document.getElementById('sna-public-review-page-size')?.addEventListener('input',snaUpdateReviewExportCount);
 for(const id of ['sna-public-review-filter','sna-public-review-sort'])document.getElementById(id)?.addEventListener('change',snaUpdateReviewExportCount);
-snaUpdateReviewExportCount();
 
 async function snaLoadPublishedReviews(){
  const serial=++snaReviewsRequestSerial;
@@ -2271,6 +2292,75 @@ function snaTrialMarkLocal(feature){try{localStorage.setItem(snaTrialLocalKey(fe
 const snaTrialAllowed=()=>!!authUser&&!isAdminMode&&(authUser.isAnonymous||currentMember?.status==='pending');
 const snaTrialHasPaidAccess=()=>isAdminMode||currentMember?.status==='approved'&&!expired(currentMember);
 
+// Reuse the existing administrator-only settings document and its permissions.
+const snaTrialPolicyRef=doc(db,'appSettings','gradeRights');
+let snaTrialPolicyReady=false,snaTrialPolicyEnabled=true,snaTrialPolicySaving=false,snaTrialPolicyUnsub=null;
+let snaTrialPolicySerial=0;
+const snaTrialPolicyMessage='관리자가 무료체험을 일시 중지했습니다. 다시 열리면 이용해 주세요.';
+function snaRenderTrialPolicy(){
+ const button=document.getElementById('sna-admin-trial-toggle'),state=document.getElementById('sna-admin-trial-state');
+ if(button){button.disabled=!isAdminMode||!snaTrialPolicyReady||snaTrialPolicySaving;button.textContent=snaTrialPolicySaving?'저장 중…':snaTrialPolicyEnabled?'무료체험 끄기':'무료체험 켜기';button.setAttribute('aria-pressed',String(snaTrialPolicyReady&&snaTrialPolicyEnabled));}
+ if(state)state.textContent=!snaTrialPolicyReady?'설정 확인 중':snaTrialPolicyEnabled?'무료체험 켜짐 · 각 기능 1회 이용 가능':'무료체험 꺼짐 · 이용 중지';
+ for(const id of ['sna-market-open-login','sna-market-open-waiting']){
+  const entry=document.getElementById(id);if(!entry)continue;
+  if(!entry.dataset.originalTrialLabel)entry.dataset.originalTrialLabel=entry.textContent;
+  entry.disabled=snaTrialPolicyReady&&!snaTrialPolicyEnabled;
+  entry.textContent=entry.disabled?'무료체험 일시 중지':entry.dataset.originalTrialLabel;
+ }
+}
+function snaApplyTrialPolicy(snapshot){
+ snaTrialPolicyEnabled=!snapshot.exists()||snapshot.data().trialEnabled!==false;
+ snaTrialPolicyReady=true;snaRenderTrialPolicy();
+ if(!snaTrialPolicyEnabled){
+  if(snaTrialActive)snaTrialEnd(true);
+  snaTrialStatus(snaTrialPolicyMessage);
+ }
+ snaTrialUI();
+}
+async function snaCheckTrialPolicy(){
+ const uid=auth.currentUser?.uid;if(!uid)throw Error('체험 계정 확인이 필요합니다.');
+ const snapshot=await getDocFromServer(snaTrialPolicyRef);
+ if(auth.currentUser?.uid!==uid)throw Error('계정이 변경되었습니다. 다시 시도해 주세요.');
+ snaApplyTrialPolicy(snapshot);
+ if(!snaTrialPolicyEnabled)throw Error(snaTrialPolicyMessage);
+ return true;
+}
+function snaWatchTrialPolicy(user){
+ const serial=++snaTrialPolicySerial;
+ if(snaTrialPolicyUnsub){snaTrialPolicyUnsub();snaTrialPolicyUnsub=null;}
+ snaTrialPolicyReady=false;snaRenderTrialPolicy();
+ if(!user)return;
+ snaTrialPolicyUnsub=onSnapshot(snaTrialPolicyRef,snapshot=>{
+  if(serial!==snaTrialPolicySerial)return;
+  // An offline snapshot cannot newly grant trial access.
+  if(snapshot.metadata?.fromCache&&!snaTrialPolicyReady)return;
+  snaApplyTrialPolicy(snapshot);
+ },error=>{
+  if(serial!==snaTrialPolicySerial)return;
+  snaTrialPolicyReady=false;snaRenderTrialPolicy();snaTrialUI();
+  const message='무료체험 설정 확인 실패: '+(error?.code||error?.message||'연결 오류');
+  const status=document.getElementById('sna-admin-trial-status');if(status)status.textContent=message;
+  snaTrialStatus(message);
+ });
+}
+document.getElementById('sna-admin-trial-toggle')?.addEventListener('click',async()=>{
+ const status=document.getElementById('sna-admin-trial-status');
+ if(!isAdminMode||!auth.currentUser||auth.currentUser.isAnonymous){if(status)status.textContent='관리자만 변경할 수 있습니다.';return;}
+ if(snaTrialPolicySaving||!snaTrialPolicyReady)return;
+ snaTrialPolicySaving=true;snaRenderTrialPolicy();
+ try{
+  const user=auth.currentUser,token=await getIdTokenResult(user,true);
+  if(token.claims.admin!==true||auth.currentUser?.uid!==user.uid)throw Error('관리자 권한을 확인하지 못했습니다.');
+  const enabled=!snaTrialPolicyEnabled;
+  await setDoc(snaTrialPolicyRef,{trialEnabled:enabled,trialUpdatedAt:Date.now(),trialUpdatedBy:user.uid},{merge:true});
+  if(auth.currentUser?.uid!==user.uid)return;
+  snaTrialPolicyEnabled=enabled;snaTrialPolicyReady=true;
+  if(!enabled&&snaTrialActive)snaTrialEnd(true);
+  if(status)status.textContent=enabled?'무료체험을 켰습니다. 다른 기기에도 반영됩니다.':'무료체험을 껐습니다. 진행 중인 체험은 횟수 차감 없이 종료됩니다.';
+ }catch(error){if(status)status.textContent='설정 저장 실패: '+(error?.code||error?.message||'권한 또는 연결 확인');}
+ finally{snaTrialPolicySaving=false;snaRenderTrialPolicy();snaTrialUI();}
+});
+
 function snaTrialUI(){
  const grid=document.getElementById('sna-realtrial-grid');if(!grid)return;
  grid.replaceChildren();
@@ -2285,16 +2375,17 @@ function snaTrialUI(){
   counter.textContent=used?'체험 완료 · 0/1':'남은 체험 1/1';
   const btn=document.createElement('button');
   btn.type='button';
-  btn.textContent=used?'1회 체험 사용 완료':snaTrialBusy?'체험 확인 중…':'실제 기능 체험하기';
+  btn.textContent=!snaTrialPolicyReady?'체험 설정 확인 중…':!snaTrialPolicyEnabled?'무료체험 일시 중지':used?'1회 체험 사용 완료':snaTrialBusy?'체험 확인 중…':'실제 기능 체험하기';
   // Authentication and the five background Firestore reads never disable all buttons.
   // Only a feature explicitly used (local or remote) or an in-flight start disables it.
-  btn.disabled=used||snaTrialBusy||!!snaTrialActive;
+  btn.disabled=!snaTrialPolicyReady||!snaTrialPolicyEnabled||used||snaTrialBusy||!!snaTrialActive;
   btn.onclick=()=>snaTrialStart(key);
   card.append(title,desc,counter,btn);grid.append(card);
  }
  const signin=document.getElementById('sna-realtrial-register');
  if(signin){signin.hidden=spent<5;signin.textContent='체험 5회 완료 · 회원가입 / 이용권 신청';}
  if(spent===5)snaTrialStatus('무료 체험을 모두 사용했습니다. 계속 이용하려면 회원가입 후 이용권 승인을 요청해 주세요.');
+ if(snaTrialPolicyReady&&!snaTrialPolicyEnabled)snaTrialStatus(snaTrialPolicyMessage);
 }
 
 async function snaTrialEnsureGuest(){
@@ -2331,6 +2422,7 @@ function snaTrialRead(feature,uid){
 // Non-blocking: update each card whenever its own server read finishes.
 // No transactions are performed while the visitor opens the trial dialog.
 function snaTrialReload(){
+ if(snaTrialPolicyReady&&!snaTrialPolicyEnabled){snaTrialStatus(snaTrialPolicyMessage);return Promise.resolve();}
  if(!snaTrialAllowed()){return Promise.resolve();}
  const uid=authUser.uid;
  const checks=Object.keys(snaTrialFeatures).map(async feature=>{
@@ -2352,7 +2444,7 @@ function snaTrialReload(){
    snaTrialStatus('체험할 기능을 누르면 해당 기능의 사용 여부를 확인하고 편집기로 이동합니다.');
  });
 }
-function snaTrialOpen(){
+async function snaTrialOpen(){
  if(snaTrialHasPaidAccess()){
   window.uiAlert?.('활성 이용권이 있습니다. 일반 편집 메뉴에서 기능을 사용해 주세요.');
   return;
@@ -2362,15 +2454,17 @@ function snaTrialOpen(){
  snaTrialModal.hidden=false;
  snaTrialUI();
  snaTrialStatus('체험할 기능을 바로 선택하세요. 선택한 기능만 서버에서 사용 여부를 확인합니다.');
- // Warm up guest auth and cached trial records without blocking the buttons.
- snaTrialPrepareAuth().then(user=>{
+ try{
+  const user=await snaTrialPrepareAuth();
+  await snaCheckTrialPolicy();
   if(!user||snaTrialModal.hidden||snaTrialActive)return;
   if(snaTrialAllowed())void snaTrialReload();
   else snaTrialStatus('현재 로그인 계정은 체험 대상이 아닙니다. 계정 상태를 확인해 주세요.');
- }).catch(err=>{
-  console.error('무료체험 로그인 연결 실패',err);
-  if(!snaTrialModal.hidden)snaTrialStatus('무료체험 로그인 오류: '+(err?.code||err?.message||String(err)));
- });
+ }catch(err){
+  console.error('무료체험 설정 확인 실패',err);
+  snaTrialStatus(err?.message||'무료체험 설정을 확인하지 못했습니다. 다시 시도해 주세요.');
+ }
+
 }
 async function snaTrialStart(feature){
  if(!snaTrialFeatures[feature]||snaTrialBusy||snaTrialActive)return;
@@ -2382,6 +2476,7 @@ async function snaTrialStart(feature){
  snaTrialUI();
  try{
   const user=await snaTrialPrepareAuth();
+  await snaCheckTrialPolicy();
   if(!user||!snaTrialAllowed()){
    throw new Error('체험 계정을 확인하지 못했습니다. 회원 상태 또는 Firebase 로그인을 확인해 주세요.');
   }
@@ -2393,6 +2488,7 @@ async function snaTrialStart(feature){
   if(snap.exists()){
    snaTrialClaims[feature]=true;snaTrialStatus('이 기능의 체험은 이미 사용했습니다.');return;
   }
+  await snaCheckTrialPolicy();
   snaTrialActive=feature;
   window.SnaReviews?.refreshAccess?.();
   snaTrialFinishing=false;
@@ -2475,12 +2571,14 @@ window.canUseFeature=feature=>{
  if(feature==='gallery'||feature==='reviews')return !!authUser && (isAdminMode||(currentMember?.status==='approved'&&!expired(currentMember)));
  if(!FEATURE_NAMES[feature])return true;
  if(isAdminMode)return true;
- if(window.SnaTrial?.active===feature&&(authUser?.isAnonymous||currentMember?.status==='pending'))return true;
+ if(snaTrialPolicyReady&&snaTrialPolicyEnabled&&window.SnaTrial?.active===feature&&(authUser?.isAnonymous||currentMember?.status==='pending'))return true;
  if(!currentMember||currentMember.status!=='approved'||expired(currentMember))return false;
  return (gradeRights[effectiveGrade(currentMember)]||[]).includes(feature);
 };
 window.SnaMemberTier=()=>!authUser?null:isAdminMode?'admin':window.SnaTrial?.active==='board'?'vip':currentMember&&!expired(currentMember)&&currentMember.status==='approved'?effectiveGrade(currentMember):null;
 function refreshGradeUI(){
+ snaRenderTrialPolicy();
+ snaUpdateReviewExportCount();
  const effective=effectiveGrade(currentMember);
  for(const feature of Object.keys(FEATURE_NAMES)){
   const b=document.getElementById('btn-'+feature);
@@ -3097,6 +3195,7 @@ async function afterAuthLogin(user){
 }
 onAuthStateChanged(auth,async user=>{
  await resetCurrentSession();
+ snaWatchTrialPolicy(user);
  if(!user){displayLogin('이메일과 비밀번호로 로그인해 주세요.');return;}
  authScreen.style.display='flex';
  viewUserForm.style.display='none';viewWaiting.style.display='block';
@@ -4124,13 +4223,13 @@ window.closeAdmin=()=>{
 </div>
 <div id="reviews-tab" class="tab-pane">
  <section class="sna-review-showcase" id="sna-public-review-showcase" aria-labelledby="sna-review-showcase-title">
-  <div class="sna-review-showcase-head"><h2 id="sna-review-showcase-title">⭐ 실제 회원 이용 후기 전시관</h2><button type="button" id="sna-public-review-refresh">↻ 후기 새로고침</button><button type="button" id="sna-public-review-save">전체 후기 한 장 저장 · JPG</button></div>
+  <div class="sna-review-showcase-head"><h2 id="sna-review-showcase-title">⭐ 실제 회원 이용 후기 전시관</h2><button type="button" id="sna-public-review-refresh">↻ 후기 새로고침</button><button type="button" id="sna-public-review-save" data-sna-review-export-admin hidden>전체 후기 한 장 저장 · JPG</button></div>
   <p>실제 회원이 작성한 후기 중 관리자가 검토해 게시한 글을 익명으로 보여줍니다. 좋은 평가와 아쉬운 평가 모두 게재할 수 있습니다. 이름이나 계정 정보는 공개하지 않습니다. 과거 비공개 후기는 동의 없이 게시하지 않습니다.</p>
   <div class="sna-review-showcase-controls"><select id="sna-public-review-filter" aria-label="이용 후기 기능 선택"><option value="all">모든 기능</option><option value="clothes">옷 추출기</option><option value="guns">총 자르기</option><option value="kill">킬로그 커팅</option><option value="merge">사진 합치기</option><option value="board">대필판</option></select><select id="sna-public-review-sort" aria-label="이용 후기 정렬"><option value="new">최신 후기순</option><option value="old">오래된 후기순</option></select></div>
   <p id="sna-public-review-summary" role="status">공개된 이용 후기를 불러오는 중입니다.</p>
-  <div class="sna-review-showcase-controls"><label style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">사진 한 장당 후기 수 <input id="sna-public-review-page-size" type="number" min="1" max="10" step="1" value="5" inputmode="numeric" style="width:75px;min-height:42px;padding:8px;border-radius:10px;background:#101d30;color:#fff;border:1px solid #4d6a92" aria-label="사진 한 장당 후기 수, 1개부터 10개">개</label><button type="button" id="sna-public-review-save-pages">고화질 여러 장 저장 · JPG</button></div>
-  <p id="sna-public-review-page-count" role="status" aria-live="polite"></p>
-  <p id="sna-public-review-export-status" role="status" aria-live="polite">현재 기능·정렬 순서로 저장합니다. 한 장 저장은 전체를 축소해 담고, 고화질 여러 장 저장은 지정한 후기 수마다 나눕니다. 마지막 사진에는 남은 후기만 담습니다.</p>
+  <div class="sna-review-showcase-controls" data-sna-review-export-admin hidden><label style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">사진 한 장당 후기 수 <input id="sna-public-review-page-size" type="number" min="1" max="10" step="1" value="5" inputmode="numeric" style="width:75px;min-height:42px;padding:8px;border-radius:10px;background:#101d30;color:#fff;border:1px solid #4d6a92" aria-label="사진 한 장당 후기 수, 1개부터 10개">개</label><button type="button" id="sna-public-review-save-pages">고화질 여러 장 저장 · JPG</button></div>
+  <p id="sna-public-review-page-count" data-sna-review-export-admin hidden role="status" aria-live="polite"></p>
+  <p id="sna-public-review-export-status" data-sna-review-export-admin hidden role="status" aria-live="polite">현재 기능·정렬 순서로 저장합니다. 한 장 저장은 전체를 축소해 담고, 고화질 여러 장 저장은 지정한 후기 수마다 나눕니다. 마지막 사진에는 남은 후기만 담습니다.</p>
   <div id="sna-public-review-list" class="sna-review-showcase-cards"></div>
  </section>
 </div>
