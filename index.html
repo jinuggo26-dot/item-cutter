@@ -1998,6 +1998,7 @@ function snaRefreshPublishButtons(){
  }
 }
 function snaRenderPublicReviews(){
+ snaUpdateReviewExportCount();
  const target=document.getElementById('sna-public-review-list'),status=document.getElementById('sna-public-review-summary');if(!target||!status)return;
  const filter=document.getElementById('sna-public-review-filter')?.value||'all',reverse=document.getElementById('sna-public-review-sort')?.value!=='old';
  snaRefreshPublishButtons();
@@ -2014,6 +2015,97 @@ function snaRenderPublicReviews(){
   card.append(meta,body,date);target.append(card);
  }
 }
+// Draw only the approved, currently displayed public reviews; never export private records.
+function snaCreateReviewImage(data,featureNames,filterLabel,options={}){
+ const columns=Math.min(4,Math.max(1,Math.ceil(Math.sqrt(data.length/2))));
+ const cardWidth=520,gap=24,pad=42,header=170,footer=70,bodyFont=24,lineHeight=36;
+ const width=pad*2+columns*cardWidth+(columns-1)*gap;
+ const probe=document.createElement('canvas').getContext('2d');probe.font=bodyFont+'px sans-serif';
+ function wrap(text,maxWidth){
+  const lines=[];
+  for(const paragraph of String(text).replace(/\r\n?/g,'\n').split('\n')){
+   let line='';
+   for(const char of Array.from(paragraph)){
+    if(line&&probe.measureText(line+char).width>maxWidth){lines.push(line);line=char;}else line+=char;
+   }
+   lines.push(line);
+  }
+  return lines;
+ }
+ const cards=data.map(r=>{const lines=wrap(r.body,cardWidth-48);return {review:r,lines,height:134+Math.max(1,lines.length)*lineHeight};});
+ const rows=[];let y=header;
+ for(let i=0;i<cards.length;i+=columns){const row=cards.slice(i,i+columns),height=Math.max(...row.map(c=>c.height));rows.push({cards:row,y,height});y+=height+gap;}
+ const height=y-gap+footer;
+ // Keep one JPG within mobile canvas memory/dimension limits without truncating text.
+ const scale=Math.min(options.highQuality?2:1,12000/Math.max(width,height),Math.sqrt(12000000/(width*height)));
+ const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.floor(width*scale));canvas.height=Math.max(1,Math.floor(height*scale));
+ const ctx=canvas.getContext('2d');ctx.scale(scale,scale);
+ ctx.fillStyle='#0e192a';ctx.fillRect(0,0,width,height);
+ ctx.fillStyle='#f4f7ff';ctx.font='bold 42px sans-serif';ctx.fillText('SNIPER · 이용 후기'+(options.page?' · '+options.page+'/'+options.pages:''),pad,68);
+ const scored=data.filter(r=>Number.isInteger(r.score)&&r.score>=1&&r.score<=5);
+ const average=scored.length?(scored.reduce((n,r)=>n+r.score,0)/scored.length).toFixed(1)+'/5':'미선택';
+ ctx.fillStyle='#c0cee4';ctx.font='24px sans-serif';ctx.fillText(filterLabel+' · 후기 '+data.length+'개 · 평균 별점 '+average,pad,113);
+ for(const row of rows)row.cards.forEach((card,index)=>{
+  const x=pad+index*(cardWidth+gap),r=card.review;
+  ctx.fillStyle='#1c2d47';ctx.fillRect(x,row.y,cardWidth,row.height);
+  ctx.strokeStyle='#466185';ctx.lineWidth=1;ctx.strokeRect(x,row.y,cardWidth,row.height);
+  ctx.font='bold 25px sans-serif';ctx.fillStyle='#eff5ff';ctx.fillText(featureNames[r.feature]||'이용 후기',x+24,row.y+42);
+  ctx.font='22px sans-serif';ctx.fillStyle='#ffcf70';ctx.textAlign='right';ctx.fillText(r.score?'★ '+r.score+'/5':'별점 미선택',x+cardWidth-24,row.y+42);ctx.textAlign='left';
+  ctx.font=bodyFont+'px sans-serif';ctx.fillStyle='#f0f4fb';card.lines.forEach((line,i)=>ctx.fillText(line,x+24,row.y+88+i*lineHeight));
+  ctx.font='19px sans-serif';ctx.fillStyle='#adc1df';ctx.fillText('익명 회원 · '+(r.createdAt?new Date(r.createdAt).toLocaleDateString('ko-KR'):'작성일 미상'),x+24,row.y+row.height-23);
+ });
+ ctx.font='20px sans-serif';ctx.fillStyle='#a8b9d2';ctx.fillText('관리자가 게시한 실제 회원 이용 후기',pad,height-25);
+ return {canvas,count:cards.length,lineCount:cards.reduce((n,c)=>n+c.lines.length,0)};
+}
+function snaReviewExportData(){
+ const filter=document.getElementById('sna-public-review-filter')?.value||'all';
+ const reverse=document.getElementById('sna-public-review-sort')?.value!=='old';
+ return {label:filter==='all'?'모든 기능':REVIEW_FEATURES[filter],data:snaPublishedReviews.filter(r=>REVIEW_FEATURES[r.feature]&&(filter==='all'||r.feature===filter)).slice().sort((a,b)=>reverse?b.createdAt-a.createdAt:a.createdAt-b.createdAt)};
+}
+function snaReviewPageSize(){
+ const input=document.getElementById('sna-public-review-page-size');
+ const value=Number(input?.value);
+ return Number.isInteger(value)&&value>=1&&value<=10?value:null;
+}
+function snaReviewPageGroups(data,size){
+ const pages=[];for(let i=0;i<data.length;i+=size)pages.push(data.slice(i,i+size));return pages;
+}
+function snaUpdateReviewExportCount(){
+ const target=document.getElementById('sna-public-review-page-count');if(!target)return;
+ const size=snaReviewPageSize(),{data}=snaReviewExportData();
+ target.textContent=!snaPublishedReviewsReady?'후기 불러오는 중':!size?'한 장당 후기 수를 1~10 사이의 정수로 입력해 주세요.':data.length?'후기 '+data.length+'개 → 사진 '+Math.ceil(data.length/size)+'장 (한 장당 최대 '+size+'개)':'저장할 공개 후기가 없습니다.';
+}
+let snaReviewExportBusy=false;
+async function snaSaveReviewImages(multiple){
+ if(snaReviewExportBusy)return;
+ const status=document.getElementById('sna-public-review-export-status');
+ if(!snaPublishedReviewsReady){status.textContent='후기를 불러온 뒤 다시 저장해 주세요.';return;}
+ const {data,label}=snaReviewExportData();
+ if(!data.length){status.textContent='저장할 공개 후기가 없습니다.';return;}
+ const size=multiple?snaReviewPageSize():data.length;
+ if(!size){status.textContent='한 장당 후기 수를 1~10 사이의 정수로 입력해 주세요.';return;}
+ const buttons=['sna-public-review-save','sna-public-review-save-pages'].map(id=>document.getElementById(id)).filter(Boolean);
+ snaReviewExportBusy=true;buttons.forEach(b=>b.disabled=true);
+ status.textContent='후기 이미지를 만드는 중입니다.';
+ try{
+  const groups=multiple?snaReviewPageGroups(data,size):[data],files=[];
+  groups.forEach((group,i)=>{
+   const result=snaCreateReviewImage(group,REVIEW_FEATURES,label,{highQuality:multiple,page:multiple?i+1:null,pages:groups.length});
+   const filename=multiple?'SNIPER_reviews_'+String(i+1).padStart(2,'0')+'_of_'+groups.length+'.jpg':'SNIPER_reviews.jpg';
+   files.push(window.SnaDataFile(result.canvas.toDataURL('image/jpeg',.97),filename));
+   result.canvas.width=1;result.canvas.height=1;
+  });
+  const saved=await window.SnaShareFiles(files);
+  status.textContent=saved?'후기 '+data.length+'개 · JPG '+files.length+'장 저장을 요청했습니다.':'저장이 취소되었습니다.';
+ }catch(error){console.error('후기 이미지 저장 실패',error);status.textContent='저장하지 못했습니다. 한 장당 후기 수를 줄여 다시 시도해 주세요.';}
+ finally{snaReviewExportBusy=false;buttons.forEach(b=>b.disabled=false);}
+}
+document.getElementById('sna-public-review-save')?.addEventListener('click',()=>snaSaveReviewImages(false));
+document.getElementById('sna-public-review-save-pages')?.addEventListener('click',()=>snaSaveReviewImages(true));
+document.getElementById('sna-public-review-page-size')?.addEventListener('input',snaUpdateReviewExportCount);
+for(const id of ['sna-public-review-filter','sna-public-review-sort'])document.getElementById(id)?.addEventListener('change',snaUpdateReviewExportCount);
+snaUpdateReviewExportCount();
+
 async function snaLoadPublishedReviews(){
  const serial=++snaReviewsRequestSerial;
  const status=document.getElementById('sna-public-review-summary');if(status)status.textContent='Firebase 공개 후기 확인 중…';
@@ -4032,10 +4124,13 @@ window.closeAdmin=()=>{
 </div>
 <div id="reviews-tab" class="tab-pane">
  <section class="sna-review-showcase" id="sna-public-review-showcase" aria-labelledby="sna-review-showcase-title">
-  <div class="sna-review-showcase-head"><h2 id="sna-review-showcase-title">⭐ 실제 회원 이용 후기 전시관</h2><button type="button" id="sna-public-review-refresh">↻ 후기 새로고침</button></div>
+  <div class="sna-review-showcase-head"><h2 id="sna-review-showcase-title">⭐ 실제 회원 이용 후기 전시관</h2><button type="button" id="sna-public-review-refresh">↻ 후기 새로고침</button><button type="button" id="sna-public-review-save">전체 후기 한 장 저장 · JPG</button></div>
   <p>실제 회원이 작성한 후기 중 관리자가 검토해 게시한 글을 익명으로 보여줍니다. 좋은 평가와 아쉬운 평가 모두 게재할 수 있습니다. 이름이나 계정 정보는 공개하지 않습니다. 과거 비공개 후기는 동의 없이 게시하지 않습니다.</p>
   <div class="sna-review-showcase-controls"><select id="sna-public-review-filter" aria-label="이용 후기 기능 선택"><option value="all">모든 기능</option><option value="clothes">옷 추출기</option><option value="guns">총 자르기</option><option value="kill">킬로그 커팅</option><option value="merge">사진 합치기</option><option value="board">대필판</option></select><select id="sna-public-review-sort" aria-label="이용 후기 정렬"><option value="new">최신 후기순</option><option value="old">오래된 후기순</option></select></div>
   <p id="sna-public-review-summary" role="status">공개된 이용 후기를 불러오는 중입니다.</p>
+  <div class="sna-review-showcase-controls"><label style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">사진 한 장당 후기 수 <input id="sna-public-review-page-size" type="number" min="1" max="10" step="1" value="5" inputmode="numeric" style="width:75px;min-height:42px;padding:8px;border-radius:10px;background:#101d30;color:#fff;border:1px solid #4d6a92" aria-label="사진 한 장당 후기 수, 1개부터 10개">개</label><button type="button" id="sna-public-review-save-pages">고화질 여러 장 저장 · JPG</button></div>
+  <p id="sna-public-review-page-count" role="status" aria-live="polite"></p>
+  <p id="sna-public-review-export-status" role="status" aria-live="polite">현재 기능·정렬 순서로 저장합니다. 한 장 저장은 전체를 축소해 담고, 고화질 여러 장 저장은 지정한 후기 수마다 나눕니다. 마지막 사진에는 남은 후기만 담습니다.</p>
   <div id="sna-public-review-list" class="sna-review-showcase-cards"></div>
  </section>
 </div>
