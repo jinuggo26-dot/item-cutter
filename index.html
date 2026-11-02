@@ -1588,13 +1588,6 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  <div id="admin-notice-list"></div>
 </div>
 <!-- Firebase에 저장되는 관리자 전용 업데이트 내역 -->
-<section class="member-panel" id="sna-admin-trial-settings">
- <h3>무료체험 운영 설정</h3>
- <p class="member-tip">회원가입 없는 체험과 승인 대기 회원의 체험에 함께 적용됩니다. 끄면 진행 중인 체험도 횟수 차감 없이 종료됩니다. 구매 회원의 이용권에는 영향을 주지 않습니다.</p>
- <p id="sna-admin-trial-state" role="status">설정 확인 중</p>
- <button type="button" class="member-btn primary" id="sna-admin-trial-toggle" aria-pressed="false" disabled>설정 확인 중…</button>
- <p class="member-tip" id="sna-admin-trial-status" role="status" aria-live="polite"></p>
-</section>
 <section id="admin-release-panel" aria-labelledby="admin-release-heading">
  <h3 id="admin-release-heading">🗓️ 업데이트 내역 관리</h3>
  <p class="release-help">제작자 소개창에 표시되는 업데이트를 추가·수정·삭제합니다. 저장하면 다른 기기에도 자동 반영됩니다. 관리자 권한이 있어야 변경할 수 있습니다.</p>
@@ -1676,7 +1669,7 @@ import {initializeApp}
 from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 
 import {
- getFirestore,doc,setDoc,getDoc,getDocFromServer,onSnapshot,
+ getFirestore,doc,setDoc,getDoc,onSnapshot,
  collection,updateDoc,deleteDoc,deleteField,addDoc,query,orderBy,limit,runTransaction
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -2292,94 +2285,6 @@ function snaTrialMarkLocal(feature){try{localStorage.setItem(snaTrialLocalKey(fe
 const snaTrialAllowed=()=>!!authUser&&!isAdminMode&&(authUser.isAnonymous||currentMember?.status==='pending');
 const snaTrialHasPaidAccess=()=>isAdminMode||currentMember?.status==='approved'&&!expired(currentMember);
 
-// Reuse the existing administrator-only settings document and its permissions.
-const snaTrialPolicyRef=doc(db,'appSettings','gradeRights');
-let snaTrialPolicyReady=false,snaTrialPolicyEnabled=true,snaTrialPolicySaving=false,snaTrialPolicyUnsub=null;
-let snaTrialPolicySerial=0;
-const snaTrialPolicyMessage='관리자가 무료체험을 일시 중지했습니다. 다시 열리면 이용해 주세요.';
-function snaRenderTrialPolicy(){
- const button=document.getElementById('sna-admin-trial-toggle'),state=document.getElementById('sna-admin-trial-state');
- if(button){button.disabled=!isAdminMode||!snaTrialPolicyReady||snaTrialPolicySaving;button.textContent=snaTrialPolicySaving?'저장 중…':snaTrialPolicyEnabled?'무료체험 끄기':'무료체험 켜기';button.setAttribute('aria-pressed',String(snaTrialPolicyReady&&snaTrialPolicyEnabled));}
- if(state)state.textContent=!snaTrialPolicyReady?'설정 확인 중':snaTrialPolicyEnabled?'무료체험 켜짐 · 각 기능 1회 이용 가능':'무료체험 꺼짐 · 이용 중지';
- for(const id of ['sna-market-open-login','sna-market-open-waiting']){
-  const entry=document.getElementById(id);if(!entry)continue;
-  if(!entry.dataset.originalTrialLabel)entry.dataset.originalTrialLabel=entry.textContent;
-  entry.disabled=false;
-  entry.textContent=snaTrialPolicyReady&&!snaTrialPolicyEnabled?'무료체험 일시 중지 · 상태 다시 확인':entry.dataset.originalTrialLabel;
- }
-}
-function snaApplyTrialPolicy(snapshot){
- snaTrialPolicyEnabled=!snapshot.exists()||snapshot.data().trialEnabled!==false;
- snaTrialPolicyReady=true;snaRenderTrialPolicy();
- if(snaTrialPolicyEnabled&&!snaTrialModal.hidden)snaTrialStatus('무료체험이 열려 있습니다. 이용할 기능을 선택해 주세요.');
- if(!snaTrialPolicyEnabled){
-  if(snaTrialActive)snaTrialEnd(true);
-  snaTrialStatus(snaTrialPolicyMessage);
- }
- snaTrialUI();
-}
-async function snaCheckTrialPolicy(){
- const uid=auth.currentUser?.uid;if(!uid)throw Error('체험 계정 확인이 필요합니다.');
- const snapshot=await getDocFromServer(snaTrialPolicyRef);
- if(auth.currentUser?.uid!==uid)throw Error('계정이 변경되었습니다. 다시 시도해 주세요.');
- snaApplyTrialPolicy(snapshot);
- if(!snaTrialPolicyEnabled)throw Error(snaTrialPolicyMessage);
- return true;
-}
-function snaWatchTrialPolicy(user){
- const serial=++snaTrialPolicySerial;
- if(snaTrialPolicyUnsub){snaTrialPolicyUnsub();snaTrialPolicyUnsub=null;}
- snaTrialPolicyReady=false;snaRenderTrialPolicy();
- snaTrialPolicyUnsub=onSnapshot(snaTrialPolicyRef,{includeMetadataChanges:true},snapshot=>{
-  if(serial!==snaTrialPolicySerial)return;
-  // An offline snapshot cannot newly grant trial access.
-  if(snapshot.metadata?.hasPendingWrites)return;
-  if(snapshot.metadata?.fromCache&&!snaTrialPolicyReady)return;
-  snaApplyTrialPolicy(snapshot);
- },error=>{
-  if(serial!==snaTrialPolicySerial)return;
-  snaTrialPolicyReady=false;snaRenderTrialPolicy();snaTrialUI();
-  const message='무료체험 설정 확인 실패: '+(error?.code||error?.message||'연결 오류');
-  const status=document.getElementById('sna-admin-trial-status');if(status)status.textContent=message;
-  snaTrialStatus(message);
- });
-}
-// A listener may stop after a permission/network error or while the mobile app is suspended.
-// Recheck the server independently, including when the last known state is disabled.
-let snaTrialPolicyRefreshPending=null;
-function snaRefreshTrialPolicy(){
- if(!auth.currentUser||snaTrialPolicySaving)return Promise.resolve();
- if(snaTrialPolicyRefreshPending)return snaTrialPolicyRefreshPending;
- const uid=auth.currentUser.uid;
- snaTrialPolicyRefreshPending=getDocFromServer(snaTrialPolicyRef).then(snapshot=>{
-  if(auth.currentUser?.uid===uid&&!snaTrialPolicySaving)snaApplyTrialPolicy(snapshot);
- }).catch(error=>{
-  const status=document.getElementById('sna-admin-trial-status');
-  if(isAdminMode&&status)status.textContent='설정 동기화 실패: '+(error?.code||error?.message||'연결 오류');
- }).finally(()=>{snaTrialPolicyRefreshPending=null;});
- return snaTrialPolicyRefreshPending;
-}
-window.addEventListener('focus',()=>{void snaRefreshTrialPolicy();});
-window.addEventListener('online',()=>{snaWatchTrialPolicy(auth.currentUser);void snaRefreshTrialPolicy();});
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')void snaRefreshTrialPolicy();});
-setInterval(()=>{if(document.visibilityState!=='hidden')void snaRefreshTrialPolicy();},10000);
-document.getElementById('sna-admin-trial-toggle')?.addEventListener('click',async()=>{
- const status=document.getElementById('sna-admin-trial-status');
- if(!isAdminMode||!auth.currentUser||auth.currentUser.isAnonymous){if(status)status.textContent='관리자만 변경할 수 있습니다.';return;}
- if(snaTrialPolicySaving||!snaTrialPolicyReady)return;
- snaTrialPolicySaving=true;snaRenderTrialPolicy();
- try{
-  const user=auth.currentUser,token=await getIdTokenResult(user,true);
-  if(token.claims.admin!==true||auth.currentUser?.uid!==user.uid)throw Error('관리자 권한을 확인하지 못했습니다.');
-  const enabled=!snaTrialPolicyEnabled;
-  await setDoc(snaTrialPolicyRef,{trialEnabled:enabled,trialUpdatedAt:Date.now(),trialUpdatedBy:user.uid},{merge:true});
-  if(auth.currentUser?.uid!==user.uid)return;
-  snaApplyTrialPolicy({exists:()=>true,data:()=>({trialEnabled:enabled})});
-  if(status)status.textContent=enabled?'무료체험을 켰습니다. 다른 기기에도 반영됩니다.':'무료체험을 껐습니다. 진행 중인 체험은 횟수 차감 없이 종료됩니다.';
- }catch(error){if(status)status.textContent='설정 저장 실패: '+(error?.code||error?.message||'권한 또는 연결 확인');}
- finally{snaTrialPolicySaving=false;snaRenderTrialPolicy();snaTrialUI();}
-});
-
 function snaTrialUI(){
  const grid=document.getElementById('sna-realtrial-grid');if(!grid)return;
  grid.replaceChildren();
@@ -2394,17 +2299,16 @@ function snaTrialUI(){
   counter.textContent=used?'체험 완료 · 0/1':'남은 체험 1/1';
   const btn=document.createElement('button');
   btn.type='button';
-  btn.textContent=!snaTrialPolicyReady?'체험 설정 확인 중…':!snaTrialPolicyEnabled?'무료체험 일시 중지':used?'1회 체험 사용 완료':snaTrialBusy?'체험 확인 중…':'실제 기능 체험하기';
+  btn.textContent=used?'1회 체험 사용 완료':snaTrialBusy?'체험 확인 중…':'실제 기능 체험하기';
   // Authentication and the five background Firestore reads never disable all buttons.
   // Only a feature explicitly used (local or remote) or an in-flight start disables it.
-  btn.disabled=!snaTrialPolicyReady||!snaTrialPolicyEnabled||used||snaTrialBusy||!!snaTrialActive;
+  btn.disabled=used||snaTrialBusy||!!snaTrialActive;
   btn.onclick=()=>snaTrialStart(key);
   card.append(title,desc,counter,btn);grid.append(card);
  }
  const signin=document.getElementById('sna-realtrial-register');
  if(signin){signin.hidden=spent<5;signin.textContent='체험 5회 완료 · 회원가입 / 이용권 신청';}
  if(spent===5)snaTrialStatus('무료 체험을 모두 사용했습니다. 계속 이용하려면 회원가입 후 이용권 승인을 요청해 주세요.');
- if(snaTrialPolicyReady&&!snaTrialPolicyEnabled)snaTrialStatus(snaTrialPolicyMessage);
 }
 
 async function snaTrialEnsureGuest(){
@@ -2441,7 +2345,6 @@ function snaTrialRead(feature,uid){
 // Non-blocking: update each card whenever its own server read finishes.
 // No transactions are performed while the visitor opens the trial dialog.
 function snaTrialReload(){
- if(snaTrialPolicyReady&&!snaTrialPolicyEnabled){snaTrialStatus(snaTrialPolicyMessage);return Promise.resolve();}
  if(!snaTrialAllowed()){return Promise.resolve();}
  const uid=authUser.uid;
  const checks=Object.keys(snaTrialFeatures).map(async feature=>{
@@ -2475,7 +2378,6 @@ async function snaTrialOpen(){
  snaTrialStatus('체험할 기능을 바로 선택하세요. 선택한 기능만 서버에서 사용 여부를 확인합니다.');
  try{
   const user=await snaTrialPrepareAuth();
-  await snaCheckTrialPolicy();
   if(!user||snaTrialModal.hidden||snaTrialActive)return;
   if(snaTrialAllowed())void snaTrialReload();
   else snaTrialStatus('현재 로그인 계정은 체험 대상이 아닙니다. 계정 상태를 확인해 주세요.');
@@ -2495,7 +2397,6 @@ async function snaTrialStart(feature){
  snaTrialUI();
  try{
   const user=await snaTrialPrepareAuth();
-  await snaCheckTrialPolicy();
   if(!user||!snaTrialAllowed()){
    throw new Error('체험 계정을 확인하지 못했습니다. 회원 상태 또는 Firebase 로그인을 확인해 주세요.');
   }
@@ -2507,7 +2408,6 @@ async function snaTrialStart(feature){
   if(snap.exists()){
    snaTrialClaims[feature]=true;snaTrialStatus('이 기능의 체험은 이미 사용했습니다.');return;
   }
-  await snaCheckTrialPolicy();
   snaTrialActive=feature;
   window.SnaReviews?.refreshAccess?.();
   snaTrialFinishing=false;
@@ -2590,13 +2490,12 @@ window.canUseFeature=feature=>{
  if(feature==='gallery'||feature==='reviews')return !!authUser && (isAdminMode||(currentMember?.status==='approved'&&!expired(currentMember)));
  if(!FEATURE_NAMES[feature])return true;
  if(isAdminMode)return true;
- if(snaTrialPolicyReady&&snaTrialPolicyEnabled&&window.SnaTrial?.active===feature&&(authUser?.isAnonymous||currentMember?.status==='pending'))return true;
+ if(window.SnaTrial?.active===feature&&(authUser?.isAnonymous||currentMember?.status==='pending'))return true;
  if(!currentMember||currentMember.status!=='approved'||expired(currentMember))return false;
  return (gradeRights[effectiveGrade(currentMember)]||[]).includes(feature);
 };
 window.SnaMemberTier=()=>!authUser?null:isAdminMode?'admin':window.SnaTrial?.active==='board'?'vip':currentMember&&!expired(currentMember)&&currentMember.status==='approved'?effectiveGrade(currentMember):null;
 function refreshGradeUI(){
- snaRenderTrialPolicy();
  snaUpdateReviewExportCount();
  const effective=effectiveGrade(currentMember);
  for(const feature of Object.keys(FEATURE_NAMES)){
@@ -3214,7 +3113,6 @@ async function afterAuthLogin(user){
 }
 onAuthStateChanged(auth,async user=>{
  await resetCurrentSession();
- snaWatchTrialPolicy(user);
  if(!user){displayLogin('이메일과 비밀번호로 로그인해 주세요.');return;}
  authScreen.style.display='flex';
  viewUserForm.style.display='none';viewWaiting.style.display='block';
