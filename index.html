@@ -7974,11 +7974,14 @@ saveBtn.addEventListener("click",async()=>{
     const maxFs=Math.max(4,options.maxHeight/1.10);
     if(fs>maxFs){fs=maxFs;g.font=`${Math.max(4,Math.round(fs))}px "Jua", sans-serif`;}
    }
-   if(key==='inquiry'||key==='sub'){
+   const isCaption=key==='inquiry'||key==='sub';
+   if(isCaption){
     const sx=directValue('b_'+key+'FreeWidth',100)/100,sy=directValue('b_'+key+'FreeHeight',100)/100;
-    g.translate(x,y);g.rotate(directValue('b_'+key+'Rotate')*Math.PI/180);g.scale(sx,sy);g.translate(-x,-y);
+    const centerY=Number.isFinite(options.captionCenterY)?options.captionCenterY:y;
+    // Resize/rotate around the actual ink center, never around its baseline.
+    g.translate(x,centerY);g.rotate(directValue('b_'+key+'Rotate')*Math.PI/180);g.scale(sx,sy);g.translate(-x,-centerY);
    }
-   g.textBaseline="middle";g.textAlign="left";
+   g.textBaseline=isCaption?"alphabetic":"middle";g.textAlign="left";
    let lines=[];
    if(options.fit){lines=[raw];}
    else{
@@ -8060,7 +8063,11 @@ saveBtn.addEventListener("click",async()=>{
 
     const naturalLineWidth=g.measureText(str).width;
     const lineWidth=Math.min(naturalLineWidth,maxW);
-    const baseX=align==="center"?x-lineWidth/2:align==="right"?x-lineWidth:x;
+    let baseX=align==="center"?x-lineWidth/2:align==="right"?x-lineWidth:x;
+    if(isCaption&&align==='center'){
+     const ink=g.measureText(str);
+     if(Number.isFinite(ink.actualBoundingBoxLeft)&&Number.isFinite(ink.actualBoundingBoxRight))baseX=x+(ink.actualBoundingBoxLeft-ink.actualBoundingBoxRight)/2;
+    }
     const spans=[];let cursor=0;const re=/일섭/g;let m;
     while((m=re.exec(str))!==null){
      if(m.index>cursor)spans.push({text:str.slice(cursor,m.index),red:false});
@@ -8391,7 +8398,7 @@ saveBtn.addEventListener("click",async()=>{
   const maxCaptionWidth=Math.max(8,textAreaWidth-12);
   function fitCaption(raw,slider,top,laneHeight,maxSlider=1000){
    if(!raw||Number(slider)<=0)return null;
-   g.save();g.textBaseline="middle";
+   g.save();g.textBaseline="alphabetic";g.textAlign="left";
    g.font='100px "Jua",sans-serif';
    const ref=g.measureText(raw);
    const inkH=Math.max(65,ref.actualBoundingBoxAscent+ref.actualBoundingBoxDescent||78);
@@ -8399,11 +8406,15 @@ saveBtn.addEventListener("click",async()=>{
    const progress=Math.pow(Math.min(maxSlider/1000,Math.max(0,Number(slider)/1000)),.44);
    const globalScale=(Number($("b_textScale").value)||100)/100;
    const finalSize=Math.max(4,maxSize*.38*(Math.max(0,Number(slider))/(maxSlider===2000?100:110))*globalScale);
-   g.font=`${finalSize}px "Jua",sans-serif`;
-   const actual=g.measureText(raw);
-   const baselineY=top+laneHeight/2+(actual.actualBoundingBoxAscent-actual.actualBoundingBoxDescent)/2;
+   // Match the exact rounded font used by text(), so render and handles agree.
+   g.font=`${Math.max(4,Math.round(finalSize))}px "Jua",sans-serif`;
+   const actual=g.measureText(raw),centerY=top+laneHeight/2;
+   const ascent=Number.isFinite(actual.actualBoundingBoxAscent)?actual.actualBoundingBoxAscent:finalSize*.8;
+   const descent=Number.isFinite(actual.actualBoundingBoxDescent)?actual.actualBoundingBoxDescent:finalSize*.2;
+   const baselineY=centerY+(ascent-descent)/2;
+   const inkWidth=Number.isFinite(actual.actualBoundingBoxLeft)&&Number.isFinite(actual.actualBoundingBoxRight)?actual.actualBoundingBoxLeft+actual.actualBoundingBoxRight:actual.width;
    g.restore();
-   return {size:finalSize,baselineY};
+   return {size:finalSize,baselineY,centerY,inkWidth,inkHeight:ascent+descent};
   }
   const inquiryFit=fitCaption(inquiryText,$("b_inquiryWidth").value,upperTop,upperH);
   const subFit=fitCaption(subText,$("b_subWidth").value,lowerTop,lowerH,2000);
@@ -8412,8 +8423,8 @@ saveBtn.addEventListener("click",async()=>{
   const inquiryX=offset("b_inquiryX"),inquiryY=offset("b_inquiryY");
   const subX=offset("b_subX"),subY=offset("b_subY");
   g.save();g.beginPath();g.rect(textAreaCenter-textAreaWidth/2,headerH,textAreaWidth,bannerH);g.clip();
-  if(inquiryFit)text(inquiryText,textAreaCenter+inquiryX,inquiryFit.baselineY+inquiryY,1,"inquiry","center",Infinity,{maxLines:1,fit:true,captionFontSize:inquiryFit.size});
-  if(subFit)text(subText,textAreaCenter+subX,subFit.baselineY+subY,1,"sub","center",Infinity,{maxLines:1,fit:true,captionFontSize:subFit.size});
+  if(inquiryFit)text(inquiryText,textAreaCenter+inquiryX,inquiryFit.baselineY+inquiryY,1,"inquiry","center",Infinity,{maxLines:1,fit:true,captionFontSize:inquiryFit.size,captionCenterY:inquiryFit.centerY+inquiryY});
+  if(subFit)text(subText,textAreaCenter+subX,subFit.baselineY+subY,1,"sub","center",Infinity,{maxLines:1,fit:true,captionFontSize:subFit.size,captionCenterY:subFit.centerY+subY});
   g.restore();
 
   // Editing operates on the WHOLE composed photo bundle, not a fixed pane.
@@ -8556,11 +8567,17 @@ saveBtn.addEventListener("click",async()=>{
   }
   const captionRects={};
   for(const [key,raw,fit,xx,yy] of [['inquiry',inquiryText,inquiryFit,inquiryX,inquiryY],['sub',subText,subFit,subX,subY]])if(raw&&fit){
-   const c=document.createElement('canvas').getContext('2d');c.font=Math.round(fit.size)+'px "Jua",sans-serif';
-   captionRects[key]={x:textAreaCenter+xx,y:fit.baselineY+yy,w:c.measureText(raw).width*directValue('b_'+key+'FreeWidth',100)/100,h:fit.size*1.15*directValue('b_'+key+'FreeHeight',100)/100,angle:directValue('b_'+key+'Rotate')};
+   const x=textAreaCenter+xx,y=fit.centerY+yy;
+   const fullW=Math.max(1,fit.inkWidth)*directValue('b_'+key+'FreeWidth',100)/100;
+   const fullH=Math.max(1,fit.inkHeight)*directValue('b_'+key+'FreeHeight',100)/100;
+   // The writing band clips oversized text. Its edit box must stay on the visible
+   // part of that band instead of covering photos or following the font baseline.
+   const visibleW=Math.max(1,2*Math.min(x-(textAreaCenter-textAreaWidth/2),textAreaCenter+textAreaWidth/2-x));
+   const visibleH=Math.max(1,2*Math.min(y-headerH,headerH+bannerH-y));
+   captionRects[key]={x,y,w:Math.min(fullW,visibleW),h:Math.min(fullH,visibleH),fullW,fullH,angle:directValue('b_'+key+'Rotate')};
   }
 
-  return {width,height,mode,captionRects,boardSX,boardSY,previewTileRects,colsLeft:clothesCols,rowsLeft:clothesRows,colsRight:gunsCols,rowsRight:gunsRows,rows:isLarge?clothesRows:rows,bottomGap,
+  return {width,height,mode,captionRects,captionBand:{x:textAreaCenter-textAreaWidth/2,y:headerH,w:textAreaWidth,h:bannerH},boardSX,boardSY,previewTileRects,colsLeft:clothesCols,rowsLeft:clothesRows,colsRight:gunsCols,rowsRight:gunsRows,rows:isLarge?clothesRows:rows,bottomGap,
    photoRects:isLarge?{
     clothes:{x:margin,y:photoTop,w:largeLeftInnerW,h:Math.max(0,bodyBottom-photoTop),contentH:packingHeight(clothesPacking)},
     guns:{x:margin+largeLeftInnerW+seamW,y:largeGunTop,w:rightInnerW,h:Math.max(0,bodyBottom-largeGunTop),contentH:packingHeight(gunsPacking)}
@@ -8937,6 +8954,13 @@ saveBtn.addEventListener("click",async()=>{
  for(const target of ['inquiry','sub'])for(const [key,label,value,min,max] of [['FreeWidth','가로 %',100,10,500],['FreeHeight','세로 %',100,10,500],['Rotate','회전 °',0,-180,180]])directNumber('b_'+target+key,(target==='inquiry'?'문의 ':'보조 ')+label,value,min,max);
  for(const side of ['Left','Right','Top','Bottom'])directNumber('b_boardEdge'+side,({Left:'판 왼쪽',Right:'판 오른쪽',Top:'판 위쪽',Bottom:'판 아래쪽'})[side]+' %',0,-40,100);
  const directReset=document.createElement('button');directReset.type='button';directReset.textContent='직접 조절 초기화';directReset.onclick=()=>{historyPush();directIds.forEach(id=>$(id).value=/Free/.test(id)?'100':'0');scheduleDraw();};advanced.append(directReset);
+ const captionReset=document.createElement('button');captionReset.type='button';captionReset.textContent='선택 문구 원래 중앙·크기로';captionReset.onclick=()=>{
+  const key=$('b_directTarget').value;if(!['inquiry','sub'].includes(key))return window.uiAlert?.('문의 또는 보조 문구를 선택하세요.');
+  historyPush();for(const axis of ['X','Y'])$('b_'+key+axis).value='0';
+  for(const axis of ['FreeWidth','FreeHeight'])$('b_'+key+axis).value='100';$('b_'+key+'Rotate').value='0';
+  $('b_'+key+'Width').value=key==='inquiry'?'110':'100';
+  $('b_'+key+'Width').dispatchEvent?.(new Event('input',{bubbles:true}));scheduleDraw();
+ };advanced.append(captionReset);
  canvas.closest('.board-preview-wrap').insertAdjacentElement('afterend',advanced);
  function directValue(id,fallback=0){const el=$(id),n=Number(el?.value);return Number.isFinite(n)?Math.max(Number(el.min),Math.min(Number(el.max),n)):fallback;}
  let directDrag=null;
@@ -8944,11 +8968,20 @@ saveBtn.addEventListener("click",async()=>{
  function captionHit(p,r){const a=-r.angle*Math.PI/180,dx=p.x-r.x,dy=p.y-r.y;return {x:dx*Math.cos(a)-dy*Math.sin(a),y:dx*Math.sin(a)+dy*Math.cos(a)};}
  canvas.addEventListener('pointerdown',e=>{
   const key=$('b_directTarget').value,m=state.previewLayout;if(key==='none'||!m)return;
+  const p=pointerPoint(e),tol=22*m.width/Math.max(1,canvas.getBoundingClientRect().width);
+  if(key==='board'){
+   const d=[['Left',p.x],['Right',m.width-p.x],['Top',p.y],['Bottom',m.height-p.y]].sort((a,b)=>a[1]-b[1]);
+   if(d[0][1]>tol)return;
+   directDrag={key,edge:d[0][0],p,initial:directValue('b_boardEdge'+d[0][0]),w:m.width,h:m.height};
+  }else{
+   const r=m.captionRects[key];if(!r)return;const q=captionHit(p,r);
+   const rotate=Math.hypot(q.x,q.y+r.h/2+28)<tol;
+   const corner=Math.abs(Math.abs(q.x)-r.w/2)<tol&&Math.abs(Math.abs(q.y)-r.h/2)<tol;
+   const inside=Math.abs(q.x)<=r.w/2+tol*.25&&Math.abs(q.y)<=r.h/2+tol*.25;
+   if(!rotate&&!corner&&!inside)return;
+   directDrag={key,p,r,q,mode:rotate?'rotate':corner?'size':'move',x:Number($('b_'+key+'X').value),y:Number($('b_'+key+'Y').value),w:directValue('b_'+key+'FreeWidth',100),h:directValue('b_'+key+'FreeHeight',100)};
+  }
   e.preventDefault();e.stopImmediatePropagation();historyPush();canvas.setPointerCapture?.(e.pointerId);
-  const p=pointerPoint(e);if(key==='board'){const d=[['Left',p.x],['Right',m.width-p.x],['Top',p.y],['Bottom',m.height-p.y]].sort((a,b)=>a[1]-b[1]);directDrag={key,edge:d[0][0],p,initial:directValue('b_boardEdge'+d[0][0]),w:m.width,h:m.height};return;}
-  const r=m.captionRects[key];if(!r)return;const q=captionHit(p,r),tol=28;
-  const corner=Math.abs(Math.abs(q.x)-r.w/2)<tol&&Math.abs(Math.abs(q.y)-r.h/2)<tol;
-  directDrag={key,p,r,q,mode:q.y<-r.h/2-8?'rotate':corner?'size':'move',x:Number($('b_'+key+'X').value),y:Number($('b_'+key+'Y').value),w:directValue('b_'+key+'FreeWidth',100),h:directValue('b_'+key+'FreeHeight',100)};
  },true);
  canvas.addEventListener('pointermove',e=>{
   if(!directDrag)return;e.preventDefault();e.stopImmediatePropagation();const d=directDrag,p=pointerPoint(e),dx=p.x-d.p.x,dy=p.y-d.p.y;
@@ -8963,7 +8996,7 @@ saveBtn.addEventListener("click",async()=>{
  $('b_directTarget').addEventListener('change',()=>{canvas.style.touchAction=$('b_directTarget').value==='none'?'manipulation':'none';scheduleDraw();});
  function drawDirectHandles(m){const key=$('b_directTarget').value;if(key==='none')return;const c=canvas.getContext('2d');c.save();c.scale(canvas.width/m.width,canvas.height/m.height);c.strokeStyle='#45ff7c';c.fillStyle='#fff';c.lineWidth=2;
   if(key==='board'){c.strokeRect(3,3,m.width-6,m.height-6);for(const [x,y] of [[3,m.height/2],[m.width-3,m.height/2],[m.width/2,3],[m.width/2,m.height-3]]){c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.fill();}}
-  else{const r=m.captionRects[key];if(r){c.translate(r.x,r.y);c.rotate(r.angle*Math.PI/180);c.strokeRect(-r.w/2,-r.h/2,r.w,r.h);for(const [x,y]of [[-r.w/2,-r.h/2],[r.w/2,-r.h/2],[-r.w/2,r.h/2],[r.w/2,r.h/2],[0,-r.h/2-28]]){c.beginPath();c.arc(x,y,8,0,Math.PI*2);c.fill();c.stroke();}}}c.restore();}
+  else{const r=m.captionRects[key];if(r){const band=m.captionBand;if(band){c.beginPath();c.rect(band.x,Math.max(0,band.y-45),band.w,band.h+45);c.clip();}c.translate(r.x,r.y);c.rotate(r.angle*Math.PI/180);c.strokeRect(-r.w/2,-r.h/2,r.w,r.h);for(const [x,y]of [[-r.w/2,-r.h/2],[r.w/2,-r.h/2],[-r.w/2,r.h/2],[r.w/2,r.h/2],[0,-r.h/2-28]]){c.beginPath();c.arc(x,y,8,0,Math.PI*2);c.fill();c.stroke();}}}c.restore();}
  const inputIds=["b_clothesFineZoom","b_clothesFineWidth","b_clothesFineHeight","b_clothesFineX","b_clothesFineY","b_gunsFineZoom","b_gunsFineWidth","b_gunsFineHeight","b_gunsFineX","b_gunsFineY","b_mediumPages","b_largeScaleMode","b_largeSizePercent","b_boardSize","b_ownerText","b_ownerSize","b_ownerX","b_ownerY","b_inquiryText","b_inquiryWidth","b_inquiryX","b_inquiryY","b_subText","b_subWidth","b_subX","b_subY","b_gradientDirection","b_textScale","b_outline","b_clothesCols","b_gunCols","b_nameSize","b_gunNameSize","b_levelSize","b_clothLevelSize","b_clothNameX","b_clothNameY","b_gunNameX","b_gunNameY","b_gunLevelX","b_gunLevelY","b_shadowStrength","b_shadowColor","b_shadowX","b_shadowY","b_saturation"];
  {
   const el=$("b_ownerSize"),out=$("b_ownerSizeValue");
