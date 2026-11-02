@@ -2304,13 +2304,14 @@ function snaRenderTrialPolicy(){
  for(const id of ['sna-market-open-login','sna-market-open-waiting']){
   const entry=document.getElementById(id);if(!entry)continue;
   if(!entry.dataset.originalTrialLabel)entry.dataset.originalTrialLabel=entry.textContent;
-  entry.disabled=snaTrialPolicyReady&&!snaTrialPolicyEnabled;
-  entry.textContent=entry.disabled?'무료체험 일시 중지':entry.dataset.originalTrialLabel;
+  entry.disabled=false;
+  entry.textContent=snaTrialPolicyReady&&!snaTrialPolicyEnabled?'무료체험 일시 중지 · 상태 다시 확인':entry.dataset.originalTrialLabel;
  }
 }
 function snaApplyTrialPolicy(snapshot){
  snaTrialPolicyEnabled=!snapshot.exists()||snapshot.data().trialEnabled!==false;
  snaTrialPolicyReady=true;snaRenderTrialPolicy();
+ if(snaTrialPolicyEnabled&&!snaTrialModal.hidden)snaTrialStatus('무료체험이 열려 있습니다. 이용할 기능을 선택해 주세요.');
  if(!snaTrialPolicyEnabled){
   if(snaTrialActive)snaTrialEnd(true);
   snaTrialStatus(snaTrialPolicyMessage);
@@ -2329,10 +2330,10 @@ function snaWatchTrialPolicy(user){
  const serial=++snaTrialPolicySerial;
  if(snaTrialPolicyUnsub){snaTrialPolicyUnsub();snaTrialPolicyUnsub=null;}
  snaTrialPolicyReady=false;snaRenderTrialPolicy();
- if(!user)return;
- snaTrialPolicyUnsub=onSnapshot(snaTrialPolicyRef,snapshot=>{
+ snaTrialPolicyUnsub=onSnapshot(snaTrialPolicyRef,{includeMetadataChanges:true},snapshot=>{
   if(serial!==snaTrialPolicySerial)return;
   // An offline snapshot cannot newly grant trial access.
+  if(snapshot.metadata?.hasPendingWrites)return;
   if(snapshot.metadata?.fromCache&&!snaTrialPolicyReady)return;
   snaApplyTrialPolicy(snapshot);
  },error=>{
@@ -2343,6 +2344,25 @@ function snaWatchTrialPolicy(user){
   snaTrialStatus(message);
  });
 }
+// A listener may stop after a permission/network error or while the mobile app is suspended.
+// Recheck the server independently, including when the last known state is disabled.
+let snaTrialPolicyRefreshPending=null;
+function snaRefreshTrialPolicy(){
+ if(!auth.currentUser||snaTrialPolicySaving)return Promise.resolve();
+ if(snaTrialPolicyRefreshPending)return snaTrialPolicyRefreshPending;
+ const uid=auth.currentUser.uid;
+ snaTrialPolicyRefreshPending=getDocFromServer(snaTrialPolicyRef).then(snapshot=>{
+  if(auth.currentUser?.uid===uid&&!snaTrialPolicySaving)snaApplyTrialPolicy(snapshot);
+ }).catch(error=>{
+  const status=document.getElementById('sna-admin-trial-status');
+  if(isAdminMode&&status)status.textContent='설정 동기화 실패: '+(error?.code||error?.message||'연결 오류');
+ }).finally(()=>{snaTrialPolicyRefreshPending=null;});
+ return snaTrialPolicyRefreshPending;
+}
+window.addEventListener('focus',()=>{void snaRefreshTrialPolicy();});
+window.addEventListener('online',()=>{snaWatchTrialPolicy(auth.currentUser);void snaRefreshTrialPolicy();});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')void snaRefreshTrialPolicy();});
+setInterval(()=>{if(document.visibilityState!=='hidden')void snaRefreshTrialPolicy();},10000);
 document.getElementById('sna-admin-trial-toggle')?.addEventListener('click',async()=>{
  const status=document.getElementById('sna-admin-trial-status');
  if(!isAdminMode||!auth.currentUser||auth.currentUser.isAnonymous){if(status)status.textContent='관리자만 변경할 수 있습니다.';return;}
@@ -2354,8 +2374,7 @@ document.getElementById('sna-admin-trial-toggle')?.addEventListener('click',asyn
   const enabled=!snaTrialPolicyEnabled;
   await setDoc(snaTrialPolicyRef,{trialEnabled:enabled,trialUpdatedAt:Date.now(),trialUpdatedBy:user.uid},{merge:true});
   if(auth.currentUser?.uid!==user.uid)return;
-  snaTrialPolicyEnabled=enabled;snaTrialPolicyReady=true;
-  if(!enabled&&snaTrialActive)snaTrialEnd(true);
+  snaApplyTrialPolicy({exists:()=>true,data:()=>({trialEnabled:enabled})});
   if(status)status.textContent=enabled?'무료체험을 켰습니다. 다른 기기에도 반영됩니다.':'무료체험을 껐습니다. 진행 중인 체험은 횟수 차감 없이 종료됩니다.';
  }catch(error){if(status)status.textContent='설정 저장 실패: '+(error?.code||error?.message||'권한 또는 연결 확인');}
  finally{snaTrialPolicySaving=false;snaRenderTrialPolicy();snaTrialUI();}
