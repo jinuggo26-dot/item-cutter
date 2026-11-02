@@ -1469,9 +1469,11 @@ html:not([data-sna-browser="allowed"]) body > :not(#sna-browser-gate){display:no
 html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
 </style>
 <style>[data-sna-review-export-admin][hidden]{display:none!important}</style>
+<style>#sna-expiry-notice[hidden],#sna-joint-admin-panel[hidden]{display:none!important}</style>
 </head>
 
 <body>
+<div id="sna-expiry-notice" hidden role="status" style="background:#503913;color:#fff0cb;padding:12px 18px;text-align:center;line-height:1.6"></div>
 <div id="sna-browser-gate" role="alert"><section><h1>이용 가능한 브라우저 안내</h1><p>삼성 기기 → 네이버 앱<br>아이폰·아이패드 → 사파리</p><p id="sna-browser-status">기기와 브라우저를 확인하고 있습니다.</p><noscript>자바스크립트를 활성화한 뒤 다시 접속해 주세요.</noscript></section></div>
 
 <div id="auth-consent-screen" style="display:none;position:fixed;inset:0;z-index:1000001;background:#080e18ed;align-items:center;justify-content:center;padding:18px">
@@ -1588,6 +1590,12 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  <div id="admin-notice-list"></div>
 </div>
 <!-- Firebase에 저장되는 관리자 전용 업데이트 내역 -->
+<section class="member-panel" id="sna-joint-admin-panel" hidden>
+<h3>공동 관리자 · 최대 1명</h3><p>최고 관리자만 지정·해제할 수 있습니다. 가입한 회원을 선택한 후 지정하세요.</p>
+<label for="sna-joint-admin-member">지정할 회원</label>
+<select id="sna-joint-admin-member" style="width:100%;padding:12px;margin:8px 0" aria-describedby="sna-joint-admin-selected"><option value="">회원 목록을 불러오는 중…</option></select>
+<p id="sna-joint-admin-selected" class="member-tip"></p>
+<button type="button" class="member-btn" data-joint-action="status">현재 공동 관리자 확인</button><button type="button" class="member-btn" data-joint-action="assign">한 명 지정</button><button type="button" class="member-btn danger" data-joint-action="revoke">지정 해제</button><p id="sna-joint-admin-status" role="status"></p></section>
 <section id="admin-release-panel" aria-labelledby="admin-release-heading">
  <h3 id="admin-release-heading">🗓️ 업데이트 내역 관리</h3>
  <p class="release-help">제작자 소개창에 표시되는 업데이트를 추가·수정·삭제합니다. 저장하면 다른 기기에도 자동 반영됩니다. 관리자 권한이 있어야 변경할 수 있습니다.</p>
@@ -1669,7 +1677,7 @@ import {initializeApp}
 from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 
 import {
- getFirestore,doc,setDoc,getDoc,onSnapshot,
+ getFirestore,doc,setDoc,getDoc,getDocFromServer,onSnapshot,
  collection,updateDoc,deleteDoc,deleteField,addDoc,query,orderBy,limit,runTransaction
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -1684,6 +1692,7 @@ const firebaseConfig={
 
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
+const SNA_JOINT_ROLE_REF=doc(db,'adminRoles','jointAdmin');
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
  createUserWithEmailAndPassword, signOut, getIdTokenResult, sendPasswordResetEmail,
  signInAnonymously, EmailAuthProvider, linkWithCredential } from
@@ -2496,6 +2505,9 @@ window.canUseFeature=feature=>{
 };
 window.SnaMemberTier=()=>!authUser?null:isAdminMode?'admin':window.SnaTrial?.active==='board'?'vip':currentMember&&!expired(currentMember)&&currentMember.status==='approved'?effectiveGrade(currentMember):null;
 function refreshGradeUI(){
+ snaUpdateExpiryNotice();
+ const jointPanel=document.getElementById('sna-joint-admin-panel');if(jointPanel)jointPanel.hidden=!isMasterAdmin;
+ if(isMasterAdmin){if(adminUserSnapshot)snaRenderJointChoices(adminUserSnapshot);else snaRenderJointStatus();}
  snaUpdateReviewExportCount();
  const effective=effectiveGrade(currentMember);
  for(const feature of Object.keys(FEATURE_NAMES)){
@@ -2800,6 +2812,7 @@ const authScreen=document.getElementById("auth-screen");
 const viewUserForm=document.getElementById("view-user-form");
 const viewWaiting=document.getElementById("view-waiting");
 const ADMIN_NAME="관리자(마스터)";
+let isMasterAdmin=false;
 let isAdminMode=false;
 let accessExpiry=null;
 let userUnsubscribe=null;
@@ -2846,6 +2859,127 @@ const validUntil=(data)=>{
  return typeof oldEnd==='number'&&Number.isFinite(oldEnd)&&oldEnd>0?oldEnd:0;
 };
 const expired=(data)=>data?.status==="approved"&&validUntil(data)!==Infinity&&Date.now()>=validUntil(data);
+function snaUpdateExpiryNotice(){
+ const bar=document.getElementById('sna-expiry-notice');if(!bar)return;
+ if(!authUser||isAdminMode||currentMember?.status!=='approved'){bar.hidden=true;return;}
+ const until=validUntil(currentMember),remaining=until-Date.now();
+ if(!Number.isFinite(until)||remaining<=0||remaining>7*86400000){bar.hidden=true;return;}
+ const days=Math.ceil(remaining/86400000),hours=Math.max(1,Math.ceil(remaining/3600000));
+ bar.hidden=false;bar.textContent='이용권 만료 사전 안내 · '+(remaining<86400000?hours+'시간':days+'일')+' 남았습니다. 종료: '+new Date(until).toLocaleString('ko-KR')+' · 연장은 관리자에게 문의해 주세요.';
+}
+setInterval(snaUpdateExpiryNotice,60000);
+// Single authoritative role document; only the master's signed token can write it.
+let snaJointRoleUnsubscribe=null;
+let snaJointRoleGeneration=0;
+let snaJointRoleUid=null;
+let snaJointActionBusy=false;
+function snaRenderJointStatus(){
+ const status=document.getElementById('sna-joint-admin-status');if(!status||!isMasterAdmin)return;
+ const member=adminUserSnapshot?.docs.find(d=>d.id===snaJointRoleUid)?.data();
+ status.textContent=snaJointRoleUid?'공동 관리자: '+(member?.name||'회원')+' · UID: '+snaJointRoleUid:'지정된 공동 관리자가 없습니다.';
+}
+function snaRenderJointChoices(snapshot){
+ const select=document.getElementById('sna-joint-admin-member');if(!select||!isMasterAdmin)return;
+ const chosen=select.value;select.replaceChildren();
+ const first=document.createElement('option');first.value='';first.textContent='공동 관리자로 지정할 회원을 선택하세요';select.append(first);
+ snapshot.docs.filter(d=>d.id!==auth.currentUser?.uid&&d.data().authUid===d.id&&!d.data().migratedTo&&d.data().status!=='revoked').sort((a,b)=>String(a.data().name||'').localeCompare(String(b.data().name||''),'ko')).forEach(d=>{
+  const data=d.data(),option=document.createElement('option');option.value=d.id;
+  option.textContent=(data.name||'이름 미설정')+(data.email?' · '+data.email:'')+' · '+d.id;
+  select.append(option);
+ });
+ if(Array.from(select.options).some(o=>o.value===chosen))select.value=chosen;
+ snaShowJointSelection();snaRenderJointStatus();
+}
+function snaShowJointSelection(){
+ const select=document.getElementById('sna-joint-admin-member'),tip=document.getElementById('sna-joint-admin-selected');
+ if(tip)tip.textContent=select?.value?'선택한 계정 UID: '+select.value:'';
+}
+document.getElementById('sna-joint-admin-member')?.addEventListener('change',snaShowJointSelection);
+async function snaReadAdminRole(user){
+ const token=await getIdTokenResult(user,true);
+ const master=token.claims.admin===true&&token.claims.jointAdmin!==true;
+ const snapshot=await getDocFromServer(SNA_JOINT_ROLE_REF);
+ const uid=snapshot.exists()?snapshot.data().uid:null;
+ return {master,jointUid:uid,admin:master||uid===user.uid};
+}
+function snaStartJointRoleWatch(user,role){
+ if(snaJointRoleUnsubscribe)snaJointRoleUnsubscribe();
+ const generation=++snaJointRoleGeneration;
+ snaJointRoleUid=role.jointUid;
+ let changing=false;
+ snaJointRoleUnsubscribe=onSnapshot(SNA_JOINT_ROLE_REF,snapshot=>{
+  if(generation!==snaJointRoleGeneration||auth.currentUser?.uid!==user.uid||snapshot.metadata.hasPendingWrites||snapshot.metadata.fromCache)return;
+  const uid=snapshot.exists()?snapshot.data().uid:null;
+  snaJointRoleUid=uid;snaRenderJointStatus();
+  if(role.master||changing||(uid===user.uid)===role.admin)return;
+  changing=true;
+  // Close the administrator UI before asynchronous account checks start.
+  isAdminMode=false;isMasterAdmin=false;
+  document.getElementById('admin-dashboard').style.display='none';
+  document.getElementById('btn-admin').style.display='none';
+  document.getElementById('sna-joint-admin-panel').hidden=true;
+  window.SnaReviews?.setRole(false);
+  showWaiting('관리자 권한 변경을 확인하는 중…');
+  authScreen.style.display='flex';
+  (async()=>{
+   await resetCurrentSession();
+   if(auth.currentUser?.uid!==user.uid)return;
+   await afterAuthLogin(user);
+  })().catch(e=>{console.error('관리자 권한 갱신 오류',e);showWaiting('권한을 다시 확인하지 못했습니다. 다시 로그인해 주세요.','error');});
+ },error=>{
+  if(generation!==snaJointRoleGeneration)return;
+  console.warn('공동 관리자 권한 구독 실패',error);
+  if(!role.master){
+   isAdminMode=false;isMasterAdmin=false;window.SnaReviews?.setRole(false);
+   document.getElementById('admin-dashboard').style.display='none';
+   document.getElementById('btn-admin').style.display='none';
+   document.getElementById('sna-joint-admin-panel').hidden=true;
+   authScreen.style.display='flex';showWaiting('관리자 권한을 확인할 수 없습니다. 다시 로그인해 주세요.','error');
+   // Clear synthetic VIP state and every privileged subscription as well.
+   resetCurrentSession().then(()=>{
+    if(auth.currentUser?.uid!==user.uid)return;
+    authScreen.style.display='flex';showWaiting('권한을확인할 수 없습니다. 다시 로그인해 주세요.','error');
+   }).catch(e=>console.error('권한 세션 정리 오류',e));
+  }else document.getElementById('sna-joint-admin-status').textContent='권한 규칙을 확인해 주세요. 공동 관리자 상태를 읽지 못했습니다.';
+ });
+}
+async function snaJointAdminAction(action){
+ const status=document.getElementById('sna-joint-admin-status'),user=auth.currentUser;
+ if(!isMasterAdmin||!user||snaJointActionBusy)return;
+ snaJointActionBusy=true;
+ const buttons=Array.from(document.querySelectorAll('[data-joint-action]'));buttons.forEach(b=>b.disabled=true);
+ try{
+  const token=await getIdTokenResult(user,true);
+  if(auth.currentUser?.uid!==user.uid||token.claims.admin!==true||token.claims.jointAdmin===true)throw Error('최고 관리자만 지정·해제할 수 있습니다.');
+  if(action==='status'){
+   const snapshot=await getDocFromServer(SNA_JOINT_ROLE_REF);snaJointRoleUid=snapshot.exists()?snapshot.data().uid:null;snaRenderJointStatus();return;
+  }
+  const uid=document.getElementById('sna-joint-admin-member').value;
+  if(action==='assign'&&(!uid||uid===user.uid))throw Error('지정할 회원을 선택해 주세요.');
+  // Read before confirmation, then compare again inside the transaction.
+  const initial=await getDocFromServer(SNA_JOINT_ROLE_REF),expectedUid=initial.exists()?initial.data().uid:null;
+  if(action==='assign'&&expectedUid&&expectedUid!==uid)throw Error('공동 관리자는 한 명만 가능합니다. 기존 지정을 먼저 해제하세요.');
+  if(action==='revoke'&&!expectedUid){snaJointRoleUid=null;snaRenderJointStatus();return;}
+  const targetUid=action==='assign'?uid:expectedUid;
+  const member=adminUserSnapshot?.docs.find(d=>d.id===targetUid)?.data();
+  if(!await window.uiConfirm((action==='assign'?'공동 관리자로 지정할까요?':'공동 관리자 지정을 해제할까요?')+'\n'+(member?.name||'회원')+'\nUID: '+targetUid))return;
+  if(auth.currentUser?.uid!==user.uid||!isMasterAdmin)throw Error('로그인 상태가 변경되었습니다.');
+  await runTransaction(db,async tx=>{
+   const current=await tx.get(SNA_JOINT_ROLE_REF),currentUid=current.exists()?current.data().uid:null;
+   if(currentUid!==expectedUid)throw Error('다른 화면에서 지정 상태가 변경되었습니다. 현재 상태를 다시 확인해 주세요.');
+   if(action==='assign'){
+    const target=await tx.get(doc(db,'users',uid));
+    if(!target.exists()||target.data().authUid!==uid||target.data().migratedTo||target.data().status==='revoked')throw Error('가입한 회원 계정을 확인해 주세요.');
+    tx.set(SNA_JOINT_ROLE_REF,{uid,updatedBy:user.uid,updatedAt:Date.now()});
+   }else tx.delete(SNA_JOINT_ROLE_REF);
+  });
+  snaJointRoleUid=action==='assign'?uid:null;snaRenderJointStatus();
+  status.textContent+=' · '+(action==='assign'?'지정 완료':'해제 완료');
+ }catch(error){status.textContent='공동 관리자 설정 실패: '+(error.code||'')+' '+(error.message||'Firestore 규칙을 확인해 주세요.');}
+ finally{snaJointActionBusy=false;buttons.forEach(b=>b.disabled=false);}
+}
+for(const action of ['status','assign','revoke'])document.querySelector('[data-joint-action="'+action+'"]')?.addEventListener('click',()=>snaJointAdminAction(action));
+
 const getUserState=(data)=>{
  if(expired(data)||data.status==="expired")return {text:"기간 만료",className:"status-expired"};
  if(data.status==="approved")return {text:"이용 중",className:"status-approved"};
@@ -2946,6 +3080,11 @@ const displayLogin=(message='')=>{
  if(message)authMsg(message);
 };
 async function resetCurrentSession(){
+ ++snaJointRoleGeneration;
+ if(snaJointRoleUnsubscribe){snaJointRoleUnsubscribe();snaJointRoleUnsubscribe=null;}
+ snaJointRoleUid=null;
+ adminUserSnapshot=null;
+ window.SnaReviews?.setRole(false);
  window.SnaCloudSession?.(null);
  if(snaPublicReviewsUnsub){snaPublicReviewsUnsub();snaPublicReviewsUnsub=null;}
  snaPublishedReviewsReady=false;snaPublishedReviews=[];snaRenderPublicReviews();
@@ -2954,7 +3093,7 @@ async function resetCurrentSession(){
  for(const unsub of liveUnsubscribes)try{unsub();}catch(e){};
  liveUnsubscribes=[];
  window.SnaTrial?.reset?.();
- authUser=null;savedName=null;currentMember=null;isAdminMode=false;
+ authUser=null;savedName=null;currentMember=null;isAdminMode=false;isMasterAdmin=false;window.SnaGalleryEditing=null;
  accessExpiry=null;expiredHandled=false;adminDataStarted=false;adminGradeDrafts.clear();
  document.getElementById('admin-dashboard').style.display='none';
  document.getElementById('btn-admin').style.display='none';
@@ -3003,9 +3142,10 @@ window.recheckMemberStatus=async()=>{
 window.openAdminPrompt=async()=>{
  if(!auth.currentUser)return window.uiAlert?.('로그인이 필요합니다.');
  try{
-  const token=await getIdTokenResult(auth.currentUser,true);
-  if(token.claims.admin!==true)return window.uiAlert?.('최고 관리자 권한이 없습니다.');
-  isAdminMode=true;
+  const user=auth.currentUser,role=await snaReadAdminRole(user);
+  if(auth.currentUser?.uid!==user.uid)return;
+  if(!role.admin)return window.uiAlert?.('관리자 권한이 없습니다.');
+  isAdminMode=true;isMasterAdmin=role.master;
   window.SnaReviews?.setRole(true);
   document.getElementById('btn-admin').style.display='';
   document.getElementById('admin-dashboard').style.display='block';
@@ -3075,19 +3215,22 @@ async function afterAuthLogin(user){
   return;
  }
  window.SnaCloudSession?.(user.uid);
- const token=await getIdTokenResult(user,true);
- if(token.claims.admin===true){
+ const role=await snaReadAdminRole(user);
+ if(auth.currentUser?.uid!==user.uid)return;
+ snaStartJointRoleWatch(user,role);
+ if(role.admin){
+  isMasterAdmin=role.master;
   isAdminMode=true;
   window.SnaReviews?.setRole(true);
   document.getElementById('btn-admin').style.display='';
-  savedName=ADMIN_NAME;
+  savedName=isMasterAdmin?ADMIN_NAME:'공동 관리자';
   currentMember={name:ADMIN_NAME,grade:'vip',status:'approved',membershipMode:'gradeOnly',gradeDuration:'permanent',gradeExpiresAt:null};
   accessExpiry=Infinity;authScreen.style.display='none';refreshGradeUI();
   liveUnsubscribes.push(startGradeSubscription(),startNoticesSubscription(),startGallerySubscription());
   loadAdminData();window.SnaAdminReportsStart?.();
   return;
  }
- isAdminMode=false;
+ isAdminMode=false;isMasterAdmin=false;
  window.SnaReviews?.setRole(false);
  document.getElementById('btn-admin').style.display='none';
  // Legacy users/{nickname} is never auto-claimed based on nicknames.
@@ -3350,7 +3493,7 @@ function loadAdminData(){
  };
  document.getElementById('admin-user-search').oninput=()=>{if(adminUserSnapshot)renderUserSnapshot(adminUserSnapshot);};
  document.getElementById('admin-user-grade-filter').onchange=()=>{if(adminUserSnapshot)renderUserSnapshot(adminUserSnapshot);};
- liveUnsubscribes.push(onSnapshot(collection(db,"users"),snapshot=>{adminUserSnapshot=snapshot;renderUserSnapshot(snapshot);snaRenderStats();},err=>console.warn("사용자 목록 오류",err)));
+ liveUnsubscribes.push(onSnapshot(collection(db,"users"),snapshot=>{adminUserSnapshot=snapshot;renderUserSnapshot(snapshot);snaRenderJointChoices(snapshot);snaRenderStats();},err=>console.warn("사용자 목록 오류",err)));
  const latest=query(collection(db,"logs"),orderBy("timestamp","desc"),limit(20));
  liveUnsubscribes.push(onSnapshot(latest,snapshot=>{
   const list=document.getElementById("admin-log-list");list.replaceChildren();
@@ -3480,6 +3623,15 @@ function showGalleryCard(item,local){
    try{await deleteDoc(doc(db,'gallery',item.id));}catch(e){window.uiAlert?.('삭제 실패: 권한을 확인해 주세요.');}
   };info.append(del);
  }
+ if(item.ownerUid===authUser?.uid){const edit=make('button','member-btn','수정하기');edit.type='button';edit.onclick=async()=>{
+  if(!window.canUseFeature?.('board'))return window.uiAlert?.('대필판 이용 권한이 필요합니다.');
+  let own;try{own=local?item:(await galleryLocalList()).find(x=>x.ownerUid===authUser.uid&&x.publicId===item.id);}catch(_){return window.uiAlert?.('편집 원본을 읽지 못했습니다. 작품을 저장한 기기·브라우저인지 확인해 주세요.');}
+  if(!own?.draft)return window.uiAlert?.('이 작품에는 편집 원본이 없습니다. 새 버전으로 저장한 작품부터, 원본을 저장한 같은 기기·브라우저에서 수정할 수 있습니다.');
+  if(!await window.uiConfirm('현재 대필판 대신 이 작품을 불러와 수정할까요?'))return;
+  await window.SnaBoard.restore(own.draft);window.SnaGalleryEditing={id:own.id,publicId:own.publicId,ownerUid:own.ownerUid,createdAt:own.createdAt};
+  const title=document.getElementById('board-work-title');if(title)title.value=own.title;window.switchTab('board');
+  window.uiAlert?.('작품을 불러왔습니다. 수정 후 저장하면 해당 작품을 갱신합니다.');
+ };info.append(edit);}
  card.append(img,info);return card;
 }
 async function loadGallery(){
@@ -3520,7 +3672,8 @@ window.addBoardToGallery=async(blob,options={})=>{
  const title=String(options.title||'대필 작품').slice(0,60);
  const name=savedName||'미지정';
  if(!authUser||!window.canUseFeature('board')){if(status)status.textContent='로그인 또는 대필판 이용 권한이 필요합니다.';return;}
- const item={id:(crypto.randomUUID?.()||Date.now()+'_'+Math.random().toString(36).slice(2)),ownerUid:authUser.uid,owner:name,author:name,title,isPublic:false,blob,createdAt:Date.now()};
+ const editing=window.SnaGalleryEditing?.ownerUid===authUser.uid?window.SnaGalleryEditing:null;
+ const item={id:editing?.id||(crypto.randomUUID?.()||Date.now()+'_'+Math.random().toString(36).slice(2)),ownerUid:authUser.uid,owner:name,author:name,title,isPublic:!!editing?.publicId,publicId:editing?.publicId||null,blob,draft:options.draft||null,createdAt:editing?.createdAt||Date.now(),updatedAt:Date.now()};
  try{
   await galleryLocalPut(item);
   if(status)status.textContent='내 전시관에 작품이 자동 등록됐어요.';
@@ -3529,13 +3682,16 @@ window.addBoardToGallery=async(blob,options={})=>{
  {
   try{
    const thumb=await galleryThumbnail(blob);
-   const remote=await addDoc(collection(db,'gallery'),{title,author:name,ownerUid:authUser.uid,thumb,isPublic:true,createdAt:Date.now()});
+   const payload={title,author:name,ownerUid:authUser.uid,thumb,isPublic:true,createdAt:item.createdAt,updatedAt:Date.now()};
+   const remote=editing?.publicId?{id:editing.publicId}:await addDoc(collection(db,'gallery'),payload);
+   if(editing?.publicId)await updateDoc(doc(db,'gallery',editing.publicId),payload);
    item.isPublic=true;item.publicId=remote.id;
    try{await galleryLocalPut(item);}catch(e){}
    if(status)status.textContent='작품이 전시관 전체 공개 목록에 등록됐어요.';
    window.logActivity?.('대필 전시관 공개',{title});
   }catch(e){console.warn('전시관 공개 실패',e);if(status)status.textContent='내 작품 저장은 완료됐지만 전체 공개는 실패했어요. Firebase 권한을 확인해 주세요.';}
  }
+ window.SnaGalleryEditing=null;
  if(galleryMode==='my')loadGallery();
 };
 
@@ -3826,6 +3982,7 @@ window.closeAdmin=()=>{
  <div class="sna-qa-status" id="sna-qa-status-clothes" role="status" aria-live="polite">추출한 결과가 있으면 자동으로 검사합니다.</div>
  <div class="sna-qa-list" id="sna-qa-list-clothes"></div>
 </section>
+<button type="button" class="action" onclick="window.c_sendToBoard()">추출 결과를 대필판에 넣기</button>
 <div id="c_results" class="results">
  <div class="empty">
   <div>◇</div>
@@ -3936,6 +4093,7 @@ window.closeAdmin=()=>{
  <div class="sna-qa-status" id="sna-qa-status-guns" role="status" aria-live="polite">추출한 결과가 있으면 자동으로 검사합니다.</div>
  <div class="sna-qa-list" id="sna-qa-list-guns"></div>
 </section>
+<button type="button" class="action" onclick="window.g_sendToBoard()">추출 결과를 대필판에 넣기</button>
 <div id="g_results" class="results">
  <div class="empty">
   <div>◇</div>
@@ -5936,6 +6094,10 @@ window.c_extractSelected=()=>{
 // 👕 옷 저장: 사용자 클릭 이벤트에서 한 번의 Web Share 호출로 모든 JPG 전달.
 // 웹 페이지는 공유 대상 앱(KakaoTalk / Gallery)을 지정하거나 표시 여부를 강제할 수 없습니다.
 // Android에서 공유를 받는 앱 목록은 OS와 앱 지원 형태에 따라 달라집니다.
+window.c_sendToBoard=async()=>{
+ if(!croppedCards.length)return window.uiAlert?.('먼저 사진을 추출해 주세요.');
+ await window.SnaBoard?.addExtracted(croppedCards.slice(),'clothes');
+};
 window.c_saveAllCards=async()=>{
  if(!croppedCards.length)return;
  if(snaSamsungSaveLimit.shouldBlock(croppedCards.length))return;
@@ -6898,6 +7060,10 @@ document.addEventListener('pointerup',e=>{const p=window._snaGunHold;window._sna
  if(from>=0&&to>=0&&from!==to){gHist();const item=photos.splice(from,1)[0];photos.splice(to,0,item);makePhotoButtons();showPhoto(to);window.SnaDraft?.queue('guns');}
 });
 imageCanvas.addEventListener('pointerdown',()=>gHist(),{capture:true});
+window.g_sendToBoard=async()=>{
+ if(!croppedCards.length)return window.uiAlert?.('먼저 사진을 추출해 주세요.');
+ await window.SnaBoard?.addExtracted(croppedCards.slice(),'guns');
+};
 window.g_saveAllCards=async()=>{
 
  if(croppedCards.length){
@@ -7785,49 +7951,6 @@ saveBtn.addEventListener("click",async()=>{
   // Single opaque-shadow renderer for captions, names, and levels.
   // Render glyph coverage independently of the photo; never alpha-blend a semitransparent
   // shadow color with the clothing/gun background. Each full shadow pixel gets exact RGB.
-  const solidBoardShadowCache=new Map();
-  function solidBoardShadowMask(glyph,font,strokeSize,color){
-   const cacheKey=font+"|"+strokeSize.toFixed(3)+"|"+color+"|"+glyph;
-   const cached=solidBoardShadowCache.get(cacheKey);
-   if(cached)return cached;
-   // Antialias at 2x and then make coverage fully opaque before compositing.
-   const density=2;
-   const measure=document.createElement("canvas").getContext("2d");
-   measure.font=font;
-   const fm=/([0-9]+(?:\.[0-9]+)?)px/.exec(font);
-   const fs=fm?Number(fm[1]):32;
-   const pad=Math.ceil(Math.max(8,strokeSize*2+5));
-   const originX=pad;
-   const originY=pad+Math.ceil(fs*1.30);
-   const logicalW=Math.max(1,Math.ceil(measure.measureText(glyph).width+pad*2+3));
-   const logicalH=Math.max(1,Math.ceil(fs*2.6+pad*2));
-   // Extremely long text may exceed mobile GPU/Canvas limits; fall back to vector.
-   if(logicalW*density>8192||logicalH*density>4096)return null;
-   const layer=document.createElement("canvas");
-   layer.width=logicalW*density;
-   layer.height=logicalH*density;
-   const c=layer.getContext("2d",{willReadFrequently:true});
-   if(!c)return null;
-   c.scale(density,density);
-   c.font=font;c.textAlign="left";c.textBaseline="middle";
-   c.lineJoin="round";c.lineWidth=strokeSize;
-   c.strokeStyle="#ffffff";c.fillStyle="#ffffff";
-   c.strokeText(glyph,originX,originY);
-   c.fillText(glyph,originX,originY);
-   const pixels=c.getImageData(0,0,layer.width,layer.height);
-   const rr=parseInt(color.slice(1,3),16),gg=parseInt(color.slice(3,5),16),bb=parseInt(color.slice(5,7),16);
-   for(let n=0;n<pixels.data.length;n+=4){
-    const visible=pixels.data[n+3]>=48;
-    pixels.data[n]=rr;pixels.data[n+1]=gg;pixels.data[n+2]=bb;
-    pixels.data[n+3]=visible?255:0;
-   }
-   c.setTransform(1,0,0,1,0,0);
-   c.putImageData(pixels,0,0);
-   const output={canvas:layer,x:originX,y:originY,w:logicalW,h:logicalH};
-   if(solidBoardShadowCache.size<140)solidBoardShadowCache.set(cacheKey,output);
-   return output;
-  }
-
   function text(value,x,y,size,key,align="left",maxW=Infinity,options={}){
    if(value===null||value===undefined||String(value)==="")return;
    // Scale the font proportionally, as in the earlier working version.
@@ -7850,6 +7973,10 @@ saveBtn.addEventListener("click",async()=>{
    if(options.maxHeight&&Number.isFinite(options.maxHeight)&&options.maxHeight>0){
     const maxFs=Math.max(4,options.maxHeight/1.10);
     if(fs>maxFs){fs=maxFs;g.font=`${Math.max(4,Math.round(fs))}px "Jua", sans-serif`;}
+   }
+   if(key==='inquiry'||key==='sub'){
+    const sx=directValue('b_'+key+'FreeWidth',100)/100,sy=directValue('b_'+key+'FreeHeight',100)/100;
+    g.translate(x,y);g.rotate(directValue('b_'+key+'Rotate')*Math.PI/180);g.scale(sx,sy);g.translate(-x,-y);
    }
    g.textBaseline="middle";g.textAlign="left";
    let lines=[];
@@ -7892,21 +8019,10 @@ saveBtn.addEventListener("click",async()=>{
     // Drawing with g.shadowBlur/glow here would give different-looking results over
     // light stationery versus red/purple/yellow clothing and weapon backgrounds.
     const dx=shadowX,dy=shadowY;
-    const shadowMask=solidBoardShadowMask(glyph,g.font,shadowStroke,shadowColor);
-    g.save();
-    g.globalAlpha=1;
-    g.globalCompositeOperation="source-over";
-    g.filter="none";
-    g.shadowColor="transparent";g.shadowBlur=0;g.shadowOffsetX=0;g.shadowOffsetY=0;
-    if(shadowMask){
-     g.drawImage(shadowMask.canvas,gx+dx-shadowMask.x,gy+dy-shadowMask.y,shadowMask.w,shadowMask.h);
-    }else{
-     // Same fully opaque shadow on platforms with restrictive canvas limits.
-     g.lineJoin="round";g.lineWidth=shadowStroke;
-     g.strokeStyle=shadowColor;g.fillStyle=shadowColor;
-     g.strokeText(glyph,gx+dx,gy+dy);
-     g.fillText(glyph,gx+dx,gy+dy);
-    }
+    g.save();g.globalAlpha=1;g.globalCompositeOperation='source-over';g.filter='none';
+    g.shadowColor='transparent';g.shadowBlur=0;g.shadowOffsetX=0;g.shadowOffsetY=0;
+    g.lineJoin='round';g.lineWidth=shadowStroke;g.strokeStyle=shadowColor;g.fillStyle=shadowColor;
+    g.strokeText(glyph,gx+dx,gy+dy);g.fillText(glyph,gx+dx,gy+dy);
     g.restore();
 
     // 글자 색이 부분적으로 비는 현상을 줄이기 위해
@@ -8282,7 +8398,7 @@ saveBtn.addEventListener("click",async()=>{
    const maxSize=Math.min(mode==="medium"?550:200,maxCaptionWidth*100/Math.max(1,ref.width),(laneHeight-3)*100/inkH);
    const progress=Math.pow(Math.min(maxSlider/1000,Math.max(0,Number(slider)/1000)),.44);
    const globalScale=(Number($("b_textScale").value)||100)/100;
-   const finalSize=Math.max(4,Math.min(maxSize,maxSize*progress*globalScale));
+   const finalSize=Math.max(4,maxSize*.38*(Math.max(0,Number(slider))/(maxSlider===2000?100:110))*globalScale);
    g.font=`${finalSize}px "Jua",sans-serif`;
    const actual=g.measureText(raw);
    const baselineY=top+laneHeight/2+(actual.actualBoundingBoxAscent-actual.actualBoundingBoxDescent)/2;
@@ -8296,8 +8412,8 @@ saveBtn.addEventListener("click",async()=>{
   const inquiryX=offset("b_inquiryX"),inquiryY=offset("b_inquiryY");
   const subX=offset("b_subX"),subY=offset("b_subY");
   g.save();g.beginPath();g.rect(textAreaCenter-textAreaWidth/2,headerH,textAreaWidth,bannerH);g.clip();
-  if(inquiryFit)text(inquiryText,textAreaCenter+inquiryX,inquiryFit.baselineY+inquiryY,1,"inquiry","center",maxCaptionWidth,{maxLines:1,fit:true,captionFontSize:inquiryFit.size});
-  if(subFit)text(subText,textAreaCenter+subX,subFit.baselineY+subY,1,"sub","center",maxCaptionWidth,{maxLines:1,fit:true,captionFontSize:subFit.size});
+  if(inquiryFit)text(inquiryText,textAreaCenter+inquiryX,inquiryFit.baselineY+inquiryY,1,"inquiry","center",Infinity,{maxLines:1,fit:true,captionFontSize:inquiryFit.size});
+  if(subFit)text(subText,textAreaCenter+subX,subFit.baselineY+subY,1,"sub","center",Infinity,{maxLines:1,fit:true,captionFontSize:subFit.size});
   g.restore();
 
   // Editing operates on the WHOLE composed photo bundle, not a fixed pane.
@@ -8350,6 +8466,7 @@ saveBtn.addEventListener("click",async()=>{
    const snap=v=>Math.round(v*scale)/scale;
    g.imageSmoothingEnabled=true;
    g.imageSmoothingQuality="high";
+   const labelJobs=[];
    let rowY=top;
    layout.forEach((row,rowIndex)=>{
     const y0=snap(rowY),y1=snap(rowY+row.height);
@@ -8401,21 +8518,16 @@ saveBtn.addEventListener("click",async()=>{
      const levelOffsetY=isGun?(Number($("b_gunLevelY")?.value)||0):offsetY;
      const levelX=baseLabelX+levelOffsetX;
      const levelY=y0+tileH-Math.max(24,levelSize*.55)+levelOffsetY;
-     if(itemName){
-      g.save();g.beginPath();g.rect(x0,y0,tileW,tileH);g.clip();
-      text(itemName,labelX,nameY,nameSize,"name","left",tileW*.90,{maxLines:1,fit:true,tileTop:y0,tileBottom:y0+tileH});
-      g.restore();
-     }
-     if(level){
-      g.save();g.beginPath();g.rect(x0,y0,tileW,tileH);g.clip();
-      text(level,levelX,levelY,levelSize,"level","left",tileW*.78,{maxLines:1,fit:true,tileTop:y0,tileBottom:y0+tileH});
-      g.restore();
-     }
+     const f=transform,cx=x+w/2;
+     const tx=v=>cx+(v-cx)*f.sx+f.dx,ty=v=>top+(v-top)*f.sy+f.dy;
+     const bounds={x:tx(x0),y:ty(y0),w:tileW*f.sx,h:tileH*f.sy};
+     for(const spec of [{value:itemName,x:labelX,y:nameY,size:nameSize,key:'name',maxW:tileW*.9},{value:level,x:levelX,y:levelY,size:levelSize,key:'level',maxW:tileW*.78}])if(spec.value)labelJobs.push({...spec,x:tx(spec.x),y:ty(spec.y),size:spec.size*Math.min(f.sx,f.sy),maxW:spec.maxW*f.sx,bounds});
      colX+=entry.width;
     });
     rowY+=row.height;
    });
-   if(fine&&$("b_photoFineEnabled").checked)g.restore();
+   if(adjusted)g.restore();
+   for(const job of labelJobs){g.save();g.beginPath();g.rect(job.bounds.x,job.bounds.y,job.bounds.w,job.bounds.h);g.clip();text(job.value,job.x,job.y,job.size,job.key,'left',job.maxW,{maxLines:1,fit:true,tileTop:job.bounds.y,tileBottom:job.bounds.y+job.bounds.h});g.restore();}
   }
 
 
@@ -8434,7 +8546,21 @@ saveBtn.addEventListener("click",async()=>{
   const bottomGap=isLarge&&clothes.length&&guns.length?
    Math.abs((photoTop+packingHeight(clothesPacking))-(largeGunTop+packingHeight(gunsPacking))):0;
   applyBoardSaturation(target);
-  return {width,height,mode,previewTileRects,colsLeft:clothesCols,rowsLeft:clothesRows,colsRight:gunsCols,rowsRight:gunsRows,rows:isLarge?clothesRows:rows,bottomGap,
+  const edges={left:directValue('b_boardEdgeLeft')/100,right:directValue('b_boardEdgeRight')/100,top:directValue('b_boardEdgeTop')/100,bottom:directValue('b_boardEdgeBottom')/100};
+  const boardSX=Math.max(.2,1+edges.left+edges.right),boardSY=Math.max(.2,1+edges.top+edges.bottom);
+  if(boardSX!==1||boardSY!==1){
+   const copy=document.createElement('canvas');copy.width=target.width;copy.height=target.height;copy.getContext('2d').drawImage(target,0,0);
+   const budget=preview?10000000:22000000;
+   const outW=target.width*boardSX,outH=target.height*boardSY,limit=Math.min(1,14000/Math.max(outW,outH),Math.sqrt(budget/(outW*outH)));
+   target.width=Math.max(1,Math.round(outW*limit));target.height=Math.max(1,Math.round(outH*limit));target.getContext('2d').drawImage(copy,0,0,target.width,target.height);copy.width=copy.height=1;
+  }
+  const captionRects={};
+  for(const [key,raw,fit,xx,yy] of [['inquiry',inquiryText,inquiryFit,inquiryX,inquiryY],['sub',subText,subFit,subX,subY]])if(raw&&fit){
+   const c=document.createElement('canvas').getContext('2d');c.font=Math.round(fit.size)+'px "Jua",sans-serif';
+   captionRects[key]={x:textAreaCenter+xx,y:fit.baselineY+yy,w:c.measureText(raw).width*directValue('b_'+key+'FreeWidth',100)/100,h:fit.size*1.15*directValue('b_'+key+'FreeHeight',100)/100,angle:directValue('b_'+key+'Rotate')};
+  }
+
+  return {width,height,mode,captionRects,boardSX,boardSY,previewTileRects,colsLeft:clothesCols,rowsLeft:clothesRows,colsRight:gunsCols,rowsRight:gunsRows,rows:isLarge?clothesRows:rows,bottomGap,
    photoRects:isLarge?{
     clothes:{x:margin,y:photoTop,w:largeLeftInnerW,h:Math.max(0,bodyBottom-photoTop),contentH:packingHeight(clothesPacking)},
     guns:{x:margin+largeLeftInnerW+seamW,y:largeGunTop,w:rightInnerW,h:Math.max(0,bodyBottom-largeGunTop),contentH:packingHeight(gunsPacking)}
@@ -8517,7 +8643,7 @@ saveBtn.addEventListener("click",async()=>{
  }
  function scheduleDraw(){
   if(state.drawQueued)return;state.drawQueued=true;
-  requestAnimationFrame(()=>{state.drawQueued=false;try{const m=buildLayout(canvas,true);state.previewLayout=m;paintPhotoFineHandles(m);paintSortSelectedTile(m);
+  requestAnimationFrame(()=>{state.drawQueued=false;try{const m=buildLayout(canvas,true);state.previewLayout=m;paintPhotoFineHandles(m);drawDirectHandles(m);paintSortSelectedTile(m);
     const coverStatus=$("b_photoFineFillInfo");
     if(coverStatus){
       if(!$("b_photoFineEnabled").checked){coverStatus.textContent="";}
@@ -8675,6 +8801,7 @@ saveBtn.addEventListener("click",async()=>{
   return {layout,rect,x:(clientX-rect.left)*layout.width/rect.width,y:(clientY-rect.top)*layout.height/rect.height};
  }
  function beginFineDrag(clientX,clientY,identifier){
+  if($('b_directTarget')?.value!=='none')return false;
   if(!$('b_photoFineEnabled').checked)return false;
   const pt=finePoint(clientX,clientY);
   if(!pt){fineStatus('사진을 먼저 추가하고 미리보기를 확인해 주세요.');return false;}
@@ -8783,6 +8910,7 @@ saveBtn.addEventListener("click",async()=>{
  canvas.addEventListener('pointerup',event=>finishFineDrag(event.pointerId));
  canvas.addEventListener('pointercancel',event=>finishFineDrag(event.pointerId));
  canvas.addEventListener('touchstart',event=>{
+  if($('b_directTarget')?.value!=='none')return;
   if(!$("b_photoFineEnabled").checked)return;
   // Even an initial tap on a blank grid area must not start page scrolling.
   // Only the canvas is locked; page scrolling elsewhere remains normal.
@@ -8802,6 +8930,40 @@ saveBtn.addEventListener("click",async()=>{
   const t=Array.from(event.changedTouches).find(t=>'touch-'+t.identifier===previewDrag.id);
   if(t)finishFineDrag('touch-'+t.identifier);
  },{passive:true});
+ const advanced=document.createElement('details');advanced.className='board-panel';
+ advanced.innerHTML='<summary>판 전체·문의·보조 문구 직접 조절</summary><p>문의·보조: 미리보기에서 이동·모서리 크기 조절·회전. 판 전체: 완성된 판의 네 변을 각각 조절합니다.</p><select id="b_directTarget"><option value="none">직접 조절 끄기</option><option value="inquiry">문의 문구</option><option value="sub">보조 문구</option><option value="board">판 전체</option></select>';
+ const directIds=[];
+ function directNumber(id,label,value,min,max){const row=document.createElement('label');row.style.cssText='display:inline-flex;gap:6px;margin:6px;align-items:center';row.textContent=label;const el=document.createElement('input');el.type='number';el.id=id;el.value=value;el.min=min;el.max=max;el.step='1';el.style.cssText='width:80px;min-height:40px';row.append(el);advanced.append(row);directIds.push(id);el.addEventListener('input',scheduleDraw);}
+ for(const target of ['inquiry','sub'])for(const [key,label,value,min,max] of [['FreeWidth','가로 %',100,10,500],['FreeHeight','세로 %',100,10,500],['Rotate','회전 °',0,-180,180]])directNumber('b_'+target+key,(target==='inquiry'?'문의 ':'보조 ')+label,value,min,max);
+ for(const side of ['Left','Right','Top','Bottom'])directNumber('b_boardEdge'+side,({Left:'판 왼쪽',Right:'판 오른쪽',Top:'판 위쪽',Bottom:'판 아래쪽'})[side]+' %',0,-40,100);
+ const directReset=document.createElement('button');directReset.type='button';directReset.textContent='직접 조절 초기화';directReset.onclick=()=>{historyPush();directIds.forEach(id=>$(id).value=/Free/.test(id)?'100':'0');scheduleDraw();};advanced.append(directReset);
+ canvas.closest('.board-preview-wrap').insertAdjacentElement('afterend',advanced);
+ function directValue(id,fallback=0){const el=$(id),n=Number(el?.value);return Number.isFinite(n)?Math.max(Number(el.min),Math.min(Number(el.max),n)):fallback;}
+ let directDrag=null;
+ function pointerPoint(e){const r=canvas.getBoundingClientRect(),m=state.previewLayout;return {x:(e.clientX-r.left)*m.width/r.width,y:(e.clientY-r.top)*m.height/r.height};}
+ function captionHit(p,r){const a=-r.angle*Math.PI/180,dx=p.x-r.x,dy=p.y-r.y;return {x:dx*Math.cos(a)-dy*Math.sin(a),y:dx*Math.sin(a)+dy*Math.cos(a)};}
+ canvas.addEventListener('pointerdown',e=>{
+  const key=$('b_directTarget').value,m=state.previewLayout;if(key==='none'||!m)return;
+  e.preventDefault();e.stopImmediatePropagation();historyPush();canvas.setPointerCapture?.(e.pointerId);
+  const p=pointerPoint(e);if(key==='board'){const d=[['Left',p.x],['Right',m.width-p.x],['Top',p.y],['Bottom',m.height-p.y]].sort((a,b)=>a[1]-b[1]);directDrag={key,edge:d[0][0],p,initial:directValue('b_boardEdge'+d[0][0]),w:m.width,h:m.height};return;}
+  const r=m.captionRects[key];if(!r)return;const q=captionHit(p,r),tol=28;
+  const corner=Math.abs(Math.abs(q.x)-r.w/2)<tol&&Math.abs(Math.abs(q.y)-r.h/2)<tol;
+  directDrag={key,p,r,q,mode:q.y<-r.h/2-8?'rotate':corner?'size':'move',x:Number($('b_'+key+'X').value),y:Number($('b_'+key+'Y').value),w:directValue('b_'+key+'FreeWidth',100),h:directValue('b_'+key+'FreeHeight',100)};
+ },true);
+ canvas.addEventListener('pointermove',e=>{
+  if(!directDrag)return;e.preventDefault();e.stopImmediatePropagation();const d=directDrag,p=pointerPoint(e),dx=p.x-d.p.x,dy=p.y-d.p.y;
+  if(d.key==='board'){const delta=(/Left|Right/.test(d.edge)?dx/d.w:dy/d.h)*100*(/Left|Top/.test(d.edge)?-1:1);$('b_boardEdge'+d.edge).value=Math.round(Math.max(-40,Math.min(100,d.initial+delta)));}
+  else if(d.mode==='move'){for(const [axis,v] of [['X',d.x+dx],['Y',d.y+dy]])$('b_'+d.key+axis).value=Math.round(Math.max(-250,Math.min(250,v)));}
+  else if(d.mode==='rotate')$('b_'+d.key+'Rotate').value=Math.round(Math.atan2(p.y-d.r.y,p.x-d.r.x)*180/Math.PI+90);
+  else{const q=captionHit(p,d.r);$('b_'+d.key+'FreeWidth').value=Math.round(Math.max(10,Math.min(500,d.w*Math.abs(q.x)/Math.max(1,Math.abs(d.q.x)))));$('b_'+d.key+'FreeHeight').value=Math.round(Math.max(10,Math.min(500,d.h*Math.abs(q.y)/Math.max(1,Math.abs(d.q.y)))));}
+  scheduleDraw();
+ },true);
+ for(const event of ['pointerup','pointercancel'])canvas.addEventListener(event,e=>{if(!directDrag)return;e.stopImmediatePropagation();directDrag=null;window.SnaDraft?.queue('board');},true);
+ canvas.addEventListener('click',event=>{if($('b_directTarget').value!=='none'){event.preventDefault();event.stopImmediatePropagation();}},true);
+ $('b_directTarget').addEventListener('change',()=>{canvas.style.touchAction=$('b_directTarget').value==='none'?'manipulation':'none';scheduleDraw();});
+ function drawDirectHandles(m){const key=$('b_directTarget').value;if(key==='none')return;const c=canvas.getContext('2d');c.save();c.scale(canvas.width/m.width,canvas.height/m.height);c.strokeStyle='#45ff7c';c.fillStyle='#fff';c.lineWidth=2;
+  if(key==='board'){c.strokeRect(3,3,m.width-6,m.height-6);for(const [x,y] of [[3,m.height/2],[m.width-3,m.height/2],[m.width/2,3],[m.width/2,m.height-3]]){c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.fill();}}
+  else{const r=m.captionRects[key];if(r){c.translate(r.x,r.y);c.rotate(r.angle*Math.PI/180);c.strokeRect(-r.w/2,-r.h/2,r.w,r.h);for(const [x,y]of [[-r.w/2,-r.h/2],[r.w/2,-r.h/2],[-r.w/2,r.h/2],[r.w/2,r.h/2],[0,-r.h/2-28]]){c.beginPath();c.arc(x,y,8,0,Math.PI*2);c.fill();c.stroke();}}}c.restore();}
  const inputIds=["b_clothesFineZoom","b_clothesFineWidth","b_clothesFineHeight","b_clothesFineX","b_clothesFineY","b_gunsFineZoom","b_gunsFineWidth","b_gunsFineHeight","b_gunsFineX","b_gunsFineY","b_mediumPages","b_largeScaleMode","b_largeSizePercent","b_boardSize","b_ownerText","b_ownerSize","b_ownerX","b_ownerY","b_inquiryText","b_inquiryWidth","b_inquiryX","b_inquiryY","b_subText","b_subWidth","b_subX","b_subY","b_gradientDirection","b_textScale","b_outline","b_clothesCols","b_gunCols","b_nameSize","b_gunNameSize","b_levelSize","b_clothLevelSize","b_clothNameX","b_clothNameY","b_gunNameX","b_gunNameY","b_gunLevelX","b_gunLevelY","b_shadowStrength","b_shadowColor","b_shadowX","b_shadowY","b_saturation"];
  {
   const el=$("b_ownerSize"),out=$("b_ownerSizeValue");
@@ -8854,6 +9016,7 @@ saveBtn.addEventListener("click",async()=>{
  ["b_outline","b_shadowStrength","b_shadowX","b_shadowY"].forEach(updateLiveControlValue);
  $("b_shadowColor").addEventListener("input",scheduleDraw);
  $("b_shadowColor").addEventListener("change",scheduleDraw);
+ inputIds.push(...directIds);
  inputIds.forEach(id=>$(id).addEventListener("input",()=>{
   scheduleDraw();
  }));
@@ -8950,7 +9113,7 @@ saveBtn.addEventListener("click",async()=>{
   ["b_topText","b_ownerText","b_titleText","b_inquiryText","b_subText","b_leftTitle","b_rightTitle"].forEach(id=>$(id).value="");
   ["b_topText","b_titleText","b_leftTitle","b_rightTitle"].forEach(id=>$(id).value="");
   $("b_mediumPages").value="1";$("b_largeScaleMode").value="auto";$("b_largeSizePercent").value="100";
-  $("b_photoFineEnabled").checked=false;$("b_photoFineFill").checked=false;resetPhotoFine();updateLargeSizeControls();syncFineUI();
+  window.SnaGalleryEditing=null;directIds.forEach(id=>$(id).value=/Free/.test(id)?'100':'0');$("b_photoFineEnabled").checked=false;$("b_photoFineFill").checked=false;resetPhotoFine();updateLargeSizeControls();syncFineUI();
   $("b_boardSize").value="medium";$("b_ownerSize").value="100";$("b_ownerSizeValue").textContent="100%";$("b_inquiryWidth").value="110";$("b_subWidth").value="100";$("b_inquiryWidthValue").textContent="110%";$("b_subWidthValue").textContent="100%";$("b_inquiryWidthNumber").value="110";$("b_subWidthNumber").value="100";$("b_textScale").value="100";$("b_outline").value="4";$("b_gradientDirection").value="vertical";
   ["b_ownerX","b_ownerY","b_inquiryX","b_inquiryY","b_subX","b_subY"].forEach(id=>$(id).value="0");
   $("b_clothesCols").value="3";$("b_gunCols").value="3";$("b_nameSize").value="28";$("b_clothLevelSize").value="40";$("b_gunNameSize").value="32";$("b_levelSize").value="60";$("b_clothNameX").value="0";$("b_clothNameY").value="0";$("b_gunNameX").value="0";$("b_gunNameY").value="0";$("b_gunLevelX").value="0";$("b_gunLevelY").value="0";$("b_shadowStrength").value="85";$("b_shadowColor").value="#777777";$("b_shadowX").value="2";$("b_shadowY").value="2";$("b_saturation").value="100";$("b_outlineValue").textContent=$("b_outline").value;$("b_shadowStrengthValue").textContent=$("b_shadowStrength").value+"%";$("b_shadowXValue").textContent=$("b_shadowX").value;$("b_shadowYValue").textContent=$("b_shadowY").value;$("b_saturationValue").textContent=$("b_saturation").value+"%";
@@ -8978,6 +9141,7 @@ saveBtn.addEventListener("click",async()=>{
    const jpgCanvas=document.createElement('canvas');jpgCanvas.width=exportCanvas.width;jpgCanvas.height=exportCanvas.height;
    const jpgCtx=jpgCanvas.getContext('2d');jpgCtx.fillStyle='#ffffff';jpgCtx.fillRect(0,0,jpgCanvas.width,jpgCanvas.height);jpgCtx.drawImage(exportCanvas,0,0);
    const file=window.SnaDataFile(jpgCanvas.toDataURL('image/jpeg',.95),filename);
+   const editDraft=window.SnaBoard.snapshot();
    const shared=await window.SnaShareFiles([file]);
    if(!shared)return;
    const blob=file;
@@ -8986,7 +9150,7 @@ saveBtn.addEventListener("click",async()=>{
    // 원본 JPG 저장 성공 이후에만 전시관에 등록한다. 전시관 등록 실패는 JPG 저장을 취소하지 않는다.
    if(window.addBoardToGallery&&!window.SnaTrial?.active){
     const title=document.getElementById('board-work-title')?.value.trim()||'나의 대필 작품';
-    window.addBoardToGallery(blob,{title}).catch(err=>{
+    window.addBoardToGallery(blob,{title,draft:editDraft}).catch(err=>{
      console.warn('전시관 등록 실패',err);
      const label=document.getElementById('board-gallery-status');if(label)label.textContent='전시관 등록에 실패했어요. JPG 저장은 완료됐습니다.';
     });
@@ -9013,9 +9177,15 @@ saveBtn.addEventListener("click",async()=>{
  };
 
  window.SnaBoard={getSettings:currentSettings,applySettings,
+  addExtracted:async(urls,type)=>{
+   if(!window.canUseFeature?.('board'))return window.uiAlert?.('대필판 이용 권한이 필요합니다.');
+   if(!['clothes','guns'].includes(type)||!urls.length)return;
+   historyPush();for(let i=0;i<urls.length;i++){const file=window.SnaDataFile(urls[i],type+'_'+(i+1)+'.jpg');state[type].push(makeItem(file,type));}
+   renderItems(type);updateLoadStatus();scheduleDraw();window.switchTab?.('board');window.SnaDraft?.queue('board');
+  },
   snapshot:()=>({settings:currentSettings(),quality:$('b_exportScale').value,autoAlign:$('b_autoAlign').checked,
-   clothes:state.clothes.filter(x=>x.file instanceof Blob).slice(0,40).map(x=>({file:x.file,name:x.name,level:x.level})),
-   guns:state.guns.filter(x=>x.file instanceof Blob).slice(0,40).map(x=>({file:x.file,name:x.name,level:x.level}))}),
+   clothes:state.clothes.filter(x=>x.file instanceof Blob).map(x=>({file:x.file,name:x.name,level:x.level})),
+   guns:state.guns.filter(x=>x.file instanceof Blob).map(x=>({file:x.file,name:x.name,level:x.level}))}),
   restore:async draft=>{if(!draft)return;state.clothes.forEach(x=>x.url&&URL.revokeObjectURL(x.url));state.guns.forEach(x=>x.url&&URL.revokeObjectURL(x.url));state.clothes.length=0;state.guns.length=0;
     if(draft.settings)applySettings(draft.settings);
     if(draft.quality)$('b_exportScale').value=draft.quality;
