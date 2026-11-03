@@ -1485,6 +1485,15 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
 #b_directTouchLayer{position:absolute;pointer-events:none;touch-action:pan-y;overflow:hidden;z-index:2}
 #b_directTouchLayer[hidden]{display:none!important}
 #b_directTouchLayer .b-direct-touch-hit{position:absolute;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;background:transparent}
+</style><style>
+#sna-maintenance-overlay{position:fixed;inset:0;background:#07111def;z-index:10003000;display:grid;place-items:center;padding:20px;overflow:auto}
+#sna-maintenance-overlay[hidden],[data-ops-master][hidden]{display:none!important}
+.sna-maintenance-card{max-width:600px;width:100%;box-sizing:border-box;padding:24px;border:1px solid #4c7291;background:#142638;border-radius:18px;color:#f2f7ff}
+#sna-maintenance-public-message{white-space:pre-wrap;line-height:1.8;overflow-wrap:anywhere}
+#sna-maintenance-message{width:100%;box-sizing:border-box;min-height:90px;background:#102034;color:white;border:1px solid #55728d;border-radius:10px;padding:10px}
+#sna-bulk-panel input[type=text],#sna-audit-search{min-height:44px;padding:10px;background:#102034;color:white;border:1px solid #55728d;border-radius:10px;box-sizing:border-box;max-width:100%}
+.sna-bulk-member-choice{display:flex;align-items:center;gap:8px;font-size:13px;margin:8px 0}.sna-bulk-member-choice input{width:20px!important;height:20px;min-height:20px}
+.sna-audit-entry{border-bottom:1px solid #365069;padding:12px 0}.sna-audit-entry summary{cursor:pointer;line-height:1.7}.sna-audit-entry pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.6 monospace}
 </style></head>
 
 <body>
@@ -1644,6 +1653,26 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  <div id="sna-admin-report-list" class="sna-admin-feedback-list"><p class="sna-empty-feedback">접수된 신고가 없습니다.</p></div>
 </div>
 <div class="member-panel"><h3>🖼 대필 전시관 관리</h3><p>대필판 저장 시 작품이 자동 게시됩니다. 이곳에서 부적절한 공개 작품을 삭제할 수 있습니다.</p><div id="admin-gallery-list"></div></div>
+<section class="member-panel" id="sna-maintenance-panel">
+ <h3>긴급 점검 모드</h3><p id="sna-maintenance-state" role="status">운영 상태 확인 중</p>
+ <div data-ops-master hidden><label for="sna-maintenance-message">회원에게 보여줄 점검 안내</label><textarea id="sna-maintenance-message" maxlength="500" rows="3" placeholder="예: 오류 수정으로 점검 중입니다. 완료 후 다시 이용해 주세요."></textarea>
+ <div class="member-controls"><button class="member-btn danger" id="sna-maintenance-on" type="button">점검 시작 · 안내 변경</button><button class="member-btn primary" id="sna-maintenance-off" type="button">점검 종료</button></div><p id="sna-maintenance-result" role="status"></p></div>
+ <p class="member-tip">최고 관리자만 변경할 수 있습니다. 점검 중에도 최고·공동 관리자는 테스트할 수 있습니다.</p>
+</section>
+<section class="member-panel" id="sna-bulk-panel" data-ops-master hidden>
+ <h3>선택 회원 이용권 일괄 연장</h3><p>아래 회원 목록에서 연장할 회원을 선택하세요. 영구권·승인 대기·차단·관리자 계정은 제외합니다. 유효한 이용권은 남은 기간을 보존하며, 만료 회원을 포함하면 오늘부터 계산합니다.</p>
+ <div class="member-controls"><label>연장 일수 <input id="sna-bulk-days" type="number" min="1" max="365" value="1" style="width:80px"></label><label><input id="sna-bulk-expired" type="checkbox"> 만료 회원 포함</label></div>
+ <input id="sna-bulk-reason" type="text" maxlength="150" placeholder="연장 사유 (예: 점검 보상)" aria-label="일괄 연장 사유">
+ <div class="member-controls"><button class="member-btn" id="sna-bulk-select-visible" type="button">현재 목록에서 선택</button><button class="member-btn" id="sna-bulk-select-clear" type="button">선택 해제</button><strong id="sna-bulk-count">선택한 회원 0명</strong></div>
+ <div class="member-controls"><button class="member-btn primary" id="sna-bulk-start" type="button">선택 회원 연장</button><button class="member-btn" id="sna-bulk-cancel" type="button">남은 처리 중지</button></div>
+ <details><summary>중단한 연장 이어하기 · 최근 20개 작업</summary><div class="member-controls"><select id="sna-bulk-job-id" aria-label="다시 실행할 연장 작업"><option value="">최근 연장 작업 선택</option></select><button class="member-btn" id="sna-bulk-resume" type="button">이어서 처리</button></div></details>
+ <p id="sna-bulk-status" role="status" aria-live="polite">같은 작업을 다시 실행해도 이미 처리한 회원에게 중복 적용되지 않습니다. 한 작업에 최대 500명을 선택할 수 있습니다.</p>
+</section>
+<section class="member-panel" id="sna-audit-panel"><h3>관리자 작업 기록</h3><p>회원 승인·등급·기간·차단·삭제, 공지·후기·전시관 관리, 공동 관리자 변경, 긴급 점검을 기록합니다. 변경 내용과 기록은 함께 저장됩니다.</p>
+ <div class="member-controls"><input id="sna-audit-search" type="search" placeholder="실행자 · 회원 UID · 작업 검색" aria-label="관리자 작업 기록 검색"><select id="sna-audit-role" aria-label="실행자 역할"><option value="">모든 관리자</option><option value="master">최고 관리자</option><option value="joint">공동 관리자</option></select></div>
+ <p id="sna-audit-status" role="status">최근 기록을 불러옵니다.</p><div id="sna-audit-list"></div>
+</section>
+
 <div class="member-controls" style="margin-bottom:10px"><input id="admin-user-search" type="search" placeholder="회원 이름 검색" aria-label="회원 검색" style="flex:1"><select id="admin-user-grade-filter" aria-label="등급 검색"><option value="">모든 등급</option><option value="silver">실버</option><option value="gold">골드</option><option value="vip">VIP</option></select></div>
 <div id="admin-user-list"></div>
   <div class="admin-section-title" style="margin-top:30px">최근 접속</div>
@@ -1655,6 +1684,7 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
 
 
 
+<div id="sna-maintenance-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="sna-maintenance-title"><div class="sna-maintenance-card"><h2 id="sna-maintenance-title">서비스 점검 안내</h2><p id="sna-maintenance-public-message" role="status"></p><div class="member-controls"><button type="button" class="member-btn" id="sna-maintenance-overlay-login">로그인 화면</button><button type="button" class="member-btn" id="sna-maintenance-overlay-logout">로그아웃</button><button type="button" class="member-btn" id="sna-maintenance-retry">다시 확인</button></div><p class="member-tip">관리자는 로그인 후 점검 중에도 사용할 수 있습니다.</p></div></div>
 <div id="ui-dialog-backdrop" role="presentation"><div class="ui-dialog-card" role="dialog" aria-modal="true" aria-labelledby="ui-dialog-title"><div class="ui-dialog-symbol" id="ui-dialog-icon">✦</div><h3 id="ui-dialog-title">알림</h3><p id="ui-dialog-message"></p><div class="ui-dialog-actions" id="ui-dialog-actions"></div></div></div>
 <script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
 (function(){
@@ -1692,8 +1722,8 @@ import {initializeApp}
 from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 
 import {
- getFirestore,doc,setDoc,getDoc,getDocFromServer,onSnapshot,
- collection,updateDoc,deleteDoc,deleteField,addDoc,query,orderBy,limit,runTransaction
+ getFirestore,doc,setDoc as snaRawSetDoc,getDoc,getDocFromServer,onSnapshot,
+ collection,updateDoc as snaRawUpdateDoc,deleteDoc as snaRawDeleteDoc,deleteField,addDoc as snaRawAddDoc,query,orderBy,limit,runTransaction as snaRawRunTransaction,serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig={
@@ -1715,13 +1745,94 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
 const auth=getAuth(app);
 let authUser=null;let savedName=null;
 let authReady=false;
+// Administrator writes and their records commit in the same transaction.
+function snaAuditActor(){
+ if(!isAdminMode||!auth.currentUser||authUser?.uid!==auth.currentUser.uid)return null;
+ return {actorUid:auth.currentUser.uid,actorName:String(savedName||'관리자').slice(0,60),actorRole:isMasterAdmin?'master':'joint'};
+}
+function snaAuditedPath(ref){return /^(users|appSettings|notices|gallery|feedbackReports|adminRoles|serviceControl|bulkExtensionJobs)\/[^/]+$/.test(ref.path);}
+function snaAuditSummary(data){
+ if(!data)return null;const out={};
+ for(const key of ['authUid','name','status','grade','gradeDuration','gradeExpiresAt','membershipMode','plan','expiresAt','legacyId','migratedTo','title','author','ownerUid','isPublic','uid','enabled','message','updatedBy','category','feature','score','rights','days','reason','processed','extended','skipped'])if(data[key]!==undefined)out[key]=data[key];
+ if(Array.isArray(data.targets))out.targetCount=data.targets.length;
+ if(data.entries)out.updateCount=Array.isArray(data.entries)?data.entries.length:0;
+ if(data.reviews)out.reviewCount=Array.isArray(data.reviews)?data.reviews.length:0;
+ for(const key of ['items','entries','reviews'])if(Array.isArray(data[key])){out[key+'Count']=data[key].length;out[key+'Ids']=data[key].map(x=>String(x?.id||x?.reportId||x?.uid||x?.title||'')).slice(0,35);}
+ return out;
+}
+function snaAuditAfter(before,write){
+ if(write.kind==='delete')return null;
+ const after=write.kind==='update'||write.options?.merge||write.options?.mergeFields?{...(before||{}),...write.data}:{...write.data};
+ for(const [key,v]of Object.entries(after))if(v&&typeof v.isEqual==='function'&&v.isEqual(deleteField()))delete after[key];
+ return after;
+}
+function snaAuditAction(path,kind,data){
+ if(path.startsWith('users/'))return kind==='delete'?'회원 삭제':data?.status==='revoked'?'회원 차단':data?.grade!==undefined?'회원 등급·이용권 변경':data?.legacyId?'기존 이용권 연결':'회원 정보 변경';
+ const group={appSettings:'운영 설정',notices:'공지',gallery:'전시관 작품',feedbackReports:'후기·오류 신고',adminRoles:'공동 관리자',serviceControl:'긴급 점검',bulkExtensionJobs:'일괄 연장 작업'}[path.split('/')[0]]||'운영 데이터';
+ return group+' '+({set:'저장',update:'변경',delete:'삭제'}[kind]||'변경');
+}
+async function runTransaction(database,callback,options={}){
+ const actor=snaAuditActor();if(!actor)return snaRawRunTransaction(database,callback,options);
+ const {auditAction,batchId,...sdkOptions}=options||{};
+ return snaRawRunTransaction(database,async raw=>{
+  const reads=new Map(),writes=[];
+  const tx={get:async ref=>{const snap=await raw.get(ref);reads.set(ref.path,snap);return snap;},set:(ref,data,opts)=>{writes.push({kind:'set',ref,data,options:opts});return tx;},update:(ref,data)=>{writes.push({kind:'update',ref,data});return tx;},delete:ref=>{writes.push({kind:'delete',ref});return tx;}};
+  const result=await callback(tx),tracked=writes.filter(w=>snaAuditedPath(w.ref));
+  for(const write of tracked)if(!reads.has(write.ref.path))reads.set(write.ref.path,await raw.get(write.ref));
+  const previous=new Map([...reads].map(([path,snap])=>[path,snap.exists()?snap.data():null]));
+  for(const write of writes){
+   if(write.kind==='delete')raw.delete(write.ref);
+   else if(write.kind==='update')raw.update(write.ref,write.data);
+   else if(write.options)raw.set(write.ref,write.data,write.options);else raw.set(write.ref,write.data);
+   if(!snaAuditedPath(write.ref))continue;
+   const before=previous.get(write.ref.path),after=snaAuditAfter(before,write);previous.set(write.ref.path,after);
+   raw.set(doc(collection(database,'adminAudit')),{...actor,action:auditAction||snaAuditAction(write.ref.path,write.kind,write.data),path:write.ref.path,before:JSON.stringify(snaAuditSummary(before)).slice(0,3500),after:JSON.stringify(snaAuditSummary(after)).slice(0,3500),batchId:String(batchId||'').slice(0,100),createdAt:serverTimestamp()});
+  }
+  return result;
+ },sdkOptions);
+}
+function setDoc(ref,data,options){return snaAuditActor()&&snaAuditedPath(ref)?runTransaction(db,async tx=>{tx.set(ref,data,options);}):snaRawSetDoc(ref,data,options);}
+function updateDoc(ref,data){return snaAuditActor()&&snaAuditedPath(ref)?runTransaction(db,async tx=>{tx.update(ref,data);}):snaRawUpdateDoc(ref,data);}
+function deleteDoc(ref){return snaAuditActor()&&snaAuditedPath(ref)?runTransaction(db,async tx=>{tx.delete(ref);}):snaRawDeleteDoc(ref);}
+async function addDoc(ref,data){
+ const target=doc(ref);if(!snaAuditActor()||!snaAuditedPath(target))return snaRawAddDoc(ref,data);
+ await setDoc(target,data);return target;
+}
+// Bulk extension is retry-safe: one immutable result marker per job/member.
+function snaExtensionPlan(member,days,now,includeExpired){
+ if(!member||!['approved','expired'].includes(member.status))return {skip:'승인 대기·차단 계정 제외'};
+ if(member.migratedTo)return {skip:'다른 계정으로 연결된 이전 회원 제외'};
+ const single=member.membershipMode==='gradeOnly';
+ const end=single?member.gradeExpiresAt:member.expiresAt;
+ if(single&&member.gradeDuration==='permanent'&&end==null||!single&&member.plan==='permanent')return {skip:'영구 이용권 제외'};
+ if(!Number.isSafeInteger(end)||end<=0)return {skip:'만료일 미설정'};
+ if((end<=now||member.status==='expired')&&!includeExpired)return {skip:'만료 회원 제외'};
+ const next=Math.max(end,now)+days*86400000;
+ const patch={status:'approved',[single?'gradeExpiresAt':'expiresAt']:next};
+ if(!single&&['gold','vip'].includes(member.grade)&&Number.isSafeInteger(member.gradeExpiresAt)&&member.gradeExpiresAt>0)patch.gradeExpiresAt=Math.max(member.gradeExpiresAt,now)+days*86400000;
+ return {patch,before:end,after:next};
+}
+async function snaExtendJobMember(jobId,uid){
+ return runTransaction(db,async tx=>{
+  const jobRef=doc(db,'bulkExtensionJobs',jobId),resultRef=doc(db,'bulkExtensionJobs',jobId,'results',uid),memberRef=doc(db,'users',uid);
+  const [jobSnap,resultSnap,memberSnap]=await Promise.all([tx.get(jobRef),tx.get(resultRef),tx.get(memberRef)]);
+  if(!jobSnap.exists())throw Error('연장 작업이 없습니다.');const job=jobSnap.data();
+  if(job.ownerUid!==auth.currentUser?.uid||!job.targets.includes(uid))throw Error('연장 작업 대상이 아닙니다.');
+  if(resultSnap.exists())return {already:true,...resultSnap.data()};
+  const plan=uid===auth.currentUser?.uid||uid===snaJointRoleUid?{skip:'관리자 계정 제외'}:snaExtensionPlan(memberSnap.exists()?memberSnap.data():null,job.days,Date.now(),job.includeExpired);
+  const result={uid,name:String(memberSnap.data()?.name||uid).slice(0,60),outcome:plan.skip?'skipped':'extended',reason:plan.skip||job.reason,beforeExpiresAt:plan.before||0,afterExpiresAt:plan.after||0,createdAt:Date.now()};
+  if(plan.patch)tx.update(memberRef,plan.patch);
+  tx.set(resultRef,result);return result;
+ },{auditAction:'이용권 일괄 연장',batchId:jobId});
+}
+
 
 
 // Detailed per-user activity logging. Each record stores local time to seconds,
 // the signed-in display name, action, and action-specific details.
 window.logActivity=async(action,detail={})=>{
  try{
-  if(!authUser)return;
+  if(!authUser||window.SnaMaintenanceBlocked?.())return;
   // 기간 만료·승인 대기·차단 계정은 서버 규칙과 동일하게 로그를 생성하지 않는다.
   if(!isAdminMode&&(!currentMember||currentMember.status!=='approved'||expired(currentMember)))return;
   const name=savedName||"이름 미확인";
@@ -1778,7 +1889,7 @@ let reviewRoleReady=false,reviewIsAdmin=false,reviewActivatedUid=null;
 // (excluding administrator and trial mode) participate in feature reviews.
 const reviewAllowed=()=>!!reviewUid&&reviewRoleReady&&!reviewIsAdmin
  &&!!authUser&&!authUser.isAnonymous&&currentMember?.status==='approved'
- &&!expired(currentMember)&&!window.SnaTrial?.active;
+ &&!expired(currentMember)&&!window.SnaTrial?.active&&!window.SnaMaintenanceBlocked?.();
 const reviewLocalKey=uid=>'sna-feature-reviews-v1:'+uid;
 function reviewSaveLocal(){if(!reviewUid)return;try{localStorage.setItem(reviewLocalKey(reviewUid),JSON.stringify(reviewRecords));}catch(e){console.warn('후기 기기 저장 실패',e);}}
 function reviewLoadLocal(uid){try{return JSON.parse(localStorage.getItem(reviewLocalKey(uid))||'{}')||{};}catch(e){return {};}}
@@ -2511,6 +2622,7 @@ const effectiveGrade=data=>{
  return Number.isFinite(Number(until))&&Number(until)>0&&Date.now()>=Number(until)?'silver':grade;
 };
 window.canUseFeature=feature=>{
+ if(['clothes','guns','merge','kill','board','gallery','reviews'].includes(feature)&&window.SnaMaintenanceBlocked?.())return false;
  if(feature==='gallery'||feature==='reviews')return !!authUser && (isAdminMode||(currentMember?.status==='approved'&&!expired(currentMember)));
  if(!FEATURE_NAMES[feature])return true;
  if(isAdminMode)return true;
@@ -2520,6 +2632,7 @@ window.canUseFeature=feature=>{
 };
 window.SnaMemberTier=()=>!authUser?null:isAdminMode?'admin':window.SnaTrial?.active==='board'?'vip':currentMember&&!expired(currentMember)&&currentMember.status==='approved'?effectiveGrade(currentMember):null;
 function refreshGradeUI(){
+ snaRenderOpsRoles();
  snaUpdateExpiryNotice();
  const jointPanel=document.getElementById('sna-joint-admin-panel');if(jointPanel)jointPanel.hidden=!isMasterAdmin;
  if(isMasterAdmin){if(adminUserSnapshot)snaRenderJointChoices(adminUserSnapshot);else snaRenderJointStatus();}
@@ -2845,9 +2958,10 @@ function stopMemberContentSubscriptions(){
  if(galleryItems)galleryItems.replaceChildren();
 }
 function syncMemberContentSubscriptions(data){
- const active=!!authUser&&!isAdminMode&&data?.status==='approved'&&!expired(data);
- if(!active){if(memberContentUnsubscribes.length)stopMemberContentSubscriptions();return;}
+ const active=!!authUser&&!isAdminMode&&data?.status==='approved'&&!expired(data)&&!window.SnaMaintenanceBlocked?.();
+ if(!active){if(memberContentUnsubscribes.length)stopMemberContentSubscriptions();if(snaCloud.unsub){snaCloud.unsub();snaCloud.unsub=null;}return;}
  if(memberContentUnsubscribes.length)return;
+ snaStartPresets(authUser.uid);
  memberContentUnsubscribes.push(startGradeSubscription(),startNoticesSubscription(),startGallerySubscription());
 }
 let expiredHandled=false;
@@ -3095,6 +3209,7 @@ const displayLogin=(message='')=>{
  if(message)authMsg(message);
 };
 async function resetCurrentSession(){
+ snaStopAdminOps();
  ++snaJointRoleGeneration;
  if(snaJointRoleUnsubscribe){snaJointRoleUnsubscribe();snaJointRoleUnsubscribe=null;}
  snaJointRoleUid=null;
@@ -3373,6 +3488,7 @@ function savedGradeDuration(data){
 let adminUserSnapshot=null;
 function loadAdminData(){
  if(adminDataStarted)return;
+ snaStartAdminOpsSubscriptions();
  adminDataStarted=true;
  document.getElementById("admin-log-search")?.addEventListener("input",renderActivityLogs);
  document.getElementById("admin-log-category")?.addEventListener("change",renderActivityLogs);
@@ -3397,6 +3513,10 @@ function loadAdminData(){
    const visibleNickname=storedNickname&&!(isUidAccount&&storedNickname===id)
     ?storedNickname:(isUidAccount?'이름 미설정':id);
    info.append(make('div','admin-card-name',visibleNickname));
+   if(isMasterAdmin&&snaBulkEligible(id,data)){
+    const choose=make('label','sna-bulk-member-choice'),checkbox=make('input');checkbox.type='checkbox';checkbox.dataset.snaBulkUid=id;checkbox.checked=snaBulkSelected.has(id);checkbox.setAttribute('aria-label',visibleNickname+' 이용권 연장 선택');
+    checkbox.onchange=()=>{if(snaBulkBusy){checkbox.checked=snaBulkSelected.has(id);return;}if(checkbox.checked)snaBulkSelected.add(id);else snaBulkSelected.delete(id);snaRenderBulkCount();};choose.append(checkbox,document.createTextNode(' 일괄 연장 대상'));info.append(choose);
+   }
    const uidCaption=make('div','admin-expiry',isUidAccount
     ?`UID: ${id.slice(0,7)}…${id.slice(-6)}`:`기존 회원 ID: ${id}`);
    uidCaption.title=id;
@@ -3522,6 +3642,114 @@ function loadAdminData(){
  const q=query(collection(db,"activityLogs"),orderBy("timestamp","desc"),limit(150));
  liveUnsubscribes.push(onSnapshot(q,snapshot=>{activityCache=snapshot.docs.map(s=>s.data());renderActivityLogs();snaRenderStats();},err=>console.warn("작업 로그 오류",err)));
 }
+// Maintenance status is public; only the master may change it.
+const SNA_MAINTENANCE_REF=doc(db,'serviceControl','maintenance');
+let snaServiceReady=false,snaServiceData={enabled:false,message:''};
+let snaOpsUnsubs=[],snaOpsStarted=false,snaAuditCache=[],snaBulkJobCache=[];
+const snaBulkSelected=new Set();let snaBulkBusy=false,snaBulkCancel=false,snaBulkPreparing=false;
+window.SnaMaintenanceBlocked=()=>!isAdminMode&&(!snaServiceReady||snaServiceData.enabled===true);
+function snaRenderMaintenance(){
+ const overlay=document.getElementById('sna-maintenance-overlay'),blocked=window.SnaMaintenanceBlocked();
+ overlay.hidden=!blocked;
+ document.getElementById('sna-maintenance-public-message').textContent=snaServiceReady?(snaServiceData.message||'서비스 점검 중입니다. 잠시 후 다시 이용해 주세요.'):'서비스 운영 상태를 확인하는 중입니다. 연결을 확인하거나 관리자 계정으로 로그인해 주세요.';
+ document.getElementById('sna-maintenance-state').textContent=!snaServiceReady?'운영 상태 확인 중':snaServiceData.enabled?'점검 중 · 일반 회원 사용 제한 / 관리자는 테스트 가능':'정상 운영 중';
+ for(const el of document.querySelectorAll('[data-ops-master]'))el.hidden=!isMasterAdmin;
+ document.getElementById('sna-maintenance-overlay-logout').hidden=!auth.currentUser;
+}
+function snaRenderOpsRoles(){snaRenderMaintenance();snaRenderBulkCount();}
+const snaServiceUnsubscribe=onSnapshot(SNA_MAINTENANCE_REF,snap=>{
+ if(snap.metadata.hasPendingWrites)return;
+ const data=snap.exists()?snap.data():{enabled:false,message:''};
+ if(snap.metadata.fromCache&&!data.enabled)return;
+ snaServiceData=data;snaServiceReady=true;
+ if(authUser&&!isAdminMode&&currentMember){syncMemberContentSubscriptions(currentMember);window.SnaReviews?.refreshAccess?.();if(!data.enabled&&document.getElementById('reviews-tab').classList.contains('active'))snaLoadPublishedReviews();}
+ const input=document.getElementById('sna-maintenance-message');if(document.activeElement!==input)input.value=data.message||'';
+ snaRenderMaintenance();
+},e=>{console.warn('점검 상태 조회 실패',e);snaServiceReady=false;snaRenderMaintenance();});
+document.getElementById('sna-maintenance-overlay-login').onclick=()=>{authScreen.style.zIndex='10004000';displayLogin('점검 중에도 관리자 계정으로 로그인할 수 있습니다.');};
+document.getElementById('sna-maintenance-overlay-logout').onclick=()=>window.signOutMember();
+document.getElementById('sna-maintenance-retry').onclick=()=>location.reload();
+snaRenderMaintenance();
+async function snaAssertMaster(){
+ const user=auth.currentUser;if(!user||!isMasterAdmin)throw Error('최고 관리자만 사용할 수 있습니다.');
+ const token=await getIdTokenResult(user,true);
+ if(auth.currentUser?.uid!==user.uid||token.claims.admin!==true||token.claims.jointAdmin===true)throw Error('최고 관리자 권한을 확인해 주세요.');return user;
+}
+async function snaSetMaintenance(enabled){
+ const status=document.getElementById('sna-maintenance-result');
+ try{
+  const user=await snaAssertMaster(),message=document.getElementById('sna-maintenance-message').value.trim().slice(0,500);
+  if(enabled&&!message)throw Error('회원에게 보여줄 점검 안내를 입력하세요.');
+  if(!await window.uiConfirm(enabled?'긴급 점검을 시작할까요? 일반 회원의 편집과 서버 데이터 접근이 제한됩니다.':'점검을 종료하고 회원의 이용을 다시 허용할까요?'))return;
+  await setDoc(SNA_MAINTENANCE_REF,{enabled,message,updatedBy:user.uid,updatedAt:serverTimestamp()});
+  status.textContent=enabled?'점검을 시작했습니다.':'점검을 종료했습니다.';
+ }catch(e){status.textContent='변경 실패: '+(e.message||e.code);}
+}
+document.getElementById('sna-maintenance-on').onclick=()=>snaSetMaintenance(true);
+document.getElementById('sna-maintenance-off').onclick=()=>snaSetMaintenance(false);
+function snaRenderBulkCount(){const out=document.getElementById('sna-bulk-count');if(out)out.textContent='선택한 회원 '+snaBulkSelected.size+'명';for(const el of document.querySelectorAll('[data-sna-bulk-uid]'))el.checked=snaBulkSelected.has(el.dataset.snaBulkUid);}
+function snaBulkEligible(uid,data){return uid!==auth.currentUser?.uid&&uid!==snaJointRoleUid&&!snaExtensionPlan(data,1,Date.now(),document.getElementById('sna-bulk-expired').checked).skip;}
+document.getElementById('sna-bulk-select-visible').onclick=()=>{if(!isMasterAdmin||snaBulkBusy)return;for(const el of document.querySelectorAll('[data-sna-bulk-uid]'))snaBulkSelected.add(el.dataset.snaBulkUid);snaRenderBulkCount();};
+document.getElementById('sna-bulk-select-clear').onclick=()=>{if(snaBulkBusy)return;snaBulkSelected.clear();snaRenderBulkCount();};
+document.getElementById('sna-bulk-expired').onchange=()=>{snaBulkSelected.clear();document.getElementById('admin-user-search').dispatchEvent(new Event('input'));snaRenderBulkCount();};
+document.getElementById('sna-bulk-cancel').onclick=()=>{snaBulkCancel=true;};
+async function snaRunBulkJob(jobId){
+ if(snaBulkBusy)return;snaBulkBusy=true;snaBulkCancel=false;
+ const status=document.getElementById('sna-bulk-status'),start=document.getElementById('sna-bulk-start'),resume=document.getElementById('sna-bulk-resume');start.disabled=resume.disabled=true;
+ let processed=0,extended=0,skipped=0;
+ try{
+  await snaAssertMaster();const snap=await getDocFromServer(doc(db,'bulkExtensionJobs',jobId));if(!snap.exists())throw Error('연장 작업이 없습니다.');const job=snap.data();
+  for(const uid of job.targets){
+   if(snaBulkCancel||auth.currentUser?.uid!==job.ownerUid)break;
+   const r=await snaExtendJobMember(jobId,uid);processed++;if(r.outcome==='extended')extended++;else skipped++;
+   status.textContent=`${processed}/${job.targets.length}명 확인 · 연장 ${extended}명 · 제외 ${skipped}명`;
+  }
+  const done=processed===job.targets.length;
+  await updateDoc(doc(db,'bulkExtensionJobs',jobId),{status:done?'completed':'paused',processed,extended,skipped,updatedAt:Date.now()});
+  status.textContent+=(done?' · 완료':' · 중단됨. 완료된 연장은 유지되며 이어서 처리할 수 있습니다.');
+  snaBulkSelected.clear();snaRenderBulkCount();
+ }catch(e){status.textContent='처리 중단: '+(e.message||e.code)+' · 같은 작업을 이어서 실행해도 이미 처리한 회원에게 중복 적용되지 않습니다.';}
+ finally{snaBulkBusy=false;start.disabled=resume.disabled=false;}
+}
+document.getElementById('sna-bulk-start').onclick=async()=>{
+ const status=document.getElementById('sna-bulk-status'),startButton=document.getElementById('sna-bulk-start');if(snaBulkBusy||snaBulkPreparing)return;snaBulkPreparing=true;startButton.disabled=true;
+ try{
+  const user=await snaAssertMaster(),days=Number(document.getElementById('sna-bulk-days').value),reason=document.getElementById('sna-bulk-reason').value.trim();
+  if(!Number.isInteger(days)||days<1||days>365)throw Error('연장 일수는 1~365일로 입력하세요.');
+  if(!reason||reason.length>150)throw Error('연장 사유를 1~150자로 입력하세요.');
+  const targets=[...snaBulkSelected];if(!targets.length||targets.length>500)throw Error('연장할 회원을 1~500명 선택하세요.');
+  if(!await window.uiConfirm(`${targets.length}명에게 ${days}일을 연장할까요?\n유효한 이용권은 기존 만료일에 더하고, 포함한 만료 회원은 오늘부터 계산합니다.\n사유: ${reason}`))return;
+  const ref=doc(collection(db,'bulkExtensionJobs')),now=Date.now();
+  await setDoc(ref,{ownerUid:user.uid,days,reason,targets,includeExpired:document.getElementById('sna-bulk-expired').checked,startedAt:now,createdAt:now,updatedAt:now,status:'running',processed:0,extended:0,skipped:0});
+  const select=document.getElementById('sna-bulk-job-id');if(!Array.from(select.options).some(o=>o.value===ref.id)){const option=document.createElement('option');option.value=ref.id;option.textContent='현재 연장 작업 · '+days+'일 · '+targets.length+'명';select.append(option);}select.value=ref.id;await snaRunBulkJob(ref.id);
+ }catch(e){status.textContent='시작 실패: '+(e.message||e.code);}
+ finally{snaBulkPreparing=false;startButton.disabled=snaBulkBusy;}
+};
+document.getElementById('sna-bulk-resume').onclick=()=>{const id=document.getElementById('sna-bulk-job-id').value;if(id)snaRunBulkJob(id);};
+function snaRenderAudit(){
+ const list=document.getElementById('sna-audit-list');list.replaceChildren();
+ const term=document.getElementById('sna-audit-search').value.trim().toLowerCase(),role=document.getElementById('sna-audit-role').value;
+ const items=snaAuditCache.filter(d=>(!role||d.actorRole===role)&&(!term||[d.actorName,d.actorUid,d.action,d.path,d.before,d.after,d.batchId].join(' ').toLowerCase().includes(term)));
+ for(const d of items){
+  const row=document.createElement('details');row.className='sna-audit-entry';const summary=document.createElement('summary');
+  const time=d.createdAt?.toMillis?.();summary.textContent=(Number.isFinite(time)?new Date(time).toLocaleString('ko-KR'):'서버 기록 저장 중')+' · '+(d.actorRole==='master'?'최고 관리자':'공동 관리자')+' '+d.actorName+' · '+d.action;
+  const detail=document.createElement('pre');detail.textContent='대상: '+d.path+'\n실행자 UID: '+d.actorUid+'\n변경 전: '+d.before+'\n변경 후: '+d.after+(d.batchId?'\n일괄 작업: '+d.batchId:'');row.append(summary,detail);list.append(row);
+ }
+ document.getElementById('sna-audit-status').textContent='최근 '+snaAuditCache.length+'건 중 '+items.length+'건 표시 · 기록은 편집·삭제할 수 없습니다.';
+}
+for(const id of ['sna-audit-search','sna-audit-role'])document.getElementById(id).addEventListener('input',snaRenderAudit);
+function snaStartAdminOpsSubscriptions(){
+ if(snaOpsStarted||!isAdminMode)return;snaOpsStarted=true;
+ snaOpsUnsubs.push(onSnapshot(query(collection(db,'adminAudit'),orderBy('createdAt','desc'),limit(200)),snap=>{snaAuditCache=snap.docs.map(x=>x.data());snaRenderAudit();},e=>{document.getElementById('sna-audit-status').textContent='기록 조회 실패: 새 Firestore 규칙을 게시했는지 확인해 주세요.';}));
+ if(isMasterAdmin)snaOpsUnsubs.push(onSnapshot(query(collection(db,'bulkExtensionJobs'),orderBy('createdAt','desc'),limit(20)),snap=>{
+  snaBulkJobCache=snap.docs.map(d=>({id:d.id,...d.data()}));const select=document.getElementById('sna-bulk-job-id'),current=select.value;select.replaceChildren();
+  const empty=document.createElement('option');empty.value='';empty.textContent='최근 연장 작업 선택';select.append(empty);
+  for(const job of snaBulkJobCache){const option=document.createElement('option');option.value=job.id;option.textContent=new Date(job.createdAt).toLocaleString('ko-KR')+' · '+job.days+'일 · '+job.targets.length+'명 · '+({running:'진행 중',paused:'중단',completed:'완료'}[job.status]||job.status);select.append(option);}
+  if(snaBulkJobCache.some(j=>j.id===current))select.value=current;
+ }));
+}
+function snaStopAdminOps(){for(const stop of snaOpsUnsubs)try{stop();}catch(_){}snaOpsUnsubs=[];snaOpsStarted=false;snaAuditCache=[];snaBulkSelected.clear();snaBulkCancel=true;document.getElementById('sna-audit-list').replaceChildren();}
+
 window.saveMemberSettings=async(id,grade='silver',duration='30')=>{
  if(!isAdminMode||!auth.currentUser){window.uiAlert?.('최고 관리자만 변경할 수 있습니다.');return false;}
  if(!['7','30','permanent'].includes(duration)||!GRADE_NAMES[grade]){
@@ -4676,6 +4904,7 @@ window.SnaJpgFile=async function(file){
  }finally{URL.revokeObjectURL(url);}
 };
 window.SnaShareFiles=async function(files){
+ if(window.SnaMaintenanceBlocked?.()){await window.uiAlert?.('서비스 점검 중입니다. 점검 종료 후 저장해 주세요.');return false;}
  let list=Array.from(files||[]).filter(Boolean);if(!list.length)return false;
  if(list.some(f=>f.type!=='image/jpeg'))list=await Promise.all(list.map(window.SnaJpgFile));
  else list=list.map(f=>new File([f],String(f.name||'image').replace(/\.(?:png|webp|jpe?g)$/i,'')+'.jpg',{type:'image/jpeg'}));
@@ -8446,14 +8675,11 @@ saveBtn.addEventListener("click",async()=>{
   const inquiryFit=fitCaption(inquiryText,$("b_inquiryWidth").value,upperTop,upperH);
   const subFit=fitCaption(subText,$("b_subWidth").value,lowerTop,lowerH,2000);
   // Manual offsets shift positions only; they never enter either font-size formula.
-  function offset(id){const n=Number($(id).value);return Number.isFinite(n)?Math.max(-250,Math.min(250,n)):0;}
-  const inquiryX=0,inquiryY=offset("b_inquiryY");
-  const subX=0,subY=offset("b_subY");
+  function offset(id){const n=Number($(id).value);return Number.isFinite(n)?Math.max(-10000,Math.min(10000,n)):0;}
+  const inquiryX=offset("b_inquiryX"),inquiryY=offset("b_inquiryY");
+  const subX=offset("b_subX"),subY=offset("b_subY");
   const captionRects={};
-  g.save();g.beginPath();g.rect(textAreaCenter-textAreaWidth/2,headerH,textAreaWidth,bannerH);g.clip();
-  if(inquiryFit)captionRects.inquiry=text(inquiryText,textAreaCenter+inquiryX,inquiryFit.baselineY+inquiryY,1,"inquiry","center",Infinity,{maxLines:1,fit:true,captionFontSize:inquiryFit.size,captionCenterY:inquiryFit.centerY+inquiryY});
-  if(subFit)captionRects.sub=text(subText,textAreaCenter+subX,subFit.baselineY+subY,1,"sub","center",Infinity,{maxLines:1,fit:true,captionFontSize:subFit.size,captionCenterY:subFit.centerY+subY});
-  g.restore();
+
 
   // Editing operates on the WHOLE composed photo bundle, not a fixed pane.
   // The original pane is used only as an initial anchor. Never crop the
@@ -8584,6 +8810,30 @@ saveBtn.addEventListener("click",async()=>{
   }else{renderClothes();renderGuns();}
   const bottomGap=isLarge&&clothes.length&&guns.length?
    Math.abs((photoTop+packingHeight(clothesPacking))-(largeGunTop+packingHeight(gunsPacking))):0;
+  // Captions share one geometry for rendering, hit targets and export.
+  function drawCaption(key,value,fit,x,y){
+   if(!fit)return null;
+   const r=text(value,textAreaCenter+x,fit.baselineY+y,1,key,"center",Infinity,{maxLines:1,fit:true,captionFontSize:fit.size,captionCenterY:fit.centerY+y});
+   if(r)r.originY=fit.centerY;return r;
+  }
+  captionRects.inquiry=drawCaption('inquiry',inquiryText,inquiryFit,inquiryX,inquiryY);
+  if(subFit){
+   // Measure through the same renderer so outlines, shadows and scaling agree.
+   g.save();g.globalAlpha=0;
+   const candidate=drawCaption('sub',subText,subFit,subX,subY);g.restore();
+   let resolvedY=subY;
+   const first=captionRects.inquiry;
+   function extents(r){const a=r.angle*Math.PI/180;return {w:Math.abs(Math.cos(a))*r.w+Math.abs(Math.sin(a))*r.h,h:Math.abs(Math.sin(a))*r.w+Math.abs(Math.cos(a))*r.h};}
+   if(first&&candidate){const a=extents(first),b=extents(candidate),gap=6;
+    if(Math.abs(first.x-candidate.x)<(a.w+b.w)/2+gap&&Math.abs(first.y-candidate.y)<(a.h+b.h)/2+gap){
+     const below=first.y+(a.h+b.h)/2+gap,above=first.y-(a.h+b.h)/2-gap;
+     const choices=[below,above].filter(y=>y-b.h/2>=0&&y+b.h/2<=height);
+     const y=(choices.length?choices:[below,above]).sort((x,y)=>Math.abs(x-candidate.y)-Math.abs(y-candidate.y))[0];
+     resolvedY=y-subFit.centerY;
+    }
+   }
+   captionRects.sub=drawCaption('sub',subText,subFit,subX,resolvedY);
+  }
   applyBoardSaturation(target);
   const edges={left:directValue('b_boardEdgeLeft')/100,right:directValue('b_boardEdgeRight')/100,top:directValue('b_boardEdgeTop')/100,bottom:directValue('b_boardEdgeBottom')/100};
   const boardSX=Math.max(.2,1+edges.left+edges.right),boardSY=Math.max(.2,1+edges.top+edges.bottom);
@@ -8999,7 +9249,7 @@ saveBtn.addEventListener("click",async()=>{
    const handle=handles[0].distance<=tol?handles[0]:null;
    const inside=Math.abs(q.x)<=r.w/2&&Math.abs(q.y)<=r.h/2;
    if(!handle&&!inside)return;
-   directDrag={key,p,r,q,mode:handle?.mode||'move',x:Number($('b_'+key+'X').value),y:Number($('b_'+key+'Y').value),w:directValue('b_'+key+'FreeWidth',100),h:directValue('b_'+key+'FreeHeight',100)};
+   directDrag={key,p,r,q,mode:handle?.mode||'move',x:r.x-m.captionCenterX,y:r.y-r.originY,snapLocked:Math.abs(r.x-m.captionCenterX)<.1,w:directValue('b_'+key+'FreeWidth',100),h:directValue('b_'+key+'FreeHeight',100)};
   }
   e.preventDefault();e.stopImmediatePropagation();historyPush();try{canvas.setPointerCapture?.(e.pointerId);}catch(_){}
  }
@@ -9007,7 +9257,12 @@ saveBtn.addEventListener("click",async()=>{
  canvas.addEventListener('pointermove',e=>{
   if(!directDrag)return;e.preventDefault();e.stopImmediatePropagation();const d=directDrag,p=pointerPoint(e),dx=p.x-d.p.x,dy=p.y-d.p.y;
   if(d.key==='board'){const delta=(/Left|Right/.test(d.edge)?dx/d.w:dy/d.h)*100*(/Left|Top/.test(d.edge)?-1:1);$('b_boardEdge'+d.edge).value=Math.round(Math.max(-40,Math.min(100,d.initial+delta)));}
-  else if(d.mode==='move'){$('b_'+d.key+'X').value='0';$('b_'+d.key+'Y').value=Math.round(Math.max(-250,Math.min(250,d.y+dy)));}
+  else if(d.mode==='move'){
+   const m=state.previewLayout,unit=m.width/canvas.getBoundingClientRect().width,raw=d.x+dx;
+   d.snapLocked=Math.abs(raw)<=(d.snapLocked?16:8)*unit;
+   $('b_'+d.key+'X').value=String(d.snapLocked?0:Math.round(raw));
+   $('b_'+d.key+'Y').value=String(Math.round(d.y+dy));
+  }
   else if(d.mode==='rotate')$('b_'+d.key+'Rotate').value=Math.round(Math.atan2(p.y-d.r.y,p.x-d.r.x)*180/Math.PI+90);
   else{
    const q=captionHit(p,d.r),clamp=v=>Math.max(10,Math.min(500,v));
@@ -9026,7 +9281,7 @@ saveBtn.addEventListener("click",async()=>{
  $('b_directTarget').addEventListener('change',()=>{canvas.style.touchAction='pan-y';scheduleDraw();});
  function drawDirectHandles(m){const key=$('b_directTarget').value;if(key==='none')return;const c=canvas.getContext('2d');c.save();c.setTransform(canvas.width/m.width,0,0,canvas.height/m.height,0,0);c.strokeStyle='#45ff7c';c.fillStyle='#fff';c.lineWidth=2;
   if(key==='board'){c.strokeRect(3,3,m.width-6,m.height-6);for(const [x,y] of [[3,m.height/2],[m.width-3,m.height/2],[m.width/2,3],[m.width/2,m.height-3]]){c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.fill();}}
-  else{const r=m.captionRects[key];if(r){const band=m.captionBand;if(band){c.beginPath();c.rect(band.x,Math.max(0,band.y-45),band.w,band.h+45);c.clip();}c.translate(r.x,r.y);c.rotate(r.angle*Math.PI/180);c.strokeRect(-r.w/2,-r.h/2,r.w,r.h);for(const {x,y} of captionHandles(r)){c.beginPath();c.arc(x,y,8,0,Math.PI*2);c.fill();c.stroke();}}}c.restore();}
+  else{const r=m.captionRects[key];if(r){c.translate(r.x,r.y);c.rotate(r.angle*Math.PI/180);c.strokeRect(-r.w/2,-r.h/2,r.w,r.h);for(const {x,y} of captionHandles(r)){c.beginPath();c.arc(x,y,8,0,Math.PI*2);c.fill();c.stroke();}}}c.restore();}
  // Only the actual object/handles consume touch gestures. Blank canvas remains scrollable.
  const directTouchLayer=document.createElement('div');directTouchLayer.id='b_directTouchLayer';
  directTouchLayer.setAttribute('aria-hidden','true');previewWrap.style.position='relative';previewWrap.appendChild(directTouchLayer);
@@ -9068,8 +9323,9 @@ saveBtn.addEventListener("click",async()=>{
  function paintCaptionCenterGuide(layout){
   const key=$('b_directTarget').value;if(!['inquiry','sub','board'].includes(key))return;
   const c=canvas.getContext('2d');c.save();c.setTransform(canvas.width/layout.width,0,0,canvas.height/layout.height,0,0);
-  c.strokeStyle='rgba(38,199,190,.7)';c.lineWidth=1.2;c.setLineDash([5,5]);
-  c.beginPath();c.moveTo(layout.captionCenterX,layout.captionBand.y);c.lineTo(layout.captionCenterX,layout.captionBand.y+layout.captionBand.h);c.stroke();c.restore();
+  const aligned=layout.captionRects[key]&&Math.abs(layout.captionRects[key].x-layout.captionCenterX)<.1;
+  c.strokeStyle=aligned?'#12bfa4':'rgba(38,199,190,.7)';c.lineWidth=aligned?2:1.2;c.setLineDash(aligned?[]:[5,5]);
+  c.beginPath();c.moveTo(layout.captionCenterX,0);c.lineTo(layout.captionCenterX,layout.height);c.stroke();c.restore();
  }
  new ResizeObserver(()=>{if(state.previewLayout)syncDirectTouchTargets(state.previewLayout);}).observe(canvas);
 
@@ -9095,7 +9351,6 @@ saveBtn.addEventListener("click",async()=>{
   function field(id){return $(id)?.closest('.board-field');}
   function row(id){return $(id)?.closest('.board-row');}
   function sectionFold(section,id,title){const d=fold(id,title);section.querySelector('h2').classList.add('sna-compact-hidden');section.before(d);d.append(section);return d;}
-  for(const id of ['b_inquiryX','b_subX']){$(id).value='0';$(id).readOnly=true;field(id)?.classList.add('sna-compact-hidden');}
   photos.querySelector('h2').textContent='1. 사진 추가';words.querySelector('h2').textContent='2. 문구 입력';preview.querySelector('h2').textContent='3. 미리보기 · 저장';
   photos.after(words);words.after(preview);
   const photoOptions=fold('b_compactPhotoOptions','사진 관리 · 삭제 · 세부 배치');
@@ -9119,13 +9374,13 @@ saveBtn.addEventListener("click",async()=>{
   const toolbar=document.createElement('div');toolbar.className='sna-board-edit-toolbar';
   const label=document.createElement('label');label.htmlFor='b_compactEditMode';label.textContent='미리보기에서 조절할 항목';
   const edit=document.createElement('select');edit.id='b_compactEditMode';
-  for(const [value,title] of [['none','선택 안 함 · 사진 순서 변경'],['photos','사진 이동 · 크기'],['inquiry','문의 문구 · 중앙 정렬 · 크기'],['sub','보조 문구 · 중앙 정렬 · 크기'],['board','판 전체 크기']]){const option=document.createElement('option');option.value=value;option.textContent=title;edit.append(option);}
+  for(const [value,title] of [['none','선택 안 함 · 사진 순서 변경'],['photos','사진 이동 · 크기'],['inquiry','문의 문구 이동 · 크기'],['sub','보조 문구 이동 · 크기'],['board','판 전체 크기']]){const option=document.createElement('option');option.value=value;option.textContent=title;edit.append(option);}
   toolbar.append(label,edit);previewWrap.before(toolbar);
   row('b_fineQuickToggle')?.classList.add('sna-compact-hidden');
   $('b_directTarget').classList.add('sna-compact-hidden');
   $('b_photoFineGoPreview').classList.add('sna-compact-hidden');
   advanced.classList.add('sna-board-fold');advanced.querySelector('summary').textContent='선택 항목 초기화';
-  advanced.querySelector('p').textContent='네 모서리를 대각선으로 끌어 크기를 조절하세요. 문구는 판 중앙에 고정되며 박스 안을 끌면 위아래로 이동합니다. 여백을 쓸면 화면이 스크롤됩니다.';
+  advanced.querySelector('p').textContent='네 모서리를 대각선으로 끌어 크기를 조절하세요. 박스 안을 끌어 자유롭게 이동하세요. 중앙 근처에서는 자동으로 맞춰지고, 다시 끌면 풀립니다. 중앙선은 저장되지 않습니다. 여백을 쓸면 화면이 스크롤됩니다.';
   fineSummary.textContent='사진 크기·위치 세부 조절';
   edit.addEventListener('change',()=>{
    const mode=edit.value;advanced.open=false;fineDetailPanel.open=false;
@@ -9260,14 +9515,13 @@ saveBtn.addEventListener("click",async()=>{
   // Preserve explicit manual edits when automatic constraint is disabled.
   historyPanel.addEventListener('input',e=>{if(!$('b_autoAlign').checked)return;
    const id=e.target.id;
-   if(!['b_inquiryX','b_subX','b_clothNameX','b_gunNameX','b_gunLevelX'].includes(id))return;
+   if(!['b_clothNameX','b_gunNameX','b_gunLevelX'].includes(id))return;
    const n=Number(e.target.value);if(Number.isFinite(n)&&Math.abs(n)>130)e.target.value=String(Math.sign(n)*130);
   },true);
 
  function applySettings(obj){
   if(!obj||typeof obj!=="object")return;
   inputIds.forEach(id=>{if(typeof obj[id]==="string")$(id).value=obj[id];});
-  $("b_inquiryX").value="0";$("b_subX").value="0";
    $('b_exportScale').value=['1','2','4'].includes(obj.b_exportScale)?obj.b_exportScale:'1';
    $('b_autoAlign').checked=obj.b_autoAlign!==false;
    $("b_photoFineEnabled").checked=obj.b_photoFineEnabled===true;
@@ -10148,13 +10402,13 @@ render();health();
 
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.11 · 중앙 정렬·스크롤 수정</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.14 · 저장 배치 유지·스펙 구분 수정</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
  <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
-(()=>{const version='12.5.11';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.11: 편집 중 여백 스크롤 · 문구 모서리 조절 · 판 중앙 정렬';}}catch(_){} })();
+(()=>{const version='12.5.14';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.14: 일괄 연장 · 긴급 점검 · 관리자 작업 기록';}}catch(_){} })();
 </script>
 
 <div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
@@ -10198,7 +10452,7 @@ render();health();
   if(!boardReady()){setStatus('대필판 이용 권한과 사진이 준비되어 있는지 확인해 주세요.');return false;}
   const stats=window.SnaBoardExtra.count(),c=stats.clothes,g=stats.guns;
   if(!c&&!g){setStatus('먼저 대필판에서 옷이나 총 사진을 추가해 주세요.');return false;}
-  const mode=(c+g)>42?'large':(c+g)>15?'medium':'small';
+  const mode=(c>54||g>30)?'large':(c>15||g>5)?'medium':'small';
   $('b_boardSize').value=mode;fire('b_boardSize');
   const clothCols=c?Math.min(9,Math.max(1,Math.ceil(Math.sqrt(c*.65)))):1;
   const gunCols=g?(g<=8?1:g<=14?2:Math.min(9,Math.max(1,Math.ceil(Math.sqrt(g*.42))))):1;
@@ -10276,12 +10530,8 @@ render();health();
   format.addEventListener('change',update);update();
   main.addEventListener('click',e=>{
     if(main.disabled)return;
-    // Preserve legacy settings and workflows; invoke their existing actions.
-    const stats=window.SnaBoardExtra?.count?.();
-    if(stats&&(stats.clothes||stats.guns)&&smart?.checked){
-      // The smart-layout checkbox denotes permission to auto-adjust sizes before exporting.
-      try{layout?.click();}catch(err){console.warn('대필판 자동 배치 오류',err);}
-    }
+    // Saving preserves the selected template, page count and columns.
+    // Smart layout computes columns inside buildLayout; it must not select a spec here.
     try{check?.click();}catch(err){console.warn('대필판 저장 전 검사 오류',err);}
     if(format.value!=='image/jpeg'){
       e.preventDefault();
@@ -10430,7 +10680,7 @@ render();health();
   };
   const cloth={9:3,12:3,15:3,18:3,21:3,24:3,30:5,40:5,45:5,48:6,54:6,96:8};
   const gun={3:1,4:1,5:1,6:1,7:1,8:1,12:2,14:2,24:3,30:3,96:6,100:5};
-  const examples={small:{cloth:[9,12,15,18,21,24],gun:[3,4,5,6,7,8]},medium:{cloth:[30,40,45,48,54],gun:[12,14,24,30]},large:{cloth:[96],gun:[96,100]}};
+  const examples={small:{cloth:[9,12,15],gun:[3,4,5]},medium:{cloth:[18,21,24,30,40,45,48,54],gun:[6,7,8,12,14,24,30]},large:{cloth:[96],gun:[96,100]}};
   let selected=presets[$('b_boardSize')?.value]?$('b_boardSize').value:'medium';
   const tiles=(obj,id)=>{
    const el=$(id);if(!el)return;
