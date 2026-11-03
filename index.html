@@ -524,7 +524,7 @@ input[type=file]{display:none}
 /* iPhone: the preview and the controls ABOVE it must not change height while adjusting. */
 #board-tab #b_touch-sort-hint{height:88px;min-height:88px;overflow:hidden;box-sizing:border-box;display:block;line-height:1.42}
 #board-tab #b_fineQuickToggle{height:48px;min-height:48px;line-height:1.2;white-space:nowrap;font-size:13px}
-#board-tab.sna-photo-editing .board-preview-wrap,#board-tab.sna-photo-editing #b_preview{touch-action:none!important;overscroll-behavior:contain!important}
+#board-tab.sna-photo-editing .board-preview-wrap,#board-tab.sna-photo-editing #b_preview{touch-action:pan-y!important;overscroll-behavior:auto!important}
 html.sna-photo-no-anchor,#board-tab.sna-photo-editing{overflow-anchor:none!important;scroll-behavior:auto!important}
 #board-tab #b_photoFineTouchStatus{box-sizing:border-box}
 #board-tab #b_photoFineDetailPanel{padding:12px;background:#152236;border:1px solid #536b96;border-radius:12px;margin:12px 0;color:#dceaff}
@@ -1479,6 +1479,12 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
 #board-tab .sna-board-edit-toolbar select{min-height:48px;width:100%;padding:10px;border:1px solid #4d6d8d;border-radius:10px;background:#142638;color:#f3f7ff;font:inherit}
 #board-tab .sna-board-edit-toolbar label{font-size:14px;font-weight:700}
 #board-tab .sna-board-fold button{min-height:44px}
+</style><style>
+#board-tab .board-preview-wrap{position:relative;touch-action:pan-y;overscroll-behavior:auto}
+#board-tab #b_preview{touch-action:pan-y!important}
+#b_directTouchLayer{position:absolute;pointer-events:none;touch-action:pan-y;overflow:hidden;z-index:2}
+#b_directTouchLayer[hidden]{display:none!important}
+#b_directTouchLayer .b-direct-touch-hit{position:absolute;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;background:transparent}
 </style></head>
 
 <body>
@@ -8441,8 +8447,8 @@ saveBtn.addEventListener("click",async()=>{
   const subFit=fitCaption(subText,$("b_subWidth").value,lowerTop,lowerH,2000);
   // Manual offsets shift positions only; they never enter either font-size formula.
   function offset(id){const n=Number($(id).value);return Number.isFinite(n)?Math.max(-250,Math.min(250,n)):0;}
-  const inquiryX=offset("b_inquiryX"),inquiryY=offset("b_inquiryY");
-  const subX=offset("b_subX"),subY=offset("b_subY");
+  const inquiryX=0,inquiryY=offset("b_inquiryY");
+  const subX=0,subY=offset("b_subY");
   const captionRects={};
   g.save();g.beginPath();g.rect(textAreaCenter-textAreaWidth/2,headerH,textAreaWidth,bannerH);g.clip();
   if(inquiryFit)captionRects.inquiry=text(inquiryText,textAreaCenter+inquiryX,inquiryFit.baselineY+inquiryY,1,"inquiry","center",Infinity,{maxLines:1,fit:true,captionFontSize:inquiryFit.size,captionCenterY:inquiryFit.centerY+inquiryY});
@@ -8588,7 +8594,7 @@ saveBtn.addEventListener("click",async()=>{
    target.width=Math.max(1,Math.round(outW*limit));target.height=Math.max(1,Math.round(outH*limit));target.getContext('2d').drawImage(copy,0,0,target.width,target.height);copy.width=copy.height=1;
   }
 
-  return {width,height,mode,captionRects,captionBand:{x:textAreaCenter-textAreaWidth/2,y:headerH,w:textAreaWidth,h:bannerH},boardSX,boardSY,previewTileRects,colsLeft:clothesCols,rowsLeft:clothesRows,colsRight:gunsCols,rowsRight:gunsRows,rows:isLarge?clothesRows:rows,bottomGap,
+  return {width,height,mode,captionRects,captionCenterX:textAreaCenter,captionPageWidth:isLarge?margin*2+largeLeftInnerW:width,captionBand:{x:textAreaCenter-textAreaWidth/2,y:headerH,w:textAreaWidth,h:bannerH},boardSX,boardSY,previewTileRects,colsLeft:clothesCols,rowsLeft:clothesRows,colsRight:gunsCols,rowsRight:gunsRows,rows:isLarge?clothesRows:rows,bottomGap,
    photoRects:isLarge?{
     clothes:{x:margin,y:photoTop,w:largeLeftInnerW,h:Math.max(0,bodyBottom-photoTop),contentH:packingHeight(clothesPacking)},
     guns:{x:margin+largeLeftInnerW+seamW,y:largeGunTop,w:rightInnerW,h:Math.max(0,bodyBottom-largeGunTop),contentH:packingHeight(gunsPacking)}
@@ -8671,7 +8677,7 @@ saveBtn.addEventListener("click",async()=>{
  }
  function scheduleDraw(){
   if(state.drawQueued)return;state.drawQueued=true;
-  requestAnimationFrame(()=>{state.drawQueued=false;try{const m=buildLayout(canvas,true);state.previewLayout=m;paintPhotoFineHandles(m);drawDirectHandles(m);paintSortSelectedTile(m);
+  requestAnimationFrame(()=>{state.drawQueued=false;try{const m=buildLayout(canvas,true);state.previewLayout=m;paintCaptionCenterGuide(m);paintPhotoFineHandles(m);drawDirectHandles(m);paintSortSelectedTile(m);syncDirectTouchTargets(m);
     const coverStatus=$("b_photoFineFillInfo");
     if(coverStatus){
       if(!$("b_photoFineEnabled").checked){coverStatus.textContent="";}
@@ -8702,7 +8708,7 @@ saveBtn.addEventListener("click",async()=>{
   // The numeric editor is below the preview inside a collapsed details panel.
   // Do not expand a huge block ABOVE the preview on start/stop.
   $("b_photoFineEditor").style.display="block";
-  canvas.style.touchAction=$("b_photoFineEnabled").checked?"none":"manipulation";
+  canvas.style.touchAction="pan-y";
   canvas.style.cursor=$("b_photoFineEnabled").checked?"grab":"auto";
  }
  ["b_largeScaleMode","b_largeSizePercent"].forEach(id=>{
@@ -8762,7 +8768,7 @@ saveBtn.addEventListener("click",async()=>{
   syncCompactEditMode();
   document.getElementById('board-tab').classList.toggle('sna-photo-editing',active);
   document.documentElement.classList.toggle('sna-photo-no-anchor',active);
-  if(previewWrap){previewWrap.style.touchAction=active?'none':'auto';previewWrap.style.overflow=active?'hidden':'auto';}
+  if(previewWrap){previewWrap.style.touchAction='pan-y';previewWrap.style.overflow='auto';}
   if(active){
    const hasPhoto=state.clothes.length+state.guns.length>0;
    fineStatus(hasPhoto?'사진 가운데는 이동 · ← → 가로폭만 · ↑ ↓ 세로 높이만 조절합니다. 반대쪽 변은 고정됩니다.':'먼저 옷 또는 총기 사진을 추가하세요. 사진이 없으면 움직일 수 없습니다.');
@@ -8941,12 +8947,9 @@ saveBtn.addEventListener("click",async()=>{
  canvas.addEventListener('touchstart',event=>{
   if($('b_directTarget')?.value!=='none')return;
   if(!$("b_photoFineEnabled").checked)return;
-  // Even an initial tap on a blank grid area must not start page scrolling.
-  // Only the canvas is locked; page scrolling elsewhere remains normal.
-  event.preventDefault();
   if(event.touches.length!==1)return;
   const t=event.changedTouches[0];
-  beginFineDrag(t.clientX,t.clientY,'touch-'+t.identifier);
+  if(beginFineDrag(t.clientX,t.clientY,'touch-'+t.identifier))event.preventDefault();
  },{passive:false});
  // Listen at window level so a finger moving outside the canvas still completes the gesture.
  window.addEventListener('touchmove',event=>{
@@ -8981,12 +8984,9 @@ saveBtn.addEventListener("click",async()=>{
  function captionHit(p,r){const a=-r.angle*Math.PI/180,dx=p.x-r.x,dy=p.y-r.y;return {x:dx*Math.cos(a)-dy*Math.sin(a),y:dx*Math.sin(a)+dy*Math.cos(a)};}
  function captionHandles(r){return [
   {x:-r.w/2,y:-r.h/2,mode:'size'},{x:r.w/2,y:-r.h/2,mode:'size'},
-  {x:-r.w/2,y:r.h/2,mode:'size'},{x:r.w/2,y:r.h/2,mode:'size'},
-  {x:-r.w/2,y:0,mode:'width'},{x:r.w/2,y:0,mode:'width'},
-  {x:0,y:-r.h/2,mode:'height'},{x:0,y:r.h/2,mode:'height'},
-  {x:0,y:-r.h/2-36,mode:'rotate'}
+  {x:-r.w/2,y:r.h/2,mode:'size'},{x:r.w/2,y:r.h/2,mode:'size'}
  ];}
- canvas.addEventListener('pointerdown',e=>{
+ function directPointerDown(e){
   const key=$('b_directTarget').value,m=state.previewLayout;if(key==='none'||!m)return;
   const p=pointerPoint(e),tol=14*m.width/Math.max(1,canvas.getBoundingClientRect().width);
   if(key==='board'){
@@ -9001,12 +9001,13 @@ saveBtn.addEventListener("click",async()=>{
    if(!handle&&!inside)return;
    directDrag={key,p,r,q,mode:handle?.mode||'move',x:Number($('b_'+key+'X').value),y:Number($('b_'+key+'Y').value),w:directValue('b_'+key+'FreeWidth',100),h:directValue('b_'+key+'FreeHeight',100)};
   }
-  e.preventDefault();e.stopImmediatePropagation();historyPush();canvas.setPointerCapture?.(e.pointerId);
- },true);
+  e.preventDefault();e.stopImmediatePropagation();historyPush();try{canvas.setPointerCapture?.(e.pointerId);}catch(_){}
+ }
+ canvas.addEventListener('pointerdown',directPointerDown,true);
  canvas.addEventListener('pointermove',e=>{
   if(!directDrag)return;e.preventDefault();e.stopImmediatePropagation();const d=directDrag,p=pointerPoint(e),dx=p.x-d.p.x,dy=p.y-d.p.y;
   if(d.key==='board'){const delta=(/Left|Right/.test(d.edge)?dx/d.w:dy/d.h)*100*(/Left|Top/.test(d.edge)?-1:1);$('b_boardEdge'+d.edge).value=Math.round(Math.max(-40,Math.min(100,d.initial+delta)));}
-  else if(d.mode==='move'){for(const [axis,v] of [['X',d.x+dx],['Y',d.y+dy]])$('b_'+d.key+axis).value=Math.round(Math.max(-250,Math.min(250,v)));}
+  else if(d.mode==='move'){$('b_'+d.key+'X').value='0';$('b_'+d.key+'Y').value=Math.round(Math.max(-250,Math.min(250,d.y+dy)));}
   else if(d.mode==='rotate')$('b_'+d.key+'Rotate').value=Math.round(Math.atan2(p.y-d.r.y,p.x-d.r.x)*180/Math.PI+90);
   else{
    const q=captionHit(p,d.r),clamp=v=>Math.max(10,Math.min(500,v));
@@ -9022,17 +9023,63 @@ saveBtn.addEventListener("click",async()=>{
  },true);
  for(const event of ['pointerup','pointercancel'])canvas.addEventListener(event,e=>{if(!directDrag)return;e.stopImmediatePropagation();directDrag=null;window.SnaDraft?.queue('board');},true);
  canvas.addEventListener('click',event=>{if($('b_directTarget').value!=='none'){event.preventDefault();event.stopImmediatePropagation();}},true);
- $('b_directTarget').addEventListener('change',()=>{canvas.style.touchAction=$('b_directTarget').value==='none'?'manipulation':'none';scheduleDraw();});
+ $('b_directTarget').addEventListener('change',()=>{canvas.style.touchAction='pan-y';scheduleDraw();});
  function drawDirectHandles(m){const key=$('b_directTarget').value;if(key==='none')return;const c=canvas.getContext('2d');c.save();c.setTransform(canvas.width/m.width,0,0,canvas.height/m.height,0,0);c.strokeStyle='#45ff7c';c.fillStyle='#fff';c.lineWidth=2;
   if(key==='board'){c.strokeRect(3,3,m.width-6,m.height-6);for(const [x,y] of [[3,m.height/2],[m.width-3,m.height/2],[m.width/2,3],[m.width/2,m.height-3]]){c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.fill();}}
   else{const r=m.captionRects[key];if(r){const band=m.captionBand;if(band){c.beginPath();c.rect(band.x,Math.max(0,band.y-45),band.w,band.h+45);c.clip();}c.translate(r.x,r.y);c.rotate(r.angle*Math.PI/180);c.strokeRect(-r.w/2,-r.h/2,r.w,r.h);for(const {x,y} of captionHandles(r)){c.beginPath();c.arc(x,y,8,0,Math.PI*2);c.fill();c.stroke();}}}c.restore();}
+ // Only the actual object/handles consume touch gestures. Blank canvas remains scrollable.
+ const directTouchLayer=document.createElement('div');directTouchLayer.id='b_directTouchLayer';
+ directTouchLayer.setAttribute('aria-hidden','true');previewWrap.style.position='relative';previewWrap.appendChild(directTouchLayer);
+ function syncDirectTouchTargets(layout){
+  const layer=document.querySelector('#b_directTouchLayer');if(!layer)return;
+  const key=$('b_directTarget').value,photos=$('b_photoFineEnabled').checked;
+  layer.hidden=key==='none'&&!photos;if(layer.hidden){layer.replaceChildren();return;}
+  const rect=canvas.getBoundingClientRect();if(!rect.width||!rect.height)return;
+  layer.style.left=canvas.offsetLeft+'px';layer.style.top=canvas.offsetTop+'px';layer.style.width=rect.width+'px';layer.style.height=rect.height+'px';
+  layer.replaceChildren();
+  const sx=rect.width/layout.width,sy=rect.height/layout.height;
+  function target(x,y,width,height,angle,photo=false){
+   const hit=document.createElement('div');hit.className='b-direct-touch-hit';
+   hit.style.left=x*sx+'px';hit.style.top=y*sy+'px';hit.style.width=width+'px';hit.style.height=height+'px';hit.style.transform='translate(-50%,-50%) rotate('+angle+'deg)';
+   if(photo){
+    hit.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.button>0)return;if(beginFineDrag(e.clientX,e.clientY,e.pointerId)){e.preventDefault();e.stopPropagation();try{canvas.setPointerCapture(e.pointerId);}catch(_){}}});
+    hit.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;const t=e.changedTouches[0];if(beginFineDrag(t.clientX,t.clientY,'touch-'+t.identifier)){e.preventDefault();e.stopPropagation();}},{passive:false});
+   }else hit.addEventListener('pointerdown',directPointerDown);
+   hit.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();});layer.append(hit);
+  }
+  if(photos){
+   for(const side of ['clothes','guns']){
+    const box=photoGroupPreviewRect(layout,side);if(!box)continue;
+    target(box.x+box.w/2,box.y+box.h/2,box.w*sx,box.h*sy,0,true);
+    for(const edge of ['left','right','top','bottom']){const h=displayedFineHandle(layout,box.handles[edge]);target(h.x,h.y,36,36,0,true);}
+   }
+  }else if(key==='board'){
+   // Large hit strips stay close to the four edges; the page interior scrolls normally.
+   const inset=8;
+   target(inset/sx,layout.height/2,24,rect.height,0);target(layout.width-inset/sx,layout.height/2,24,rect.height,0);
+   target(layout.width/2,inset/sy,rect.width,24,0);target(layout.width/2,layout.height-inset/sy,rect.width,24,0);
+  }else{
+   const r=layout.captionRects[key];if(!r)return;
+   target(r.x,r.y,Math.max(14,r.w*sx),Math.max(14,r.h*sy),r.angle);
+   const a=r.angle*Math.PI/180;
+   for(const h of captionHandles(r))target(r.x+h.x*Math.cos(a)-h.y*Math.sin(a),r.y+h.x*Math.sin(a)+h.y*Math.cos(a),32,32,0);
+  }
+ }
+ function paintCaptionCenterGuide(layout){
+  const key=$('b_directTarget').value;if(!['inquiry','sub','board'].includes(key))return;
+  const c=canvas.getContext('2d');c.save();c.setTransform(canvas.width/layout.width,0,0,canvas.height/layout.height,0,0);
+  c.strokeStyle='rgba(38,199,190,.7)';c.lineWidth=1.2;c.setLineDash([5,5]);
+  c.beginPath();c.moveTo(layout.captionCenterX,layout.captionBand.y);c.lineTo(layout.captionCenterX,layout.captionBand.y+layout.captionBand.h);c.stroke();c.restore();
+ }
+ new ResizeObserver(()=>{if(state.previewLayout)syncDirectTouchTargets(state.previewLayout);}).observe(canvas);
+
  // Compact board controls: move existing nodes so their event handlers and values survive.
  function syncCompactEditMode(){
   const select=document.querySelector('#b_compactEditMode');if(!select)return;
   let target=$('b_directTarget').value;
   if($('b_photoFineEnabled').checked&&target!=='none'){$('b_directTarget').value='none';target='none';}
   const mode=$('b_photoFineEnabled').checked?'photos':target;
-  canvas.style.touchAction=mode==='none'?'manipulation':'none';
+  canvas.style.touchAction='pan-y';
   select.value=mode;
   advanced.hidden=!['inquiry','sub','board'].includes(mode);
   directReset.hidden=mode!=='board';
@@ -9048,6 +9095,7 @@ saveBtn.addEventListener("click",async()=>{
   function field(id){return $(id)?.closest('.board-field');}
   function row(id){return $(id)?.closest('.board-row');}
   function sectionFold(section,id,title){const d=fold(id,title);section.querySelector('h2').classList.add('sna-compact-hidden');section.before(d);d.append(section);return d;}
+  for(const id of ['b_inquiryX','b_subX']){$(id).value='0';$(id).readOnly=true;field(id)?.classList.add('sna-compact-hidden');}
   photos.querySelector('h2').textContent='1. 사진 추가';words.querySelector('h2').textContent='2. 문구 입력';preview.querySelector('h2').textContent='3. 미리보기 · 저장';
   photos.after(words);words.after(preview);
   const photoOptions=fold('b_compactPhotoOptions','사진 관리 · 삭제 · 세부 배치');
@@ -9071,13 +9119,13 @@ saveBtn.addEventListener("click",async()=>{
   const toolbar=document.createElement('div');toolbar.className='sna-board-edit-toolbar';
   const label=document.createElement('label');label.htmlFor='b_compactEditMode';label.textContent='미리보기에서 조절할 항목';
   const edit=document.createElement('select');edit.id='b_compactEditMode';
-  for(const [value,title] of [['none','선택 안 함 · 사진 순서 변경'],['photos','사진 이동 · 크기'],['inquiry','문의 문구 이동 · 크기'],['sub','보조 문구 이동 · 크기'],['board','판 전체 크기']]){const option=document.createElement('option');option.value=value;option.textContent=title;edit.append(option);}
+  for(const [value,title] of [['none','선택 안 함 · 사진 순서 변경'],['photos','사진 이동 · 크기'],['inquiry','문의 문구 · 중앙 정렬 · 크기'],['sub','보조 문구 · 중앙 정렬 · 크기'],['board','판 전체 크기']]){const option=document.createElement('option');option.value=value;option.textContent=title;edit.append(option);}
   toolbar.append(label,edit);previewWrap.before(toolbar);
   row('b_fineQuickToggle')?.classList.add('sna-compact-hidden');
   $('b_directTarget').classList.add('sna-compact-hidden');
   $('b_photoFineGoPreview').classList.add('sna-compact-hidden');
   advanced.classList.add('sna-board-fold');advanced.querySelector('summary').textContent='선택 항목 초기화';
-  advanced.querySelector('p').textContent='모서리는 글자 크기, 좌우 점은 폭, 위아래 점은 높이를 조절합니다. 박스 안을 끌면 이동합니다.';
+  advanced.querySelector('p').textContent='네 모서리를 대각선으로 끌어 크기를 조절하세요. 문구는 판 중앙에 고정되며 박스 안을 끌면 위아래로 이동합니다. 여백을 쓸면 화면이 스크롤됩니다.';
   fineSummary.textContent='사진 크기·위치 세부 조절';
   edit.addEventListener('change',()=>{
    const mode=edit.value;advanced.open=false;fineDetailPanel.open=false;
@@ -9219,6 +9267,7 @@ saveBtn.addEventListener("click",async()=>{
  function applySettings(obj){
   if(!obj||typeof obj!=="object")return;
   inputIds.forEach(id=>{if(typeof obj[id]==="string")$(id).value=obj[id];});
+  $("b_inquiryX").value="0";$("b_subX").value="0";
    $('b_exportScale').value=['1','2','4'].includes(obj.b_exportScale)?obj.b_exportScale:'1';
    $('b_autoAlign').checked=obj.b_autoAlign!==false;
    $("b_photoFineEnabled").checked=obj.b_photoFineEnabled===true;
@@ -10099,13 +10148,13 @@ render();health();
 
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.10 · 화면 배율 조절 수정</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.11 · 중앙 정렬·스크롤 수정</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
  <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
-(()=>{const version='12.5.10';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.10: 고해상도 화면 문구 박스·터치 배율 수정';}}catch(_){} })();
+(()=>{const version='12.5.11';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.11: 편집 중 여백 스크롤 · 문구 모서리 조절 · 판 중앙 정렬';}}catch(_){} })();
 </script>
 
 <div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
