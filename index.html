@@ -9023,7 +9023,7 @@ saveBtn.addEventListener("click",async()=>{
  for(const event of ['pointerup','pointercancel'])canvas.addEventListener(event,e=>{if(!directDrag)return;e.stopImmediatePropagation();directDrag=null;window.SnaDraft?.queue('board');},true);
  canvas.addEventListener('click',event=>{if($('b_directTarget').value!=='none'){event.preventDefault();event.stopImmediatePropagation();}},true);
  $('b_directTarget').addEventListener('change',()=>{canvas.style.touchAction=$('b_directTarget').value==='none'?'manipulation':'none';scheduleDraw();});
- function drawDirectHandles(m){const key=$('b_directTarget').value;if(key==='none')return;const c=canvas.getContext('2d');c.save();c.scale(canvas.width/m.width,canvas.height/m.height);c.strokeStyle='#45ff7c';c.fillStyle='#fff';c.lineWidth=2;
+ function drawDirectHandles(m){const key=$('b_directTarget').value;if(key==='none')return;const c=canvas.getContext('2d');c.save();c.setTransform(canvas.width/m.width,0,0,canvas.height/m.height,0,0);c.strokeStyle='#45ff7c';c.fillStyle='#fff';c.lineWidth=2;
   if(key==='board'){c.strokeRect(3,3,m.width-6,m.height-6);for(const [x,y] of [[3,m.height/2],[m.width-3,m.height/2],[m.width/2,3],[m.width/2,m.height-3]]){c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.fill();}}
   else{const r=m.captionRects[key];if(r){const band=m.captionBand;if(band){c.beginPath();c.rect(band.x,Math.max(0,band.y-45),band.w,band.h+45);c.clip();}c.translate(r.x,r.y);c.rotate(r.angle*Math.PI/180);c.strokeRect(-r.w/2,-r.h/2,r.w,r.h);for(const {x,y} of captionHandles(r)){c.beginPath();c.arc(x,y,8,0,Math.PI*2);c.fill();c.stroke();}}}c.restore();}
  // Compact board controls: move existing nodes so their event handlers and values survive.
@@ -9058,10 +9058,11 @@ saveBtn.addEventListener("click",async()=>{
   for(const child of Array.from(words.children))if(child.tagName!=='H2'&&!basic.has(child)&&child.tagName!=='INPUT')move(child,wordOptions);
   words.append(wordOptions);
   const extra=document.createElement('div');extra.id='b_compactExtraSettings';
-  const nameOptions=sectionFold(names,'b_compactNames','사진별 이름 · 레벨 · 순서');
+  // Frequently edited photo metadata and shared colors stay directly visible.
+  names.querySelector('h2').textContent='사진별 이름 · 레벨 · 순서';photos.after(names);
+  colors.querySelector('h2').textContent='색상 · 그림자 · 테두리';words.after(colors);
   const labelOptions=sectionFold(labels,'b_compactLabels','이름·레벨 글자 크기 · 위치');
-  const colorOptions=sectionFold(colors,'b_compactColors','색상 · 그림자 · 테두리');
-  extra.append(nameOptions,labelOptions,colorOptions);
+  extra.append(labelOptions);
   const automatic=fold('b_compactAutomatic','자동 배치 · 테마 · 사용 안내');
   move($('sna-board-magic'),automatic);extra.append(automatic);
   const alignment=fold('b_compactAlign','정렬 · 사진 위치 초기화');
@@ -10098,13 +10099,13 @@ render();health();
 
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.9 · 문구 박스 연동</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.10 · 화면 배율 조절 수정</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
  <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
-(()=>{const version='12.5.9';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.9: 문구 실제 박스 연동 · 숫자 조절창 제거';}}catch(_){} })();
+(()=>{const version='12.5.10';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.10: 고해상도 화면 문구 박스·터치 배율 수정';}}catch(_){} })();
 </script>
 
 <div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
