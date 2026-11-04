@@ -3552,13 +3552,13 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  let snaOpsUnsubs=[],snaOpsStarted=false,snaAuditCache=[],snaBulkJobCache=[];
  const snaBulkSelected=new Set();let snaBulkBusy=false,snaBulkCancel=false,snaBulkPreparing=false;
  window.SnaMaintenanceBlocked=()=>false;
- let snaMaintenanceNoticeDismissed=false;
+ let snaMaintenanceNoticeDismissed=false,snaMaintenanceNoticeOpen=false,snaMaintenanceNoticeText='';
  function snaRenderMaintenance(){
  const overlay=document.getElementById('sna-maintenance-overlay'),blocked=window.SnaMaintenanceBlocked();
- overlay.hidden=isAdminMode||!snaServiceReady||snaServiceData.enabled!==true||snaMaintenanceNoticeDismissed;
+ overlay.hidden=!snaMaintenanceNoticeOpen;
  const notice=document.getElementById('sna-service-check-notice');if(notice){notice.hidden=isAdminMode||snaServiceReady;notice.querySelector('span').textContent=snaServiceError||'운영 상태를 확인 중입니다. 로그인은 계속할 수 있습니다.';}
- document.getElementById('sna-maintenance-title').textContent=snaServiceReady?'서비스 점검 안내':snaServiceError?'운영 상태 확인 실패':'운영 상태 확인 중';
- document.getElementById('sna-maintenance-public-message').textContent=snaServiceError|| (snaServiceReady?(snaServiceData.message||'서비스 점검 중입니다. 잠시 후 다시 이용해 주세요.'):'서버에서 현재 운영 상태를 확인하고 있습니다. 아직 점검 중으로 확정된 상태는 아닙니다.');
+ document.getElementById('sna-maintenance-title').textContent='서비스 점검 안내';
+ document.getElementById('sna-maintenance-public-message').textContent=snaMaintenanceNoticeText;
  document.getElementById('sna-maintenance-state').textContent=snaServiceError||(!snaServiceReady?'운영 상태 확인 중':snaServiceData.enabled?'점검 안내 중 · 일반 회원도 기존 권한대로 이용 가능':'정상 운영 중');
  for(const el of document.querySelectorAll('[data-ops-master]'))el.hidden=!isMasterAdmin;
  document.getElementById('sna-maintenance-overlay-logout').hidden=!auth.currentUser;
@@ -3566,6 +3566,7 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  function snaRenderOpsRoles(){snaRenderMaintenance();snaRenderBulkPicker();}
  function snaApplyMaintenance(data){
  if(snaServiceData.enabled!==data.enabled||snaServiceData.message!==data.message)snaMaintenanceNoticeDismissed=false;
+ if(data.enabled===true&&!snaMaintenanceNoticeDismissed&&!snaMaintenanceNoticeOpen){snaMaintenanceNoticeText=data.message||'서비스 점검 안내입니다. 기존 이용권 권한대로 계속 이용할 수 있습니다.';snaMaintenanceNoticeOpen=true;}
  snaServiceRevision++;snaServiceData=data;snaServiceReady=true;snaServiceError='';
  if(authUser&&!isAdminMode&&currentMember){syncMemberContentSubscriptions(currentMember);window.SnaReviews?.refreshAccess?.();if(!data.enabled&&document.getElementById('reviews-tab').classList.contains('active'))snaLoadPublishedReviews();}
  const input=document.getElementById('sna-maintenance-message');if(document.activeElement!==input)input.value=data.message||'';
@@ -3613,7 +3614,7 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')snaWatchMaintenance();});
  document.getElementById('sna-maintenance-overlay-login').onclick=()=>{authScreen.style.zIndex='10004000';displayLogin('점검 중에도 관리자 계정으로 로그인할 수 있습니다.');};
  document.getElementById('sna-maintenance-overlay-logout').onclick=()=>window.signOutMember();
- document.getElementById('sna-maintenance-continue').onclick=()=>{snaMaintenanceNoticeDismissed=true;snaRenderMaintenance();};
+ document.getElementById('sna-maintenance-continue').onclick=()=>{snaMaintenanceNoticeDismissed=true;snaMaintenanceNoticeOpen=false;snaRenderMaintenance();};
  document.getElementById('sna-maintenance-retry').onclick=snaWatchMaintenance;
  document.getElementById('sna-service-check-retry').onclick=snaWatchMaintenance;
  snaRenderMaintenance();
@@ -7915,21 +7916,7 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  if(r)r.originY=fit.centerY;return r;
  }
  captionRects.inquiry=drawCaption('inquiry',inquiryText,inquiryFit,inquiryX,inquiryY);
- if(subFit){
- const candidate=drawCaption('sub',subText,subFit,subX,subY,true);
- let resolvedY=subY;
- const first=captionRects.inquiry;
- function extents(r){const a=r.angle*Math.PI/180;return {w:Math.abs(Math.cos(a))*r.w+Math.abs(Math.sin(a))*r.h,h:Math.abs(Math.sin(a))*r.w+Math.abs(Math.cos(a))*r.h};}
- if(first&&candidate){const a=extents(first),b=extents(candidate),gap=6;
- if(Math.abs(first.x-candidate.x)<(a.w+b.w)/2+gap&&Math.abs(first.y-candidate.y)<(a.h+b.h)/2+gap){
- const below=first.y+(a.h+b.h)/2+gap,above=first.y-(a.h+b.h)/2-gap;
- const choices=[below,above].filter(y=>y-b.h/2>=0&&y+b.h/2<=height);
- const y=(choices.length?choices:[below,above]).sort((x,y)=>Math.abs(x-candidate.y)-Math.abs(y-candidate.y))[0];
- resolvedY=y-subFit.centerY;
- }
- }
- captionRects.sub=drawCaption('sub',subText,subFit,subX,resolvedY);
- }
+ captionRects.sub=drawCaption('sub',subText,subFit,subX,subY);
  applyBoardSaturation(target);
  const edges={left:directValue('b_boardEdgeLeft')/100,right:directValue('b_boardEdgeRight')/100,top:directValue('b_boardEdgeTop')/100,bottom:directValue('b_boardEdgeBottom')/100};
  const boardSX=Math.max(.2,1+edges.left+edges.right),boardSY=Math.max(.2,1+edges.top+edges.bottom);
@@ -9405,13 +9392,13 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  })();
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.21 · 점검 중 일반 회원 이용 허용</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.23 · 문의·보조 문구 독립 이동 수정</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
  <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
- (()=>{const version='12.5.21';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.21: 일괄 연장 · 긴급 점검 · 관리자 작업 기록';}}catch(_){} })();
+ (()=>{const version='12.5.23';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.23: 일괄 연장 · 긴급 점검 · 관리자 작업 기록';}}catch(_){} })();
 </script>
 
 <div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
