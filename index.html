@@ -1660,9 +1660,11 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  <p class="member-tip">최고 관리자만 변경할 수 있습니다. 점검 중에도 최고·공동 관리자는 테스트할 수 있습니다.</p>
 </section>
 <section class="member-panel" id="sna-bulk-panel" data-ops-master hidden>
- <h3>선택 회원 이용권 일괄 연장</h3><p>아래 회원 목록에서 연장할 회원을 선택하세요. 영구권·승인 대기·차단·관리자 계정은 제외합니다. 유효한 이용권은 남은 기간을 보존하며, 만료 회원을 포함하면 오늘부터 계산합니다.</p>
+ <h3>선택 회원 이용권 일괄 연장</h3><p>이 영역의 회원 선택 목록에서 연장할 회원을 체크하세요. 영구권·승인 대기·차단·관리자 계정은 제외합니다. 유효한 이용권은 남은 기간을 보존하며, 만료 회원을 포함하면 오늘부터 계산합니다.</p>
  <div class="member-controls"><label>연장 일수 <input id="sna-bulk-days" type="number" min="1" max="365" value="1" style="width:80px"></label><label><input id="sna-bulk-expired" type="checkbox"> 만료 회원 포함</label></div>
  <input id="sna-bulk-reason" type="text" maxlength="150" placeholder="연장 사유 (예: 점검 보상)" aria-label="일괄 연장 사유">
+ <label for="sna-bulk-member-search">회원 선택</label><input id="sna-bulk-member-search" type="search" placeholder="닉네임 또는 회원 ID 검색" aria-label="일괄 연장 회원 검색">
+ <p id="sna-bulk-picker-summary" role="status">회원 목록을 불러오는 중입니다.</p><div id="sna-bulk-member-list" style="max-height:360px;overflow-y:auto;overscroll-behavior:contain;border:1px solid #48658a;border-radius:12px;padding:10px;margin:10px 0"></div>
  <div class="member-controls"><button class="member-btn" id="sna-bulk-select-visible" type="button">현재 목록에서 선택</button><button class="member-btn" id="sna-bulk-select-clear" type="button">선택 해제</button><strong id="sna-bulk-count">선택한 회원 0명</strong></div>
  <div class="member-controls"><button class="member-btn primary" id="sna-bulk-start" type="button">선택 회원 연장</button><button class="member-btn" id="sna-bulk-cancel" type="button">남은 처리 중지</button></div>
  <details><summary>중단한 연장 이어하기 · 최근 20개 작업</summary><div class="member-controls"><select id="sna-bulk-job-id" aria-label="다시 실행할 연장 작업"><option value="">최근 연장 작업 선택</option></select><button class="member-btn" id="sna-bulk-resume" type="button">이어서 처리</button></div></details>
@@ -3628,7 +3630,7 @@ function loadAdminData(){
  };
  document.getElementById('admin-user-search').oninput=()=>{if(adminUserSnapshot)renderUserSnapshot(adminUserSnapshot);};
  document.getElementById('admin-user-grade-filter').onchange=()=>{if(adminUserSnapshot)renderUserSnapshot(adminUserSnapshot);};
- liveUnsubscribes.push(onSnapshot(collection(db,"users"),snapshot=>{adminUserSnapshot=snapshot;renderUserSnapshot(snapshot);snaRenderJointChoices(snapshot);snaRenderStats();},err=>console.warn("사용자 목록 오류",err)));
+ liveUnsubscribes.push(onSnapshot(collection(db,"users"),snapshot=>{adminUserSnapshot=snapshot;renderUserSnapshot(snapshot);snaRenderJointChoices(snapshot);snaRenderStats();snaRenderBulkPicker();},err=>{console.warn("사용자 목록 오류",err);const out=document.getElementById('sna-bulk-picker-summary');if(out)out.textContent='회원 목록을 불러오지 못했습니다. Firebase 규칙과 로그인 상태를 확인해 주세요.';}));
  const latest=query(collection(db,"logs"),orderBy("timestamp","desc"),limit(20));
  liveUnsubscribes.push(onSnapshot(latest,snapshot=>{
   const list=document.getElementById("admin-log-list");list.replaceChildren();
@@ -3656,7 +3658,7 @@ function snaRenderMaintenance(){
  for(const el of document.querySelectorAll('[data-ops-master]'))el.hidden=!isMasterAdmin;
  document.getElementById('sna-maintenance-overlay-logout').hidden=!auth.currentUser;
 }
-function snaRenderOpsRoles(){snaRenderMaintenance();snaRenderBulkCount();}
+function snaRenderOpsRoles(){snaRenderMaintenance();snaRenderBulkPicker();}
 const snaServiceUnsubscribe=onSnapshot(SNA_MAINTENANCE_REF,snap=>{
  if(snap.metadata.hasPendingWrites)return;
  const data=snap.exists()?snap.data():{enabled:false,message:''};
@@ -3689,9 +3691,37 @@ document.getElementById('sna-maintenance-on').onclick=()=>snaSetMaintenance(true
 document.getElementById('sna-maintenance-off').onclick=()=>snaSetMaintenance(false);
 function snaRenderBulkCount(){const out=document.getElementById('sna-bulk-count');if(out)out.textContent='선택한 회원 '+snaBulkSelected.size+'명';for(const el of document.querySelectorAll('[data-sna-bulk-uid]'))el.checked=snaBulkSelected.has(el.dataset.snaBulkUid);}
 function snaBulkEligible(uid,data){return uid!==auth.currentUser?.uid&&uid!==snaJointRoleUid&&!snaExtensionPlan(data,1,Date.now(),document.getElementById('sna-bulk-expired').checked).skip;}
-document.getElementById('sna-bulk-select-visible').onclick=()=>{if(!isMasterAdmin||snaBulkBusy)return;for(const el of document.querySelectorAll('[data-sna-bulk-uid]'))snaBulkSelected.add(el.dataset.snaBulkUid);snaRenderBulkCount();};
+function snaRenderBulkPicker(){
+ const list=document.getElementById('sna-bulk-member-list'),summary=document.getElementById('sna-bulk-picker-summary');
+ if(!list)return;list.replaceChildren();
+ if(!isMasterAdmin){snaBulkSelected.clear();summary.textContent='최고 관리자만 회원을 선택할 수 있습니다.';snaRenderBulkCount();return;}
+ if(!adminUserSnapshot){summary.textContent='회원 목록을 불러오는 중입니다.';snaRenderBulkCount();return;}
+ const needle=document.getElementById('sna-bulk-member-search').value.trim().toLowerCase();
+ const rows=adminUserSnapshot.docs.map(snap=>{
+  const data=snap.data(),uid=snap.id,name=String(data.name||uid);
+  const reason=uid===auth.currentUser?.uid||uid===snaJointRoleUid?'관리자 계정 제외':snaExtensionPlan(data,1,Date.now(),document.getElementById('sna-bulk-expired').checked).skip||'';
+  return {uid,data,name,reason};
+ });
+ const eligible=new Set(rows.filter(r=>!r.reason).map(r=>r.uid));
+ for(const uid of snaBulkSelected)if(!eligible.has(uid))snaBulkSelected.delete(uid);
+ let visible=0,available=0;
+ for(const row of rows){
+  if(needle&&!(`${row.name} ${row.uid}`.toLowerCase().includes(needle)))continue;
+  visible++;if(!row.reason)available++;
+  const label=document.createElement('label');label.className='sna-bulk-member-choice';label.style.cssText='padding:10px;border-bottom:1px solid #344f74;min-height:44px';
+  const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.disabled=!!row.reason;checkbox.checked=snaBulkSelected.has(row.uid);checkbox.setAttribute('aria-label',row.name+' 이용권 연장 선택');
+  if(!row.reason)checkbox.dataset.snaBulkUid=row.uid;
+  checkbox.onchange=()=>{if(snaBulkBusy||!isMasterAdmin){checkbox.checked=snaBulkSelected.has(row.uid);return;}if(checkbox.checked)snaBulkSelected.add(row.uid);else snaBulkSelected.delete(row.uid);snaRenderBulkCount();};
+  const text=document.createElement('span');text.textContent=row.name+' · '+(row.reason||'연장 가능');label.append(checkbox,text);list.append(label);
+ }
+ if(!visible){const empty=document.createElement('p');empty.textContent=needle?'검색 결과가 없습니다.':'등록된 회원이 없습니다.';list.append(empty);}
+ summary.textContent=`표시 ${visible}명 · 선택 가능 ${available}명 / 전체 ${rows.length}명`;
+ snaRenderBulkCount();
+}
+document.getElementById('sna-bulk-member-search').oninput=snaRenderBulkPicker;
+document.getElementById('sna-bulk-select-visible').onclick=()=>{if(!isMasterAdmin||snaBulkBusy)return;for(const el of document.querySelectorAll('#sna-bulk-member-list [data-sna-bulk-uid]:not(:disabled)'))snaBulkSelected.add(el.dataset.snaBulkUid);snaRenderBulkCount();};
 document.getElementById('sna-bulk-select-clear').onclick=()=>{if(snaBulkBusy)return;snaBulkSelected.clear();snaRenderBulkCount();};
-document.getElementById('sna-bulk-expired').onchange=()=>{snaBulkSelected.clear();document.getElementById('admin-user-search').dispatchEvent(new Event('input'));snaRenderBulkCount();};
+document.getElementById('sna-bulk-expired').onchange=()=>{if(snaBulkBusy)return;snaBulkSelected.clear();document.getElementById('admin-user-search').dispatchEvent(new Event('input'));snaRenderBulkPicker();};
 document.getElementById('sna-bulk-cancel').onclick=()=>{snaBulkCancel=true;};
 async function snaRunBulkJob(jobId){
  if(snaBulkBusy)return;snaBulkBusy=true;snaBulkCancel=false;
@@ -8323,6 +8353,7 @@ saveBtn.addEventListener("click",async()=>{
      // The interaction box is never independently cropped or remeasured later.
      captionGeometry={x,y:options.captionCenterY,w:(inkW+padding*2)*sx,h:(inkH+padding*2)*sy,inkW:inkW*sx,inkH:inkH*sy,angle:directValue('b_'+key+'Rotate')};
     }
+    if(options.measureOnly)return; // Geometry inspection must never paint glyphs.
     const spans=[];let cursor=0;const re=/일섭/g;let m;
     while((m=re.exec(str))!==null){
      if(m.index>cursor)spans.push({text:str.slice(cursor,m.index),red:false});
@@ -8811,16 +8842,15 @@ saveBtn.addEventListener("click",async()=>{
   const bottomGap=isLarge&&clothes.length&&guns.length?
    Math.abs((photoTop+packingHeight(clothesPacking))-(largeGunTop+packingHeight(gunsPacking))):0;
   // Captions share one geometry for rendering, hit targets and export.
-  function drawCaption(key,value,fit,x,y){
+  function drawCaption(key,value,fit,x,y,measureOnly=false){
    if(!fit)return null;
-   const r=text(value,textAreaCenter+x,fit.baselineY+y,1,key,"center",Infinity,{maxLines:1,fit:true,captionFontSize:fit.size,captionCenterY:fit.centerY+y});
+   const r=text(value,textAreaCenter+x,fit.baselineY+y,1,key,"center",Infinity,{maxLines:1,fit:true,captionFontSize:fit.size,captionCenterY:fit.centerY+y,measureOnly});
    if(r)r.originY=fit.centerY;return r;
   }
   captionRects.inquiry=drawCaption('inquiry',inquiryText,inquiryFit,inquiryX,inquiryY);
   if(subFit){
    // Measure through the same renderer so outlines, shadows and scaling agree.
-   g.save();g.globalAlpha=0;
-   const candidate=drawCaption('sub',subText,subFit,subX,subY);g.restore();
+   const candidate=drawCaption('sub',subText,subFit,subX,subY,true);
    let resolvedY=subY;
    const first=captionRects.inquiry;
    function extents(r){const a=r.angle*Math.PI/180;return {w:Math.abs(Math.cos(a))*r.w+Math.abs(Math.sin(a))*r.h,h:Math.abs(Math.sin(a))*r.w+Math.abs(Math.cos(a))*r.h};}
@@ -10402,13 +10432,13 @@ render();health();
 
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.14 · 저장 배치 유지·스펙 구분 수정</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.16 · 일괄 연장 회원 선택 목록 추가</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
  <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
-(()=>{const version='12.5.14';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.14: 일괄 연장 · 긴급 점검 · 관리자 작업 기록';}}catch(_){} })();
+(()=>{const version='12.5.16';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.16: 일괄 연장 · 긴급 점검 · 관리자 작업 기록';}}catch(_){} })();
 </script>
 
 <div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
