@@ -1486,11 +1486,7 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
 #b_directTouchLayer[hidden]{display:none!important}
 #b_directTouchLayer .b-direct-touch-hit{position:absolute;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;background:transparent}
 </style><style>
-#sna-maintenance-overlay{position:fixed;inset:0;background:#07111def;z-index:2147483000!important;display:grid;place-items:center;padding:20px;overflow:auto}
-#sna-maintenance-overlay[hidden],[data-ops-master][hidden]{display:none!important}
-.sna-maintenance-card{max-width:600px;width:100%;box-sizing:border-box;padding:24px;border:1px solid #4c7291;background:#142638;border-radius:18px;color:#f2f7ff}
-#sna-maintenance-public-message{white-space:pre-wrap;line-height:1.8;overflow-wrap:anywhere}
-#sna-maintenance-message{width:100%;box-sizing:border-box;min-height:90px;background:#102034;color:white;border:1px solid #55728d;border-radius:10px;padding:10px}
+[data-ops-master][hidden]{display:none!important}
 #sna-bulk-panel input[type=text],#sna-audit-search{min-height:44px;padding:10px;background:#102034;color:white;border:1px solid #55728d;border-radius:10px;box-sizing:border-box;max-width:100%}
 .sna-bulk-member-choice{display:flex;align-items:center;gap:8px;font-size:13px;margin:8px 0}.sna-bulk-member-choice input{width:20px!important;height:20px;min-height:20px}
 .sna-audit-entry{border-bottom:1px solid #365069;padding:12px 0}.sna-audit-entry summary{cursor:pointer;line-height:1.7}.sna-audit-entry pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.6 monospace}
@@ -1652,12 +1648,6 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  <div id="sna-admin-report-list" class="sna-admin-feedback-list"><p class="sna-empty-feedback">접수된 신고가 없습니다.</p></div>
 </div>
 <div class="member-panel"><h3>🖼 대필 전시관 관리</h3><p>대필판 저장 시 작품이 자동 게시됩니다. 이곳에서 부적절한 공개 작품을 삭제할 수 있습니다.</p><div id="admin-gallery-list"></div></div>
-<section class="member-panel" id="sna-maintenance-panel">
- <h3>점검 안내 모드</h3><p id="sna-maintenance-state" role="status">운영 상태 확인 중</p>
- <div data-ops-master hidden><label for="sna-maintenance-message">회원에게 보여줄 점검 안내</label><textarea id="sna-maintenance-message" maxlength="500" rows="3" placeholder="예: 오류 수정으로 점검 중입니다. 완료 후 다시 이용해 주세요."></textarea>
- <div class="member-controls"><button class="member-btn danger" id="sna-maintenance-on" type="button">점검 시작 · 안내 변경</button><button class="member-btn primary" id="sna-maintenance-off" type="button">점검 종료</button></div><p id="sna-maintenance-result" role="status"></p></div>
- <p class="member-tip">최고 관리자만 안내를 켜고 끌 수 있습니다. 점검 중에도 일반 회원은 기존 이용권 권한대로 이용합니다.</p>
-</section>
 <section class="member-panel" id="sna-bulk-panel" data-ops-master hidden>
  <h3>선택 회원 이용권 일괄 연장</h3><p>이 영역의 회원 선택 목록에서 연장할 회원을 체크하세요. 영구권·승인 대기·차단·관리자 계정은 제외합니다. 유효한 이용권은 남은 기간을 보존하며, 만료 회원을 포함하면 오늘부터 계산합니다.</p>
  <div class="member-controls"><label>연장 일수 <input id="sna-bulk-days" type="number" min="1" max="365" value="1" style="width:80px"></label><label><input id="sna-bulk-expired" type="checkbox"> 만료 회원 포함</label></div>
@@ -1669,7 +1659,7 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  <details><summary>중단한 연장 이어하기 · 최근 20개 작업</summary><div class="member-controls"><select id="sna-bulk-job-id" aria-label="다시 실행할 연장 작업"><option value="">최근 연장 작업 선택</option></select><button class="member-btn" id="sna-bulk-resume" type="button">이어서 처리</button></div></details>
  <p id="sna-bulk-status" role="status" aria-live="polite">같은 작업을 다시 실행해도 이미 처리한 회원에게 중복 적용되지 않습니다. 한 작업에 최대 500명을 선택할 수 있습니다.</p>
 </section>
-<section class="member-panel" id="sna-audit-panel"><h3>관리자 작업 기록</h3><p>회원 승인·등급·기간·차단·삭제, 공지·후기·전시관 관리, 공동 관리자 변경, 긴급 점검을 기록합니다. 변경 내용과 기록은 함께 저장됩니다.</p>
+<section class="member-panel" id="sna-audit-panel"><h3>관리자 작업 기록</h3><p>회원 승인·등급·기간·차단·삭제, 공지·후기·전시관 관리, 공동 관리자 변경을 기록합니다. 변경 내용과 기록은 함께 저장됩니다.</p>
  <div class="member-controls"><input id="sna-audit-search" type="search" placeholder="실행자 · 회원 UID · 작업 검색" aria-label="관리자 작업 기록 검색"><select id="sna-audit-role" aria-label="실행자 역할"><option value="">모든 관리자</option><option value="master">최고 관리자</option><option value="joint">공동 관리자</option></select></div>
  <p id="sna-audit-status" role="status">최근 기록을 불러옵니다.</p><div id="sna-audit-list"></div>
 </section>
@@ -1685,8 +1675,6 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
 
 
 
-<div id="sna-service-check-notice" hidden role="status" style="position:fixed;left:12px;right:12px;bottom:12px;z-index:10005000;padding:12px;background:#14283a;color:#fff;border:1px solid #54768c;border-radius:12px;font-size:13px;display:flex;gap:10px;align-items:center"><span style="flex:1"></span><button type="button" id="sna-service-check-retry" class="member-btn">다시 확인</button></div><style>#sna-service-check-notice[hidden]{display:none!important}</style>
-<div id="sna-maintenance-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="sna-maintenance-title"><div class="sna-maintenance-card"><h2 id="sna-maintenance-title">서비스 점검 안내</h2><p id="sna-maintenance-public-message" role="status"></p><div class="member-controls"><button type="button" class="member-btn primary" id="sna-maintenance-continue">확인 · 계속 이용</button><button type="button" class="member-btn" id="sna-maintenance-overlay-login">로그인 화면</button><button type="button" class="member-btn" id="sna-maintenance-overlay-logout">로그아웃</button><button type="button" class="member-btn" id="sna-maintenance-retry">다시 확인</button></div><p class="member-tip">점검 중에도 기존 이용권 권한대로 편집·저장을 이용할 수 있습니다.</p></div></div>
 <div id="ui-dialog-backdrop" role="presentation"><div class="ui-dialog-card" role="dialog" aria-modal="true" aria-labelledby="ui-dialog-title"><div class="ui-dialog-symbol" id="ui-dialog-icon">✦</div><h3 id="ui-dialog-title">알림</h3><p id="ui-dialog-message"></p><div class="ui-dialog-actions" id="ui-dialog-actions"></div></div></div>
 <script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
  (function(){
@@ -1824,7 +1812,7 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  }
  window.logActivity=async(action,detail={})=>{
  try{
- if(!authUser||window.SnaMaintenanceBlocked?.())return;
+ if(!authUser)return;
  if(!isAdminMode&&(!currentMember||currentMember.status!=='approved'||expired(currentMember)))return;
  const name=savedName||"이름 미확인";
  const now=new Date();
@@ -1870,7 +1858,7 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  let reviewRoleReady=false,reviewIsAdmin=false,reviewActivatedUid=null;
  const reviewAllowed=()=>!!reviewUid&&reviewRoleReady&&!reviewIsAdmin
  &&!!authUser&&!authUser.isAnonymous&&currentMember?.status==='approved'
- &&!expired(currentMember)&&!window.SnaTrial?.active&&!window.SnaMaintenanceBlocked?.();
+ &&!expired(currentMember)&&!window.SnaTrial?.active;
  const reviewLocalKey=uid=>'sna-feature-reviews-v1:'+uid;
  function reviewSaveLocal(){if(!reviewUid)return;try{localStorage.setItem(reviewLocalKey(reviewUid),JSON.stringify(reviewRecords));}catch(e){console.warn('후기 기기 저장 실패',e);}}
  function reviewLoadLocal(uid){try{return JSON.parse(localStorage.getItem(reviewLocalKey(uid))||'{}')||{};}catch(e){return {};}}
@@ -2553,7 +2541,6 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  return Number.isFinite(Number(until))&&Number(until)>0&&Date.now()>=Number(until)?'silver':grade;
  };
  window.canUseFeature=feature=>{
- if(['clothes','guns','merge','kill','board','gallery','reviews'].includes(feature)&&window.SnaMaintenanceBlocked?.())return false;
  if(feature==='gallery'||feature==='reviews')return !!authUser && (isAdminMode||(currentMember?.status==='approved'&&!expired(currentMember)));
  if(!FEATURE_NAMES[feature])return true;
  if(isAdminMode)return true;
@@ -2873,7 +2860,7 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  if(galleryItems)galleryItems.replaceChildren();
  }
  function syncMemberContentSubscriptions(data){
- const active=!!authUser&&!isAdminMode&&data?.status==='approved'&&!expired(data)&&!window.SnaMaintenanceBlocked?.();
+ const active=!!authUser&&!isAdminMode&&data?.status==='approved'&&!expired(data);
  if(!active){if(memberContentUnsubscribes.length)stopMemberContentSubscriptions();if(snaCloud.unsub){snaCloud.unsub();snaCloud.unsub=null;}return;}
  if(memberContentUnsubscribes.length)return;
  snaStartPresets(authUser.uid);
@@ -3546,119 +3533,15 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  const q=query(collection(db,"activityLogs"),orderBy("timestamp","desc"),limit(150));
  liveUnsubscribes.push(onSnapshot(q,snapshot=>{activityCache=snapshot.docs.map(s=>s.data());renderActivityLogs();snaRenderStats();},err=>console.warn("작업 로그 오류",err)));
  }
- const SNA_MAINTENANCE_REF=doc(db,'serviceControl','maintenance');
- let snaServiceReady=false,snaServiceData={enabled:false,message:''},snaServiceError='';
- let snaServiceUnsubscribe=null,snaServiceGeneration=0,snaMaintenanceSaving=false,snaServiceRevision=0,snaServiceAbort=null;
  let snaOpsUnsubs=[],snaOpsStarted=false,snaAuditCache=[],snaBulkJobCache=[];
  const snaBulkSelected=new Set();let snaBulkBusy=false,snaBulkCancel=false,snaBulkPreparing=false;
- window.SnaMaintenanceBlocked=()=>false;
- let snaMaintenanceNoticeDismissed=false,snaMaintenanceNoticeOpen=false,snaMaintenanceNoticeText='';
- let snaNoticeClickArmed=false,snaNoticeReadableAt=0,snaNoticeReadTimer=null;
- const snaNoticePendingKey='sna-maintenance-unread-v1';
- try{const pending=JSON.parse(sessionStorage.getItem(snaNoticePendingKey)||'null');if(pending&&typeof pending.text==='string'){snaMaintenanceNoticeOpen=true;snaMaintenanceNoticeText=pending.text;}}catch(_){}
- function snaRememberMaintenanceNotice(){try{if(snaMaintenanceNoticeOpen)sessionStorage.setItem(snaNoticePendingKey,JSON.stringify({text:snaMaintenanceNoticeText}));else sessionStorage.removeItem(snaNoticePendingKey);}catch(_){} }
- function snaAcknowledgeMaintenance(event){
- if(!snaMaintenanceNoticeOpen||!event.isTrusted||Date.now()<snaNoticeReadableAt||!snaNoticeClickArmed)return;
- snaNoticeClickArmed=false;snaMaintenanceNoticeDismissed=true;snaMaintenanceNoticeOpen=false;snaRememberMaintenanceNotice();snaRenderMaintenance();
- }
-
- function snaRenderMaintenance(){
- const overlay=document.getElementById('sna-maintenance-overlay'),blocked=window.SnaMaintenanceBlocked();
- overlay.hidden=!snaMaintenanceNoticeOpen;
- const confirm=document.getElementById('sna-maintenance-continue');
- if(snaMaintenanceNoticeOpen&&overlay.dataset.reading!=='true'){
- overlay.dataset.reading='true';snaNoticeClickArmed=false;snaNoticeReadableAt=Date.now()+1200;confirm.disabled=true;
- clearTimeout(snaNoticeReadTimer);snaNoticeReadTimer=setTimeout(()=>{if(snaMaintenanceNoticeOpen)confirm.disabled=false;},1200);
- }else if(!snaMaintenanceNoticeOpen){delete overlay.dataset.reading;clearTimeout(snaNoticeReadTimer);confirm.disabled=false;snaNoticeClickArmed=false;}
-
- const notice=document.getElementById('sna-service-check-notice');if(notice){notice.hidden=isAdminMode||snaServiceReady;notice.querySelector('span').textContent=snaServiceError||'운영 상태를 확인 중입니다. 로그인은 계속할 수 있습니다.';}
- document.getElementById('sna-maintenance-title').textContent='서비스 점검 안내';
- document.getElementById('sna-maintenance-public-message').textContent=snaMaintenanceNoticeText;
- document.getElementById('sna-maintenance-state').textContent=snaServiceError||(!snaServiceReady?'운영 상태 확인 중':snaServiceData.enabled?'점검 안내 중 · 일반 회원도 기존 권한대로 이용 가능':'정상 운영 중');
- for(const el of document.querySelectorAll('[data-ops-master]'))el.hidden=!isMasterAdmin;
- document.getElementById('sna-maintenance-overlay-logout').hidden=!auth.currentUser;
- }
- function snaRenderOpsRoles(){snaRenderMaintenance();snaRenderBulkPicker();}
- function snaApplyMaintenance(data){
- if(snaServiceData.enabled!==data.enabled||snaServiceData.message!==data.message)snaMaintenanceNoticeDismissed=false;
- if(data.enabled===true&&!snaMaintenanceNoticeDismissed&&!snaMaintenanceNoticeOpen){snaMaintenanceNoticeText=data.message||'서비스 점검 안내입니다. 기존 이용권 권한대로 계속 이용할 수 있습니다.';snaMaintenanceNoticeOpen=true;snaRememberMaintenanceNotice();}
- snaServiceRevision++;snaServiceData=data;snaServiceReady=true;snaServiceError='';
- if(authUser&&!isAdminMode&&currentMember){syncMemberContentSubscriptions(currentMember);window.SnaReviews?.refreshAccess?.();if(!data.enabled&&document.getElementById('reviews-tab').classList.contains('active'))snaLoadPublishedReviews();}
- const input=document.getElementById('sna-maintenance-message');if(document.activeElement!==input)input.value=data.message||'';
- snaRenderMaintenance();
- }
- function snaMaintenanceReadError(error,generation){
- if(generation!==snaServiceGeneration)return;
- if(snaServiceReady)return;
- snaServiceError=error?.code==='permission-denied'?'운영 상태 조회 권한이 없습니다. 최고 관리자가 최신 Firebase 규칙을 게시해야 합니다.':'서버 상태 조회가 지연되고 있습니다. 로그인 후 다시 확인해 주세요.';
- snaRenderMaintenance();
- }
- async function snaReadMaintenanceHTTP(generation){
- const revision=snaServiceRevision,controller=new AbortController();snaServiceAbort=controller;
- const timer=setTimeout(()=>controller.abort(),8000);
- try{
- const url='https://firestore.googleapis.com/v1/projects/'+encodeURIComponent(firebaseConfig.projectId)+'/databases/(default)/documents/serviceControl/maintenance?key='+encodeURIComponent(firebaseConfig.apiKey);
- const response=await fetch(url,{cache:'no-store',signal:controller.signal});
- let data;
- if(response.status===404)data={enabled:false,message:''};
- else{
- if(!response.ok){const error=new Error('HTTP '+response.status);error.code=response.status===403?'permission-denied':'unavailable';throw error;}
- const json=await response.json(),fields=json.fields||{};
- if(fields.enabled&&typeof fields.enabled.booleanValue!=='boolean')throw Error('점검 상태 형식 오류');
- data={enabled:fields.enabled?.booleanValue===true,message:fields.message?.stringValue||''};
- }
- if(generation===snaServiceGeneration&&revision===snaServiceRevision)snaApplyMaintenance(data);
- }catch(error){if(!controller.signal.aborted||generation===snaServiceGeneration)snaMaintenanceReadError(error,generation);}
- finally{clearTimeout(timer);if(snaServiceAbort===controller)snaServiceAbort=null;}
- }
- function snaWatchMaintenance(){
- const generation=++snaServiceGeneration;
- if(snaServiceUnsubscribe)snaServiceUnsubscribe();
- if(snaServiceAbort)snaServiceAbort.abort();
- // Re-entering the app must not discard a confirmed server state.
- snaServiceError='';snaRenderMaintenance();
- snaServiceUnsubscribe=onSnapshot(SNA_MAINTENANCE_REF,{includeMetadataChanges:true},snap=>{
- if(generation!==snaServiceGeneration||snap.metadata.hasPendingWrites||snap.metadata.fromCache)return;
- snaApplyMaintenance(snap.exists()?snap.data():{enabled:false,message:''});
- },error=>snaMaintenanceReadError(error,generation));
- void snaReadMaintenanceHTTP(generation);
- }
- snaWatchMaintenance();
- window.addEventListener('pageshow',e=>{if(e.persisted)snaWatchMaintenance();});
- window.addEventListener('online',snaWatchMaintenance);
- document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')snaWatchMaintenance();});
- document.getElementById('sna-maintenance-overlay-login').onclick=()=>{authScreen.style.zIndex='2147483100';displayLogin('점검 중에도 관리자 계정으로 로그인할 수 있습니다.');};
- document.getElementById('sna-maintenance-overlay-logout').onclick=()=>window.signOutMember();
- const snaNoticeConfirm=document.getElementById('sna-maintenance-continue');
- snaNoticeConfirm.addEventListener('pointerdown',event=>{snaNoticeClickArmed=event.isTrusted&&snaMaintenanceNoticeOpen&&Date.now()>=snaNoticeReadableAt;});
- snaNoticeConfirm.addEventListener('pointercancel',()=>{snaNoticeClickArmed=false;});
- snaNoticeConfirm.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' ')snaNoticeClickArmed=event.isTrusted&&Date.now()>=snaNoticeReadableAt;});
- snaNoticeConfirm.onclick=snaAcknowledgeMaintenance;
- document.getElementById('sna-maintenance-retry').onclick=snaWatchMaintenance;
- document.getElementById('sna-service-check-retry').onclick=snaWatchMaintenance;
- snaRenderMaintenance();
+ function snaRenderOpsRoles(){for(const el of document.querySelectorAll('[data-ops-master]'))el.hidden=!isMasterAdmin;snaRenderBulkPicker();}
+ try{sessionStorage.removeItem('sna-maintenance-unread-v1');}catch(_){}
  async function snaAssertMaster(){
  const user=auth.currentUser;if(!user||!isMasterAdmin)throw Error('최고 관리자만 사용할 수 있습니다.');
  const token=await getIdTokenResult(user,true);
  if(auth.currentUser?.uid!==user.uid||token.claims.admin!==true||token.claims.jointAdmin===true)throw Error('최고 관리자 권한을 확인해 주세요.');return user;
  }
- async function snaSetMaintenance(enabled){
- const status=document.getElementById('sna-maintenance-result');
- if(snaMaintenanceSaving)return;snaMaintenanceSaving=true;
- const buttons=['sna-maintenance-on','sna-maintenance-off'].map(id=>document.getElementById(id));buttons.forEach(b=>b.disabled=true);
- try{
- const user=await snaAssertMaster(),message=document.getElementById('sna-maintenance-message').value.trim().slice(0,500);
- if(enabled&&!message)throw Error('회원에게 보여줄 점검 안내를 입력하세요.');
- if(!await window.uiConfirm(enabled?'점검 안내를 표시할까요? 일반 회원도 기존 이용권 권한대로 편집·저장을 계속할 수 있습니다.':'점검 안내를 종료할까요?'))return;
- await setDoc(SNA_MAINTENANCE_REF,{enabled,message,updatedBy:user.uid,updatedAt:serverTimestamp()});
- const saved=await getDocFromServer(SNA_MAINTENANCE_REF);
- const actual=saved.exists()?saved.data():{enabled:false,message:''};snaApplyMaintenance(actual);
- status.textContent=actual.enabled===enabled?(enabled?'점검을 시작했습니다. 서버 저장 확인 완료.':'점검을 종료했습니다. 서버 저장 확인 완료.'):'서버 상태가 다른 창에서 변경되었습니다. 현재 운영 상태를 확인해 주세요.';
- }catch(e){status.textContent=e.code==='permission-denied'?'변경 실패: Firebase 규칙에서 권한이 거부되었습니다. 최신 규칙을 게시한 뒤 다시 시도하세요.':'서버 확인 실패: '+(e.message||e.code)+' · 현재 운영 상태를 다시 확인해 주세요.';}
- finally{snaMaintenanceSaving=false;buttons.forEach(b=>b.disabled=false);}
- }
- document.getElementById('sna-maintenance-on').onclick=()=>snaSetMaintenance(true);
- document.getElementById('sna-maintenance-off').onclick=()=>snaSetMaintenance(false);
  function snaRenderBulkCount(){const out=document.getElementById('sna-bulk-count');if(out)out.textContent='선택한 회원 '+snaBulkSelected.size+'명';for(const el of document.querySelectorAll('[data-sna-bulk-uid]'))el.checked=snaBulkSelected.has(el.dataset.snaBulkUid);}
  function snaBulkEligible(uid,data){return uid!==auth.currentUser?.uid&&uid!==snaJointRoleUid&&!snaExtensionPlan(data,1,Date.now(),document.getElementById('sna-bulk-expired').checked).skip;}
  function snaRenderBulkPicker(){
@@ -4878,7 +4761,6 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  }finally{URL.revokeObjectURL(url);}
  };
  window.SnaShareFiles=async function(files){
- if(window.SnaMaintenanceBlocked?.()){await window.uiAlert?.('서비스 점검 중입니다. 점검 종료 후 저장해 주세요.');return false;}
  let list=Array.from(files||[]).filter(Boolean);if(!list.length)return false;
  if(list.some(f=>f.type!=='image/jpeg'))list=await Promise.all(list.map(window.SnaJpgFile));
  else list=list.map(f=>new File([f],String(f.name||'image').replace(/\.(?:png|webp|jpe?g)$/i,'')+'.jpg',{type:'image/jpeg'}));
@@ -9411,13 +9293,13 @@ html[data-sna-browser="allowed"] #sna-browser-gate{display:none!important}
  })();
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.24 · 안내 창 읽기 유지·터치 오작동 방지</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v12.5.25 · 점검 차단창 제거</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
  <strong>v12.4 업데이트 안내</strong><div>작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
- (()=>{const version='12.5.24';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.24: 일괄 연장 · 긴급 점검 · 관리자 작업 기록';}}catch(_){} })();
+ (()=>{const version='12.5.25';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v12.5.25: 일괄 연장 · 관리자 작업 기록';}}catch(_){} })();
 </script>
 
 <div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
