@@ -5289,6 +5289,158 @@ window.SnaChatRead={start:crStart,stop:crStop,observe:crObserve};if(chatState.op
  document.querySelectorAll('[data-qa-run]').forEach(btn=>btn.addEventListener('click',()=>batch(btn.dataset.qaRun)));
  return {inspect,check:batch,scheduleCheck};
  })();
+ window.SnaDetectCardGrid=function(imgData){
+ /* v13.3 옷장 카드 격자 인식: 밝은 배경과 카드의 경계선만으로 찾음(사진 크기·위치 기준 없음).
+    모든 카드를 같은 크기로, 각 카드 가운데에 맞춰 자름. */
+ if(!imgData||!imgData.data)return null;
+ const W=imgData.width,H=imgData.height,d=imgData.data,N=W*H,G=4;
+ if(W<120||H<90)return null;
+ const L=new Uint8Array(N),BG=new Uint8Array(N),CD=new Uint8Array(N);
+ for(let i=0,p=0;i<N;i++,p+=4){
+ const r=d[p],g=d[p+1],b=d[p+2],l=(r*299+g*587+b*114)/1000;
+ const s=Math.max(r,g,b)-Math.min(r,g,b);
+ L[i]=l;BG[i]=l>=150&&s<40?1:0;CD[i]=l<145||s>70?1:0;
+ }
+ const lf=new Float64Array(W),rf=new Float64Array(W);
+ for(let y=0;y<H;y++){const o=y*W;for(let x=0;x<W-G-1;x++){const k=o+x;
+ if(BG[k]&&CD[k+G]&&CD[k+G+1])lf[x]++;
+ if(CD[k]&&CD[k+1]&&BG[k+G+1])rf[x]++;
+ }}
+ function peaks(p){
+ let m=0;for(const v of p)if(v>m)m=v;
+ const out=[];if(m<=0)return out;
+ for(let i=1;i<p.length-1;i++){
+ if(p[i]>=m*.25&&p[i]>p[i-1]&&p[i]>=p[i+1]){
+ let j=i;while(j+1<p.length&&p[j+1]===p[i])j++;
+ if(j+1<p.length&&p[j+1]>p[i]){i=j;continue;}
+ const c=Math.round((i+j)/2);
+ if(out.length&&c-out[out.length-1]<6){if(p[c]>p[out[out.length-1]])out[out.length-1]=c;}
+ else out.push(c);
+ i=j;
+ }
+ }
+ return out;
+ }
+ function pairSize(pa,pb,fa,fb){
+ const hist=new Map();
+ for(const i of pa)for(const j of pb){const dd=j-i;if(dd<12)continue;hist.set(dd,(hist.get(dd)||0)+Math.min(fa[i],fb[j]));}
+ if(!hist.size)return 0;
+ const sm=new Map();let mx=0;
+ for(const dd of hist.keys()){const v=(hist.get(dd-1)||0)+(hist.get(dd)||0)+(hist.get(dd+1)||0);sm.set(dd,v);if(v>mx)mx=v;}
+ let d0=Infinity;for(const [dd,v] of sm)if(v>=mx*.6&&dd<d0)d0=dd;
+ let best=d0,bv=-1;for(let dd=d0-1;dd<=d0+1;dd++){const v=hist.get(dd)||0;if(v>bv){bv=v;best=dd;}}
+ return best;
+ }
+ function lattice(starts,size){
+ starts=starts.slice().sort((a,b)=>a-b);
+ if(starts.length<2)return null;
+ const diffs=[];for(let i=1;i<starts.length;i++){const dd=starts[i]-starts[i-1];if(dd>size)diffs.push(dd);}
+ if(!diffs.length)return null;
+ const p0=Math.min(...diffs);let num=0,den=0;
+ for(const dd of diffs){const k=Math.round(dd/p0);if(k>=1&&Math.abs(dd-k*p0)<=3+k){num+=dd;den+=k;}}
+ if(!den)return null;
+ const p=num/den;
+ const offs=starts.map(s=>s-Math.round((s-starts[0])/p)*p).sort((a,b)=>a-b);
+ return {a:offs[Math.floor(offs.length/2)],p};
+ }
+ function expand(lat,starts,size,limit,score){
+ if(!lat)return starts.slice();
+ const out=[];
+ for(let k=-Math.floor(lat.a/lat.p);lat.a+k*lat.p+size+G<limit;k++){
+ const v=lat.a+k*lat.p;if(v<0)continue;
+ const vi=Math.round(v);let best=vi,bv=-1;
+ for(let q=Math.max(0,vi-3);q<=Math.min(limit-G-2,vi+3);q++){const sc=score(q);if(sc>bv){bv=sc;best=q;}}
+ out.push(best);
+ }
+ return out;
+ }
+ const pl=peaks(lf),pr=peaks(rf);
+ const wp=pairSize(pl,pr,lf,rf);
+ if(!wp||wp>W*.6)return null;
+ const colStarts=pl.filter(i=>pr.some(j=>Math.abs(j-i-wp)<=Math.max(3,Math.round(wp*.02))));
+ if(!colStarts.length)return null;
+ const cand=expand(lattice(colStarts,wp),colStarts,wp,W,q=>lf[q]+rf[Math.min(W-1,q+wp)]);
+ const xs=[];for(const i of cand)for(let x=i+G+2;x<i+wp-2;x++)if(x>=0&&x<W)xs.push(x);
+ const tf=new Float64Array(H),bf=new Float64Array(H);
+ for(let y=0;y<H-G-1;y++){const o=y*W,o4=o+G*W,o5=o+(G+1)*W,o1=o+W;let t=0,b=0;
+ for(const x of xs){if(BG[o+x]&&CD[o4+x]&&CD[o5+x])t++;if(CD[o+x]&&CD[o1+x]&&BG[o5+x])b++;}
+ tf[y]=t;bf[y]=b;
+ }
+ const pt=peaks(tf),pb=peaks(bf);
+ const hp=pairSize(pt,pb,tf,bf);
+ if(!hp||hp>H*.9||hp<wp*.6||hp>wp*2)return null;
+ const rowStarts=pt.filter(i=>pb.some(j=>Math.abs(j-i-hp)<=Math.max(3,Math.round(hp*.02))));
+ if(!rowStarts.length)return null;
+ const rc=expand(lattice(rowStarts,hp),rowStarts,hp,H,q=>tf[q]+bf[Math.min(H-1,q+hp)]);
+ const at=(x,y)=>y*W+x;
+ const cells=[];
+ for(let ri=0;ri<rc.length;ri++){const y=rc[ri];
+ if(y<1||y+hp+G+2>=H)continue;
+ for(let ci=0;ci<cand.length;ci++){const x=cand[ci];
+ if(x<1||x+wp+G+2>=W)continue;
+ let n=0,lo=0,ro=0;
+ for(let yy=y+G+Math.floor(hp*.1);yy<y+G+Math.floor(hp*.9);yy+=2){n++;
+ if(BG[at(x-1,yy)]&&CD[at(x+G+1,yy)])lo++;
+ if(CD[at(x+wp,yy)]&&BG[at(x+wp+G+2,yy)])ro++;
+ }
+ if(!n||lo/n<.6||ro/n<.6)continue;
+ let m=0,to=0,bo=0;
+ for(let xx=x+G+Math.floor(wp*.1);xx<x+G+Math.floor(wp*.9);xx+=2){m++;
+ if(BG[at(xx,y-1)]&&CD[at(xx,y+G+1)])to++;
+ if(CD[at(xx,y+hp)]&&BG[at(xx,y+hp+G+2)])bo++;
+ }
+ if(!m||to/m<.6||bo/m<.6)continue;
+ cells.push({ci,ri,x,y});
+ }
+ }
+ if(!cells.length)return null;
+ function crossing(prof){
+ const n=prof.length;if(n<7)return null;
+ const a=(prof[0]+prof[1]+prof[2])/3,b=(prof[n-1]+prof[n-2]+prof[n-3])/3,mid=(a+b)/2;
+ if(Math.abs(a-b)<20)return null;
+ for(let k=0;k<n-1;k++){const u=prof[k],v=prof[k+1];if((u-mid)*(v-mid)<=0&&u!==v)return k+(mid-u)/(v-u);}
+ return null;
+ }
+ function avgCols(ys,x0,x1){const out=[];for(let x=x0;x<x1;x++){let s=0;for(const y of ys)s+=L[at(x,y)];out.push(s/ys.length);}return out;}
+ function avgRows(xs2,y0,y1){const out=[];for(let y=y0;y<y1;y++){let s=0;for(const x of xs2)s+=L[at(x,y)];out.push(s/xs2.length);}return out;}
+ const colEdge=new Map(),rowEdge=new Map();
+ for(const ci of new Set(cells.map(c=>c.ci))){
+ const x=cand[ci],ys=[];
+ for(const c of cells)if(c.ci===ci)for(let yy=c.y+Math.floor(hp*.15);yy<c.y+Math.floor(hp*.85);yy+=2)ys.push(yy);
+ const x0=Math.max(0,x-3),xl=crossing(avgCols(ys,x0,Math.min(W,x+G+6)));
+ const xe=x+wp,x2=Math.max(0,xe-4),xr=crossing(avgCols(ys,x2,Math.min(W,xe+G+4)));
+ colEdge.set(ci,[xl==null?x+G/2:x0+xl,xr==null?xe+G/2:x2+xr]);
+ }
+ for(const ri of new Set(cells.map(c=>c.ri))){
+ const y=rc[ri],xs2=[];
+ for(const c of cells)if(c.ri===ri)for(let xx=c.x+Math.floor(wp*.15);xx<c.x+Math.floor(wp*.85);xx+=2)xs2.push(xx);
+ const y0=Math.max(0,y-3),yt=crossing(avgRows(xs2,y0,Math.min(H,y+G+6)));
+ const ye=y+hp,y2=Math.max(0,ye-4),yb=crossing(avgRows(xs2,y2,Math.min(H,ye+G+4)));
+ rowEdge.set(ri,[yt==null?y+G/2:y0+yt,yb==null?ye+G/2:y2+yb]);
+ }
+ const med=a=>{const s=a.slice().sort((p,q)=>p-q);return s[Math.floor(s.length/2)];};
+ const wsub=med([...colEdge.values()].map(([l,r])=>r-l)),hsub=med([...rowEdge.values()].map(([t,b])=>b-t));
+ let cw=Math.max(8,Math.round(wsub)-1),ch=Math.max(8,Math.round(hsub)-1);
+ const memo=window.__snaCardGridMemo||(window.__snaCardGridMemo=new Map());
+ const key=W+'x'+H;let mem=memo.get(key);
+ if(mem&&Math.abs(mem.cw-cw)<=2&&Math.abs(mem.ch-ch)<=2){cw=mem.cw;ch=mem.ch;}
+ else{mem={cw,ch,cols:[],rows:[]};memo.set(key,mem);}
+ const snap=(list,center,size)=>{
+ for(const e of list)if(Math.abs(e.c-center)<=1.2)return e.v;
+ const v=Math.round(center-size/2+.5);list.push({c:center,v});return v;
+ };
+ const colX=new Map(),rowY=new Map();
+ for(const [ci,[l,r]] of colEdge)colX.set(ci,snap(mem.cols,(l+r)/2,cw));
+ for(const [ri,[t,b]] of rowEdge)rowY.set(ri,snap(mem.rows,(t+b)/2,ch));
+ const usedC=[...colEdge.keys()].sort((a,b)=>a-b),usedR=[...rowEdge.keys()].sort((a,b)=>a-b);
+ const out=[];
+ for(const c of cells.sort((a,b)=>a.ri-b.ri||a.ci-b.ci)){
+ const x=colX.get(c.ci),y=rowY.get(c.ri);
+ if(x<0||y<0||x+cw>W||y+ch>H)continue;
+ out.push({x,y,width:cw,height:ch,partial:false,gridColumn:usedC.indexOf(c.ci),gridRow:usedR.indexOf(c.ri),source:'grid2'});
+ }
+ return out.length?out:null;
+ };
  window.SnaDetectItemGrid=function(image,imageCanvas){
  const iw=imageCanvas.width,ih=imageCanvas.height;
  if(iw<160||ih<120)return null;
@@ -6058,6 +6210,7 @@ window.SnaChatRead={start:crStart,stop:crStop,observe:crObserve};if(chatState.op
  }
  function detectRegularItemGrid(){return window.SnaDetectItemGrid(image,imageCanvas);}
  function detectCards(){
+ try{const grid2=window.SnaDetectCardGrid(originalImageData);if(grid2&&grid2.length){cards=grid2;return;}}catch(err){console.warn('옷 카드 격자 인식 실패, 이전 방식으로 찾습니다.',err);}
  const regularGrid=detectRegularItemGrid();
  if(regularGrid){cards=regularGrid;return;}
  legacyDetectCards();
@@ -9919,13 +10072,13 @@ if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.SnaK
  })();
 </script>
 
-<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v13.2.1 · 두 장 대필판 행·열 직접 지정</div>
+<div class="sna-version-bar" id="sna-version-bar" aria-label="현재 버전">v13.3.0 · 옷 카드 인식 개선 · 모두 같은 크기</div>
 <div id="sna-update-toast" role="status" hidden style="position:fixed;z-index:100200;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);max-width:min(92vw,400px);background:#203757;border:1px solid #658abb;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 26px #0009;font:13px system-ui;line-height:1.65">
- <strong>v13.2.1 업데이트 안내</strong><div><b>두 장 대필판 행·열</b>: 고스펙·중스펙 2장 연결에서 옷과 총기의 열(가로)×행(세로)을 직접 고를 수 있어요. 모든 사진은 같은 크기로 들어가고(사진을 키우지 않음), 판 크기가 배열에 맞춰 자동으로 바뀝니다. v13.1.0: <b>계정 보호</b>: 계정 공유 등 부정 이용 확인을 위해 이용 기록에 기기 종류·브라우저와 기기 구분용 무작위 번호가 함께 기록됩니다(개인 식별 정보는 기록하지 않습니다). v13.0.0: <b>킬로그 커팅 새 인식</b>: '킬 알림' 글자와 총 아이콘을 찾아 폰·패드 화면 크기와 상관없이 인식하고, 배경 삭제 없이 킬로그 직사각형 그대로 자릅니다. 위·아래로 붙은 장식도 직사각형 안에 포함됩니다. 서버 연결이 필요 없고, 사진을 추가하면 바로 잘립니다. 보정 화면은 없애고 버튼을 줄였습니다. <b>대필판 연동</b>: 킬로그 결과의 「🔫 대필판에 넣기」로 총기칸에 바로 붙이고, 대필판의 「🎯 총기칸 킬로그」에서 위치·크기를 조절할 수 있습니다. 작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
+ <strong>v13.3.0 업데이트 안내</strong><div><b>옷 추출</b>: 옷장 사진의 카드를 경계선으로 정확히 찾아, 모든 카드가 같은 크기로 잘립니다(상의·바지·신발·가방·마스크·안경 모두). v13.2.1: <b>두 장 대필판 행·열</b>: 고스펙·중스펙 2장 연결에서 옷과 총기의 열(가로)×행(세로)을 직접 고를 수 있어요. 모든 사진은 같은 크기로 들어가고(사진을 키우지 않음), 판 크기가 배열에 맞춰 자동으로 바뀝니다. v13.1.0: <b>계정 보호</b>: 계정 공유 등 부정 이용 확인을 위해 이용 기록에 기기 종류·브라우저와 기기 구분용 무작위 번호가 함께 기록됩니다(개인 식별 정보는 기록하지 않습니다). v13.0.0: <b>킬로그 커팅 새 인식</b>: '킬 알림' 글자와 총 아이콘을 찾아 폰·패드 화면 크기와 상관없이 인식하고, 배경 삭제 없이 킬로그 직사각형 그대로 자릅니다. 위·아래로 붙은 장식도 직사각형 안에 포함됩니다. 서버 연결이 필요 없고, 사진을 추가하면 바로 잘립니다. 보정 화면은 없애고 버튼을 줄였습니다. <b>대필판 연동</b>: 킬로그 결과의 「🔫 대필판에 넣기」로 총기칸에 바로 붙이고, 대필판의 「🎯 총기칸 킬로그」에서 위치·크기를 조절할 수 있습니다. 작업 자동복구, 되돌리기, 고화질 저장, 사진 순서 변경, 추출 검토, 공통 공유, 킬로그 오른쪽 직각 고정이 추가됐습니다. v12.5.1: 킬로그 메뉴에 예시 사진을 포함했습니다. v12.5.0: 이미지 합치기 작업 설정의 되돌리기·다시 실행·이전 작업 복원 버튼 디자인을 개선했습니다. v12.5.0: 관리자 후기 목록의 게시 상태 동기화, 「전시관 게시 / 게시 취소 / 후기 삭제」 버튼을 정리했습니다. 새 후기 작성창에는 익명 전시 가능성을 사전 안내하며, 과거 비공개 후기는 자동 공개하지 않습니다. 기존 추출·통계·사진 삭제·관리자 후기 면제는 유지됩니다.</div>
  <button id="sna-update-close" type="button" style="background:#93b6ff;color:#14223a;border:0;border-radius:8px;padding:7px 12px;font-weight:750;margin-top:5px">확인</button>
 </div>
 <script type="application/x-sniper-blocked" data-sna-original-script data-sna-script-type="">
- (()=>{const version='13.2.1';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v13.2.1: 두 장 대필판 열(가로)×행(세로) 직접 지정 · 모든 사진 같은 크기(키우지 않음) · 판 크기 자동 맞춤';}}catch(_){} })();
+ (()=>{const version='13.3.0';try{const key='sna_last_seen_version',old=localStorage.getItem(key);if(old!==version){const pop=document.getElementById('sna-update-toast');if(pop)pop.hidden=false;document.getElementById('sna-update-close')?.addEventListener('click',()=>{if(pop)pop.hidden=true;});localStorage.setItem(key,version);let n=document.getElementById('sna-version-bar');n.title='v13.3.0: 옷 추출 카드 인식 개선 · 모든 카드 같은 크기로 자르기';}}catch(_){} })();
 </script>
 
 <div id="sna-review-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sna-review-title">
